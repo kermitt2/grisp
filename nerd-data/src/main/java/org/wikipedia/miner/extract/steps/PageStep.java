@@ -139,11 +139,6 @@ public class PageStep extends Configured implements Tool {
 				dpp = new DumpPageParser(lc, si) ;
 				
 				mos = new MultipleOutputs(job);
-				
-				
-				
-				
-				
 
 			} catch (Exception e) {
 				Logger.getLogger(Step1Mapper.class).error("Could not configure mapper", e);
@@ -160,27 +155,26 @@ public class PageStep extends Configured implements Tool {
 					
 						switch (dp.getType()) {
 					
-						case article :
-							reporter.incrCounter(Counter.articleCount, 1);
-							break ;
-						case category :
-							reporter.incrCounter(Counter.categoryCount, 1);
-						
-						
-							if (Util.normaliseTitle(dp.getTitle()).equals(Util.normaliseTitle(lc.getRootCategoryName()))) {
+							case article :
+								reporter.incrCounter(Counter.articleCount, 1);
+								break ;
+							case category :
+								reporter.incrCounter(Counter.categoryCount, 1);
 							
-								reporter.incrCounter(Counter.rootCategoryCount, 1);
-								reporter.incrCounter(Counter.rootCategoryId, dp.getId()) ;
-							}
-							
-							break ;
-						case disambiguation :
-							reporter.incrCounter(Counter.disambiguationCount, 1);
-							break ;
-						case redirect :
-							reporter.incrCounter(Counter.redirectCount, 1);
-							mos.getCollector(Output.tempRedirect.name(), reporter).collect(new IntWritable(dp.getId()), new Text(dp.getTarget()));
-							break ;
+								if (Util.normaliseTitle(dp.getTitle()).equals(Util.normaliseTitle(lc.getRootCategoryName()))) {
+								
+									reporter.incrCounter(Counter.rootCategoryCount, 1);
+									reporter.incrCounter(Counter.rootCategoryId, dp.getId()) ;
+								}
+								
+								break ;
+							case disambiguation :
+								reporter.incrCounter(Counter.disambiguationCount, 1);
+								break ;
+							case redirect :
+								reporter.incrCounter(Counter.redirectCount, 1);
+								mos.getCollector(Output.tempRedirect.name(), reporter).collect(new IntWritable(dp.getId()), new Text(dp.getTarget()));
+								break ;
 						}
 					
 						if (dp.getLastEdited() != null) {	

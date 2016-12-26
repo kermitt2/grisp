@@ -75,17 +75,15 @@ public class RedirectStep extends Configured implements Tool {
 		conf.setReducerClass(Step2Reducer.class) ;
 
 		// set up input
-
 		conf.setInputFormat(TextInputFormat.class);
-		FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.page) + "/" + PageStep.Output.tempRedirect + "*"));
+		FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + 
+			DumpExtractor.getDirectoryName(ExtractionStep.page) + "/" + PageStep.Output.tempRedirect + "*"));
 
 		//set up output
-
 		conf.setOutputFormat(RedirectOutputFormat.class);
 		FileOutputFormat.setOutputPath(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.redirect)));
 
 		//set up distributed cache
-
 		DistributedCache.addCacheFile(new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.OUTPUT_SITEINFO).toUri(), conf);
 		DistributedCache.addCacheFile(new Path(conf.get(DumpExtractor.KEY_LANG_FILE)).toUri(), conf);
 
@@ -121,7 +119,7 @@ public class RedirectStep extends Configured implements Tool {
 		
 		private MultipleOutputs mos ;
 		
-		Vector<Path> pageFiles = new Vector<Path>() ;
+		//Vector<Path> pageFiles = new Vector<Path>() ;
 		
 		private PagesByTitleCache articleIdsByTitle ;
 
@@ -141,10 +139,10 @@ public class RedirectStep extends Configured implements Tool {
 						lc = new LanguageConfiguration(job.get(DumpExtractor.KEY_LANG_CODE), cf) ;
 					}
 
-					if (cf.getName().startsWith(PageStep.Output.tempPage.name())) {
+					/*if (cf.getName().startsWith(PageStep.Output.tempPage.name())) {
 						Logger.getLogger(Step2Mapper.class).info("Located cached page file " + cf.toString()) ;
 						pageFiles.add(cf) ;
-					}
+					}*/
 				}
 
 				if (si == null) 
@@ -153,12 +151,12 @@ public class RedirectStep extends Configured implements Tool {
 				if (lc == null) 
 					throw new Exception("Could not locate '" + job.get(DumpExtractor.KEY_LANG_FILE) + "' in DistributedCache") ;
 
-				if (pageFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 1") ;
+				/*if (pageFiles.isEmpty())
+					throw new Exception("Could not gather page summary files produced in step 1") ;*/
 				
 				mos = new MultipleOutputs(job);
 				
-				articleIdsByTitle = new PagesByTitleCache(articleIdsByTitleDbFile);
+				articleIdsByTitle = new PagesByTitleCache(articleIdsByTitleDbFile, job.get(DumpExtractor.KEY_LANG_CODE));
 			} catch (Exception e) {
 				Logger.getLogger(Step2Mapper.class).error("Could not configure mapper", e);
 				System.exit(1) ;
@@ -175,8 +173,7 @@ public class RedirectStep extends Configured implements Tool {
 
 				int sourceId = Integer.parseInt(line.substring(0,pos)) ;
 				String targetTitle = line.substring(pos+1) ;
-				int targetId = articleIdsByTitle.getArticleId(targetTitle) ;
-
+				int targetId = articleIdsByTitle.getPageId(targetTitle) ;
 				if (targetId == -1)
 					Logger.getLogger(Step2Mapper.class).warn("Could not identify id for redirect target '" + targetTitle + "'") ;
 				else {

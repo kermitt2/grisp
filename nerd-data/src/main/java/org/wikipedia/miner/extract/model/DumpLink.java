@@ -40,4 +40,12 @@ public class DumpLink {
 	public String getTargetTitle() {
 		return targetTitle;
 	}
+
+	public String toString() {
+		return "targetLanguage=\"" + targetLanguage + "\"" +
+			" targetNamespace=\"" + targetNamespace + "\"" +
+			" targetTitle=\"" + targetTitle + "\"" +
+			" targetSection=\"" + targetSection + "\"" +
+			" anchor=\"" + anchor + "\"";
+	}
 }

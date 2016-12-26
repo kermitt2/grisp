@@ -32,6 +32,8 @@ public class RedirectCache {
   	private String envFilePath = null;
   	private boolean isLoaded = false ;
 
+  	//private Transaction tx = null; 
+
 	/*public static RedirectCache getInstance() throws IOException {
         if (instance == null)
 			getNewInstance();
@@ -45,14 +47,14 @@ public class RedirectCache {
 		instance = new RedirectCache();
 	}*/
 
-    public RedirectCache(String envFilePath0) throws IOException {
+    public RedirectCache(String envFilePath0, String lang) throws IOException {
     	this.envFilePath = envFilePath0;
     	if (this.envFilePath != null) {
     	   	this.isLoaded = true;
     	   	Logger.getLogger(RedirectCache.class).info("Loading from existing RedirectCache DB: " + envFilePath);
     	}
     	else {
-    		File path = new File("/tmp/lmdb-temp-redirects");
+    		File path = new File("/tmp/lmdb-temp-redirects-"+lang);
     		if (!path.exists()) {
     			path.mkdir();
     			Logger.getLogger(RedirectCache.class).info("new RedirectCache DB: " + path.toString());
@@ -69,9 +71,14 @@ public class RedirectCache {
     	env.setMapSize(100 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for ~40 million redirections
     	env.open(envFilePath);
 		db = env.openDatabase();
+
+		// prepare read transaction
+		//tx = null; 
     }
 
     public void close() {
+    	/*if (tx != null)
+    		tx.close();*/
  	   	db.close();
     	env.close();
 	}
@@ -126,7 +133,7 @@ public class RedirectCache {
 		long bytesRead = 0 ;
 
 		int nbToAdd = 0;
-		Transaction tx = env.createWriteTransaction();
+		Transaction txw = env.createWriteTransaction();
 		FileSystem fs = FileSystem.get(new Configuration());
 		try {
 			for (Path redirectFile : redirectFiles) {
@@ -135,9 +142,9 @@ public class RedirectCache {
 
 				while ((line = fis.readLine()) != null) {
 					if (nbToAdd == 10000) {
-						tx.commit();
+						txw.commit();
 						nbToAdd = 0;
-						tx = env.createWriteTransaction();
+						txw = env.createWriteTransaction();
 					}
 
 					bytesRead = bytesRead + line.length() + 1 ;
@@ -150,23 +157,23 @@ public class RedirectCache {
 						int targetId = Integer.parseInt(values[1]) ;
 
 						//redirectTargetsBySource.put(sourceId, targetId) ;	
-						db.put(tx, BigInteger.valueOf(sourceId).toByteArray(), BigInteger.valueOf(targetId).toByteArray());
+						db.put(txw, BigInteger.valueOf(sourceId).toByteArray(), BigInteger.valueOf(targetId).toByteArray());
 						nbToAdd++;
 
 						if (reporter != null)
 							reporter.progress() ;
 					} catch (Exception e) {
-						Logger.getLogger(Util.class).error("Caught exception while gathering redirect from '" + line + "' in '" + redirectFile + "'", e);
+						Logger.getLogger(RedirectCache.class).error("Caught exception while gathering redirect from '" + line + "' in '" + redirectFile + "'", e);
 					}
 				}
 
 				fis.close();
 			}
 		} catch(Exception e) {
-			Logger.getLogger(Util.class).error("Caught exception while gathering page", e) ;
+			Logger.getLogger(RedirectCache.class).error("Caught exception while gathering page", e) ;
 		} finally {
-			if (tx != null)	
-				tx.close();
+			if (txw != null)	
+				txw.close();
 		}
 
 		long memAfter = r.totalMemory() ;
@@ -181,7 +188,25 @@ public class RedirectCache {
 
 		//return redirectTargetsBySource.get(sourceId) ;
 		//return db.get(sourceId) ;
-		byte[] res = db.get(BigInteger.valueOf(sourceId).toByteArray());
+		//Transaction tx = null; 
+		byte[] res = null;
+		try (Transaction tx = env.createReadTransaction()) {
+			try {
+				res = db.get(tx, BigInteger.valueOf(sourceId).toByteArray());
+			} catch(LMDBException e) {
+				Logger.getLogger(RedirectCache.class).error("Caught LMDB exception while getTargetId: " + sourceId, e) ;
+			}
+		} /*catch(Exception e) {
+			Logger.getLogger(RedirectCache.class).error("Caught exception while getTargetId: " + sourceId, e) ;
+			if (tx != null)
+				tx.close();
+			tx = null;
+		} finally {
+			if (tx != null)
+				tx.reset();	
+				//tx.close();
+		}*/
+
 		if (res == null)
 			return -1;
 		else 
@@ -189,14 +214,9 @@ public class RedirectCache {
 	}
 
 	public int getTargetId(String targetTitle, PagesByTitleCache articlesById) throws IOException {
-		//PagesByTitleCache articlesById = PagesByTitleCache.getInstance();
-		/*if (!articlesById.isLoadedArticles()) {
-			articlesById.loadArticles(pageFiles);
-		}*/
 
 		//Integer currId = PagesByTitleCache.getArticlesCache().getPageId(targetTitle) ;
-		int currId = articlesById.getArticleId(targetTitle) ;
-
+		int currId = articlesById.getPageId(targetTitle);
 		if (currId == -1)
 			return -1 ;
 

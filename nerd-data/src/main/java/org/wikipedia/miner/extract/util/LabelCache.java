@@ -34,6 +34,8 @@ public class LabelCache {
   	private String envFilePath = null;
   	private boolean isLoaded = false ;
 
+  	//private Transaction tx = null;
+
 	/*public static LabelCache getInstance() throws IOException {
         if (instance == null)
 			getNewInstance();
@@ -47,14 +49,14 @@ public class LabelCache {
 		instance = new LabelCache();
 	}*/
 
-    public LabelCache(String envFilePath0) throws IOException {
+    public LabelCache(String envFilePath0, String lang) throws IOException {
     	this.envFilePath = envFilePath0;
     	if (envFilePath != null) {
     	   	this.isLoaded = true;
     	   	Logger.getLogger(LabelCache.class).info("Loading from existing LabelCache DB: " + envFilePath);
     	}
     	else {
-    		File path = new File("/tmp/lmdb-temp-labels");
+    		File path = new File("/tmp/lmdb-temp-labels-"+lang);
     		if (!path.exists()) {
     			path.mkdir();
     			Logger.getLogger(LabelCache.class).info("new LabelCache DB: " + path.toString());
@@ -62,7 +64,6 @@ public class LabelCache {
     			this.isLoaded = true;
     			Logger.getLogger(LabelCache.class).info("Existing LabelCache DB found: DB will not be reloaded from label files");
     		}
-    	   	//	java.nio.file.Path path = java.nio.file.Files.createDirectory(java.nio.file.FileSystems.getDefault().getPath("/tmp/lmdb-temp-labels"));
     	   	envFilePath = path.toString();
     	}
 
@@ -71,9 +72,13 @@ public class LabelCache {
     	env.setMapSize(100 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for ~8 million labels
     	env.open(envFilePath);
 		db = env.openDatabase();
+
+		//tx = null;
     }
 
     public void close() {
+    	/*if (tx != null)
+    		tx.close();*/
  	   	db.close();
     	env.close();
 	}
@@ -105,12 +110,34 @@ public class LabelCache {
 	}
 
 	public boolean isKnown(String label) {
-		if (db.get(bytes(label)) != null)
+		/*if (tx == null)
+			tx = env.createReadTransaction(); 
+		else
+			tx.renew();*/
+
+		byte[] res = null;
+		try (Transaction tx = env.createReadTransaction()) {
+			try {
+				res = db.get(tx, bytes(label));
+			} catch(LMDBException e) {
+				Logger.getLogger(LabelCache.class).error("Caught exception while isKnown label: " + label, e);
+			}
+		} 
+		/*catch(Exception e) {
+			Logger.getLogger(LabelCache.class).error("Caught exception while isKnown label: " + label, e) ;
+			if (tx != null)	
+				tx.close();
+			tx = null;
+		} finally {
+			if (tx != null)
+				tx.reset();	
+				//tx.close();
+		}*/
+
+		if (res != null)
 			return true;
 		else 
 			return false;
-
-		//return labelVocabulary.contains(label) ;
 	}
 
 	private long getBytes(List<Path> paths) {
@@ -136,7 +163,7 @@ public class LabelCache {
 		long bytesRead = 0 ;
 
 		int nbToAdd = 0;
-		Transaction tx = env.createWriteTransaction();
+		Transaction txw = env.createWriteTransaction();
 		FileSystem fs = FileSystem.get(new Configuration());
 		try {
 			for (Path path:paths) {
@@ -145,9 +172,9 @@ public class LabelCache {
 
 				while ((line = fis.readLine()) != null) {
 					if (nbToAdd == 10000) {
-						tx.commit();
+						txw.commit();
 						nbToAdd = 0;
-						tx = env.createWriteTransaction();
+						txw = env.createWriteTransaction();
 					}
 
 					bytesRead = bytesRead + line.length() + 1 ;
@@ -156,7 +183,7 @@ public class LabelCache {
 						CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream(line.getBytes("UTF8"))) ;
 						String labelText = cri.readString("labelText");
 						//labelVocabulary.add(labelText);
-						db.put(tx, bytes(labelText), bytes("1"));
+						db.put(txw, bytes(labelText), bytes("1"));
 						nbToAdd++;
 					} catch (Exception e) {
 						Logger.getLogger(getClass()).error("Caught exception while gathering label from '" + line + "' in '" + path + "'", e);
@@ -167,12 +194,12 @@ public class LabelCache {
 				}
 				fis.close();
 			}
-			tx.commit();
+			txw.commit();
 		} catch(Exception e) {
 			Logger.getLogger(Util.class).error("Caught exception while gathering page", e) ;
 		} finally {
-			if (tx != null)
-				tx.close();
+			if (txw != null)
+				txw.close();
 		}
 
 		long memAfter = r.totalMemory() ;

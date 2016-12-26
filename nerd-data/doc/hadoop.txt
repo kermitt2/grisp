@@ -1,3 +1,20 @@
+Expected produced files: there must be 13 generated csv files
+
+articleParents.csv   label.csv       pageLinkOut.csv              stats.csv
+categoryParents.csv  page.csv        redirectSourcesByTarget.csv  
+childArticles.csv    pageLabel.csv   redirectTargetsBySource.csv
+childCategories.csv  pageLinkIn.csv  sentenceSplits.csv
+
+Intel Core i7-4790K CPU 4.00GHz Haswell, 16GB memory, with 4 cores, 8 threads, SSD, pseudo distributed mode
+
+French and German Wikipedia XML dump: ~2 h 30 mn
+English Wikipedia XML dump: ~7h
+
+07:59:40
+
+!! Note !!: right now, works only in pseudo distributed mode (LMDB cache DB are located under local /tmp/) - for cluster level, we need to locate the LMDB databases for cache on the hdfs and uses distributed haddop caches to access to the cache dbs. 
+
+
 Hadoop 2.* config with YARN
 
 // etc/hadoop/hadoop-env.sh 
@@ -144,13 +161,3 @@ launching hadoop process:
 // getting the csv files
  ~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/de/
 
-
-Expected produced files: there must be 14 generated csv files
-
-articleParents.csv   label.csv       pageLinkOut.csv              stats.csv
-categoryParents.csv  page.csv        redirectSourcesByTarget.csv  translations.csv
-childArticles.csv    pageLabel.csv   redirectTargetsBySource.csv
-childCategories.csv  pageLinkIn.csv  sentenceSplits.csv
-
-French and German Wikipedia XML dump: ~4 hours - Intel Core i7-4790K CPU 4.00GHz Haswell, 16GB memory, with 4 cores, 8 threads, SSD, pseudo distributed mode
-English Wikipedia XML dump: 

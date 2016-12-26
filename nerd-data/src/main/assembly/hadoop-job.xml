@@ -10,6 +10,15 @@
     <format>jar</format>
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>${project.basedir}</directory>
+      <includes>
+        <include>lib/com.scienceminer.nerd-0.0.1.jar</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
+  </fileSets>
   <dependencySets>
     <dependencySet>
       <unpack>false</unpack>

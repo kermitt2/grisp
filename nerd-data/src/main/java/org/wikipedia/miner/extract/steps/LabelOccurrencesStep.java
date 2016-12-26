@@ -109,7 +109,7 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 
 		private DumpPageParser pageParser ;
 		
-		private Vector<Path> labelFiles = new Vector<Path>() ;
+		//private Vector<Path> labelFiles = new Vector<Path>() ;
 		private LabelCache labelCache ;
 
 		private MarkupStripper stripper = new MarkupStripper() ;
@@ -131,10 +131,10 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 						lc = new LanguageConfiguration(job.get(DumpExtractor.KEY_LANG_CODE), cf) ;
 					}
 					
-					if (cf.getName().startsWith(LabelSensesStep.Output.tempLabel.name())) {
+					/*if (cf.getName().startsWith(LabelSensesStep.Output.tempLabel.name())) {
 						Logger.getLogger(LabelOccurrencesMapper.class).info("Located cached label file " + cf.toString()) ;
 						labelFiles.add(cf) ;
-					}
+					}*/
 				}
 				
 				if (si == null) 
@@ -143,15 +143,15 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 				if (lc == null) 
 					throw new Exception("Could not locate '" + job.get(DumpExtractor.KEY_LANG_FILE) + "' in DistributedCache") ;
 
-				if (labelFiles.isEmpty())
-					throw new Exception("Could not gather label files produced in step 3") ;
+				/*if (labelFiles.isEmpty())
+					throw new Exception("Could not gather label files produced in step 3") ;*/
 
 				pageParser = new DumpPageParser(lc, si) ;
 				
 				/*labelCache = LabelCache.getInstance();
 				if (!labelCache.isLoaded()) 
 					labelCache.load(labelFiles, null) ;*/
-				labelCache = new LabelCache(labelDbFile);
+				labelCache = new LabelCache(labelDbFile, job.get(DumpExtractor.KEY_LANG_CODE));
 			} catch (Exception e) {
 				Logger.getLogger(LabelOccurrencesMapper.class).error("Could not configure mapper", e);
 				System.exit(1) ;

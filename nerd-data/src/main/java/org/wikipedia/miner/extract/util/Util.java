@@ -10,6 +10,9 @@ public class Util {
 
 	public static String normaliseTitle(String title) {
 
+		if ( (title == null) || (title.trim().length() == 0) )
+			return title;
+
 		StringBuffer s = new StringBuffer() ;
 
 		s.append(Character.toUpperCase(title.charAt(0))) ;

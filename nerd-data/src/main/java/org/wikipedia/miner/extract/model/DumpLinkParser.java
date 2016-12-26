@@ -30,7 +30,6 @@ public class DumpLinkParser {
 		tmp.deleteCharAt(tmp.length()-1) ;
 		namespacePattern = Pattern.compile("(" + tmp + ")\\:(.*)") ;
 		
-		
 		mainPattern = Pattern.compile("([^#|]+)(\\#([^|]+))?(\\|(.+))?") ;
 	}
 	

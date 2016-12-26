@@ -126,6 +126,7 @@ public class DumpExtractor {
 		conf.set(KEY_LANG_CODE, args[2]) ;
 		conf.set(KEY_SENTENCE_MODEL, args[3]) ;
 		conf.set(KEY_OUTPUT_DIR, args[4]) ;
+		// final dir is args[5]
 
 		//force one reducer. These don't take very long, and multiple reducers would make finalise file functions more complicated.  
 		
@@ -146,8 +147,6 @@ public class DumpExtractor {
 		return conf ;
 	}
 
-
-
 	private FileSystem getFileSystem(Path path) throws IOException {
 		return path.getFileSystem(conf) ;
 	}
@@ -162,12 +161,6 @@ public class DumpExtractor {
 		FileSystem fs = path.getFileSystem(conf);
 		return fs.getFileStatus(path) ;
 	}
-	
-	
-	
-	
-	
-
 
 	private void configure() throws Exception {
 
@@ -196,7 +189,6 @@ public class DumpExtractor {
 
 		//check output directory
 		workingDir = new Path(args[4]) ;
-		
 		
 		//TODO: this should be dependent on an "overwrite" flag
 		//if (getFileSystem(workingDir).exists(workingDir))
@@ -247,7 +239,6 @@ public class DumpExtractor {
 	}
 
 	private int run() throws Exception {
-
 		FileSystem fs = getFileSystem(workingDir) ;
 
 		Logger.getLogger(DumpExtractor.class).info("Extracting site info") ;
@@ -297,7 +288,7 @@ public class DumpExtractor {
 		if (lastCompletedStep.compareTo(ExtractionStep.redirect) < 0) {
 			if (articleIdsByTitleDbFile == null) {
 				// create the page title cache for the next step mappers
-				PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null);
+				PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null, lang);
 
 				Vector<Path> pageFiles = new Vector<Path>() ;
 				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
@@ -345,7 +336,7 @@ public class DumpExtractor {
 		if (lastCompletedStep.compareTo(ExtractionStep.labelSense) < 0) {
 			if (articleIdsByTitleDbFile == null) {
 				// create the page title cache for the next step mappers
-				PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null);
+				PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null, lang);
 
 				Vector<Path> pageFiles = new Vector<Path>() ;
 				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
@@ -368,7 +359,7 @@ public class DumpExtractor {
 
 			if (redirectDbFile == null) {
 				// create the page title cache for the next step mappers
-				RedirectCache redirectsCache = new RedirectCache(null);
+				RedirectCache redirectsCache = new RedirectCache(null, lang);
 
 				Vector<Path> pageFiles = new Vector<Path>() ;
 				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
@@ -442,7 +433,7 @@ public class DumpExtractor {
 		if (lastCompletedStep.compareTo(ExtractionStep.labelOccurrence) < 0) {
 			if (labelDbFile == null) {
 				// create the page title cache for the next step mappers
-				LabelCache labelCache = new LabelCache(null);
+				LabelCache labelCache = new LabelCache(null, lang);
 
 				Vector<Path> labelFiles = new Vector<Path>() ;
 				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);

@@ -8,13 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -108,23 +102,19 @@ public class LabelSensesStep extends Configured implements Tool {
 		conf.setReducerClass(LabelSensesReducer.class) ;
 
 		// set up input
-
 		conf.setInputFormat(XmlInputFormat.class);
 		conf.set(XmlInputFormat.START_TAG_KEY, "<page>") ;
 		conf.set(XmlInputFormat.END_TAG_KEY, "</page>") ;
 		FileInputFormat.setInputPaths(conf, conf.get(DumpExtractor.KEY_INPUT_FILE));
 
 		//set up output
-
 		conf.setOutputFormat(LabelOutputFormat.class);
 		FileOutputFormat.setOutputPath(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) +"/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense)));
 
 		//set up distributed cache
-
 		DistributedCache.addCacheFile(new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.OUTPUT_SITEINFO).toUri(), conf);
 		DistributedCache.addCacheFile(new Path(conf.get(DumpExtractor.KEY_LANG_FILE)).toUri(), conf);
 		DistributedCache.addCacheFile(new Path(conf.get(DumpExtractor.KEY_SENTENCE_MODEL)).toUri(), conf);
-
 
 		//cache page files created in 1st step, so we can look up pages by title
 		Path pageStepPath = new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.page)) ;
@@ -141,7 +131,7 @@ public class LabelSensesStep extends Configured implements Tool {
 		for (FileStatus fs:FileSystem.get(conf).listStatus(redirectStepPath)) {
 
 			if (fs.getPath().getName().startsWith(RedirectStep.Output.redirectTargetsBySource.name())) {
-				Logger.getLogger(LabelSensesStep.class).info("Cached redirect file " + fs.getPath()) ;
+				//Logger.getLogger(LabelSensesStep.class).info("Cached redirect file " + fs.getPath()) ;
 				DistributedCache.addCacheFile(fs.getPath().toUri(), conf);
 			}
 		}
@@ -164,8 +154,6 @@ public class LabelSensesStep extends Configured implements Tool {
 		MultipleOutputs.addNamedOutput(conf, Output.fatalErrors.name(), TextOutputFormat.class,
 				IntWritable.class, Text.class);
 
-
-
 		conf.set("mapred.textoutputformat.separator", ",");
 
 		JobClient.runJob(conf);
@@ -186,10 +174,10 @@ public class LabelSensesStep extends Configured implements Tool {
 		private DumpPageParser pageParser ;
 		private DumpLinkParser linkParser ;
 
-		Vector<Path> pageFiles = new Vector<Path>() ;
+		//Vector<Path> pageFiles = new Vector<Path>() ;
 		private PagesByTitleCache pagesByTitle ;
 		
-		Vector<Path> redirectFiles = new Vector<Path>() ;
+		//Vector<Path> redirectFiles = new Vector<Path>() ;
 		private RedirectCache redirects = null;
 
 		private MarkupStripper stripper = new MarkupStripper() ;
@@ -242,7 +230,7 @@ public class LabelSensesStep extends Configured implements Tool {
 						lc = new LanguageConfiguration(job.get(DumpExtractor.KEY_LANG_CODE), p) ;
 					}
 
-					if (p.getName().startsWith(PageStep.Output.tempPage.name())) {
+					/*if (p.getName().startsWith(PageStep.Output.tempPage.name())) {
 						Logger.getLogger(LabelSensesMapper.class).info("Located cached page file " + p.toString()) ;
 						pageFiles.add(p) ;
 					}
@@ -250,7 +238,7 @@ public class LabelSensesStep extends Configured implements Tool {
 					if (p.getName().startsWith(RedirectStep.Output.redirectTargetsBySource.name())) {
 						Logger.getLogger(LabelSensesMapper.class).info("Located cached redirect file " + p.toString()) ;
 						redirectFiles.add(p) ;
-					}
+					}*/
 				}
 
 				//for (Path p:DistributedCache.getLocalCacheArchives(job)){
@@ -267,11 +255,11 @@ public class LabelSensesStep extends Configured implements Tool {
 					throw new Exception("Could not load sentence model '" + job.get(DumpExtractor.KEY_SENTENCE_MODEL) + "' from DistributedCache") ;
 
 
-				if (pageFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 1") ;
+				//if (pageFiles.isEmpty())
+				//	throw new Exception("Could not gather page summary files produced in step 1") ;
 
-				if (redirectFiles.isEmpty())
-					throw new Exception("Could not gather redirect summary files produced in step 2") ;
+				//if (redirectFiles.isEmpty())
+				//	throw new Exception("Could not gather redirect summary files produced in step 2") ;
 
 				pageParser = new DumpPageParser(lc, si) ;
 				linkParser = new DumpLinkParser(lc, si) ;
@@ -286,11 +274,11 @@ public class LabelSensesStep extends Configured implements Tool {
 
 				//if (!categoriesByTitle.isLoadedCategories())
 				//	categoriesByTitle.loadCategories(pageFiles, null);
-				pagesByTitle = new PagesByTitleCache(articleIdsByTitleDbFile);
+				pagesByTitle = new PagesByTitleCache(articleIdsByTitleDbFile, job.get(DumpExtractor.KEY_LANG_CODE));
 
 				//if(!redirects.isLoaded()) 
 				//	redirects.load(redirectFiles, null);
-				redirects = new RedirectCache(redirectDbFile);	
+				redirects = new RedirectCache(redirectDbFile, job.get(DumpExtractor.KEY_LANG_CODE));	
 
 			} catch (Exception e) {
 				Logger.getLogger(LabelSensesMapper.class).error("Could not configure mapper", e);
@@ -363,9 +351,9 @@ public class LabelSensesStep extends Configured implements Tool {
 					case redirect :
 
 						// add association from this redirect title to target.
-						Integer targetId = redirects.getTargetId(page.getTarget(), pagesByTitle) ;
+						int targetId = redirects.getTargetId(page.getTarget(), pagesByTitle) ;
 						
-						if (targetId != null) {
+						if (targetId != -1) {
 							label = new ExLabel(0,0,0,0,new TreeMap<Integer, ExSenseForLabel>()) ;
 							label.getSensesById().put(targetId, new ExSenseForLabel(0, 0, false, true)) ;
 
@@ -386,8 +374,8 @@ public class LabelSensesStep extends Configured implements Tool {
 					}
 
 					// now emit collected translations
-					if (!translationsByLangCode.isEmpty())
-						mos.getCollector(Output.translations.name(), reporter).collect(new IntWritable(page.getId()), new DbTranslations(translationsByLangCode)) ;
+					//if (!translationsByLangCode.isEmpty())
+					//	mos.getCollector(Output.translations.name(), reporter).collect(new IntWritable(page.getId()), new DbTranslations(translationsByLangCode)) ;
 				}
 
 			} catch (Exception e) {
@@ -436,11 +424,10 @@ public class LabelSensesStep extends Configured implements Tool {
 				lastPos = pos ;
 			}
 
-
 			// collect sentence splits
 			if (sentenceSplits.size() > 0) {
 				ArrayList<Integer> ss = new ArrayList<Integer>() ;
-				for (int s:sentenceSplits)
+				for (int s : sentenceSplits)
 					ss.add(s) ;
 
 				mos.getCollector(Output.sentenceSplits.name(), reporter).collect(new IntWritable(pageId), new DbSentenceSplitList(ss));
@@ -468,8 +455,8 @@ public class LabelSensesStep extends Configured implements Tool {
 
 				if (link != null && link.getTargetNamespace()==SiteInfo.MAIN_KEY) {
 
-					Integer targetId = redirects.getTargetId(link.getTargetTitle(), pagesByTitle) ; 
-					if (targetId != null) {
+					int targetId = redirects.getTargetId(link.getTargetTitle(), pagesByTitle) ; 
+					if (targetId != -1) {
 						label = labels.get(link.getAnchor()) ;
 
 						if (label == null) {
@@ -492,8 +479,6 @@ public class LabelSensesStep extends Configured implements Tool {
 						}
 
 						labels.put(link.getAnchor(), label) ;
-
-
 
 						ArrayList<Integer> locations = outLinksAndLocations.get(targetId) ; 
 
@@ -532,15 +517,14 @@ public class LabelSensesStep extends Configured implements Tool {
 				if (link == null)
 					continue ;
 
-				if (link.getTargetLanguage() != null) {
+				/*if (link.getTargetLanguage() != null) {
 					translationsByLangCode.put(link.getTargetLanguage(), link.getAnchor()) ;
 					continue ;
-				}
+				}*/
 
 				if (link.getTargetNamespace() == SiteInfo.CATEGORY_KEY)  {
 					//Integer parentId = categoriesByTitle.getPageId(link.getTargetTitle()) ;
-					int parentId = pagesByTitle.getCategoryId(link.getTargetTitle()) ;
-
+					int parentId = pagesByTitle.getPageId(link.getTargetTitle()) ;
 					if (parentId != -1) {
 						if (page.getNamespace() == SiteInfo.CATEGORY_KEY)
 							mos.getCollector(Output.tempCategoryParent.name(), reporter).collect(new IntWritable(page.getId()), new IntWritable(parentId));
@@ -556,7 +540,8 @@ public class LabelSensesStep extends Configured implements Tool {
 		@Override
 		public void close() throws IOException {
 			pagesByTitle.close();
-
+			redirects.close();
+			
 			super.close();
 			mos.close();
 		}

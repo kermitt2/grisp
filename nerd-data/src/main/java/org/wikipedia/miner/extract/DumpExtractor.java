@@ -1,6 +1,5 @@
 package org.wikipedia.miner.extract;
 
-
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TIntShortHashMap;

@@ -11,12 +11,8 @@ import org.apache.hadoop.conf.*;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.log4j.Logger;
-//import org.mapdb.DB;
-//import org.mapdb.DBMaker;
-//import org.mapdb.HTreeMap;
-import org.wikipedia.miner.util.ProgressTracker;
 
-//import gnu.trove.set.hash.THashSet;
+import org.wikipedia.miner.util.ProgressTracker;
 
 import org.fusesource.lmdbjni.*;
 import static org.fusesource.lmdbjni.Constants.*;
@@ -183,8 +179,10 @@ public class LabelCache {
 						CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream(line.getBytes("UTF8"))) ;
 						String labelText = cri.readString("labelText");
 						//labelVocabulary.add(labelText);
-						db.put(txw, bytes(labelText), bytes("1"));
-						nbToAdd++;
+						if (labelText.length() < 500) {
+							db.put(txw, bytes(labelText), bytes("1"));
+							nbToAdd++;
+						}
 					} catch (Exception e) {
 						Logger.getLogger(getClass()).error("Caught exception while gathering label from '" + line + "' in '" + path + "'", e);
 					}

@@ -9,30 +9,24 @@ import org.apache.hadoop.fs.Path;
 public class Util {
 
 	public static String normaliseTitle(String title) {
-
 		if ( (title == null) || (title.trim().length() == 0) )
 			return title;
 
-		StringBuffer s = new StringBuffer() ;
-
-		s.append(Character.toUpperCase(title.charAt(0))) ;
-		
-		s.append(title.substring(1).replace('_', ' ')) ;
-		
-		String newTitle = s.toString() ;
-		
-		int index = newTitle.indexOf('#') ;
+		StringBuffer s = new StringBuffer();
+		s.append(Character.toUpperCase(title.charAt(0)));
+		s.append(title.substring(1).replace('_', ' '));
+	
+		String newTitle = s.toString();
+		int index = newTitle.indexOf('#');
 		
 		if (index>0)
-			newTitle = newTitle.substring(0,index) ;
+			newTitle = newTitle.substring(0,index);
 
-		return newTitle.trim() ;
+		return newTitle.trim();
 	}
 
 	public static long getFileSize(Path path) {
-
-		File file = new File(path.toString()) ;
-
-		return file.length() ;
+		File file = new File(path.toString());
+		return file.length();
 	}
 }

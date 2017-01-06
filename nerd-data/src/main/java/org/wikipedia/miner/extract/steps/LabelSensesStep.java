@@ -1,13 +1,6 @@
 package org.wikipedia.miner.extract.steps;
 
-
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,46 +11,22 @@ import opennlp.tools.util.Span;
 
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.RecordWriter;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.TextOutputFormat;
+import org.apache.hadoop.fs.*;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.MultipleOutputs;
 import org.apache.hadoop.record.CsvRecordOutput;
 import org.apache.hadoop.record.Record;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
-import org.wikipedia.miner.db.struct.DbLinkLocation;
-import org.wikipedia.miner.db.struct.DbSentenceSplitList;
-import org.wikipedia.miner.db.struct.DbTranslations;
+import org.wikipedia.miner.db.struct.*;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
-import org.wikipedia.miner.extract.model.DumpLink;
-import org.wikipedia.miner.extract.model.DumpLinkParser;
-import org.wikipedia.miner.extract.model.DumpPage;
-import org.wikipedia.miner.extract.model.DumpPageParser;
+import org.wikipedia.miner.extract.model.*;
 import org.wikipedia.miner.extract.model.struct.ExLabel;
 import org.wikipedia.miner.extract.model.struct.ExSenseForLabel;
-import org.wikipedia.miner.extract.util.LanguageConfiguration;
-import org.wikipedia.miner.extract.util.PagesByTitleCache;
-import org.wikipedia.miner.extract.util.RedirectCache;
-import org.wikipedia.miner.extract.util.SiteInfo;
-import org.wikipedia.miner.extract.util.XmlInputFormat;
+import org.wikipedia.miner.extract.util.*;
 import org.wikipedia.miner.util.MarkupStripper;
 
 
@@ -77,7 +46,7 @@ import org.wikipedia.miner.util.MarkupStripper;
  */
 public class LabelSensesStep extends Configured implements Tool {
 
-	public enum Output {tempLabel, tempPageLink, tempCategoryParent, tempArticleParent, sentenceSplits, translations, fatalErrors} ;
+	public enum Output {tempLabel, tempPageLink, tempCategoryParent, tempArticleParent, sentenceSplits, translations, fatalErrors};
 
 	private static String articleIdsByTitleDbFile = null;
 	private static String redirectDbFile = null;
@@ -190,8 +159,6 @@ public class LabelSensesStep extends Configured implements Tool {
 		@Override
 		public void configure(JobConf job) {
 			try {
-				//redirects = RedirectCache.getInstance();
-
 				for (Path p:DistributedCache.getLocalCacheFiles(job)) {
 					Logger.getLogger(LabelSensesMapper.class).info("Located cached file " + p.toString()) ;
 
@@ -241,10 +208,6 @@ public class LabelSensesStep extends Configured implements Tool {
 					}*/
 				}
 
-				//for (Path p:DistributedCache.getLocalCacheArchives(job)){
-				//	
-				//}
-
 				if (si == null) 
 					throw new Exception("Could not locate '" + DumpExtractor.OUTPUT_SITEINFO + "' in DistributedCache") ;
 
@@ -265,7 +228,6 @@ public class LabelSensesStep extends Configured implements Tool {
 				linkParser = new DumpLinkParser(lc, si) ;
 
 				mos = new MultipleOutputs(job);
-				
 				
 				//articlesByTitle = PagesByTitleCache.getArticlesCache() ;
 				//categoriesByTitle = PagesByTitleCache.getCategoriesCache() ;
@@ -524,7 +486,7 @@ public class LabelSensesStep extends Configured implements Tool {
 
 				if (link.getTargetNamespace() == SiteInfo.CATEGORY_KEY)  {
 					//Integer parentId = categoriesByTitle.getPageId(link.getTargetTitle()) ;
-					int parentId = pagesByTitle.getPageId(link.getTargetTitle()) ;
+					int parentId = pagesByTitle.getCategoryId(link.getTargetTitle()) ;
 					if (parentId != -1) {
 						if (page.getNamespace() == SiteInfo.CATEGORY_KEY)
 							mos.getCollector(Output.tempCategoryParent.name(), reporter).collect(new IntWritable(page.getId()), new IntWritable(parentId));

@@ -114,51 +114,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			
-			<!--plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
-				<configuration>
-					<webResources>
-						<resource>
-							<directory>src/main/webapp/WEB-INF</directory>
-							<targetPath>WEB-INF</targetPath>  
-						</resource>  
-						<resource>  
-							<directory>doc</directory>   
-						    <targetPath>doc</targetPath>   
-						</resource> 
-						<resource>
-							<directory>lib</directory>   
-						    <targetPath>WEB-INF/lib</targetPath>   
-						</resource>   
-					</webResources>     
-				</configuration>
-			</plugin-->
-			<!--plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>		
-				<configuration>
-					<jvmArgs>-Xms8g -Xmx13g -Dfile.encoding=UTF-8</jvmArgs>
-					<contextPath>/</contextPath> 
-					<scanIntervalSeconds>10</scanIntervalSeconds>
-					<connectors>
-					       <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-					          <port>8060</port>
-					          <maxIdleTime>60000</maxIdleTime>
-							  <requestHeaderSize>65536</requestHeaderSize>
-							  <requestBufferSize>2097152</requestBufferSize>
-					       </connector>
-					</connectors> 
-				  	<resourceBases>
-					    <resourceBase>src/main/webapp</resourceBase>
-						<resourceBase>doc</resourceBase>
-						<resourceBase>lib</resourceBase>    
-			        </resourceBases>
-					<jettyConfig>target/classes/jetty.xml</jettyConfig>
-				</configuration>
-			</plugin-->
+
 
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -173,9 +129,6 @@
                             <mainClass>org.wikipedia.miner.extract.DumpExtractor</mainClass>
                         </manifest>
                     </archive>
-                    <!--descriptorRefs>
-                    	<descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs-->
                 </configuration>
                 <executions>
                     <execution>
@@ -209,6 +162,107 @@
 		</plugins>	
 	</build>
 	
+	<profiles>
+		<profile>
+		  <!-- mvn compile exec:exec -PbuildTranslationEn -->	
+		  <id>buildTranslationEn</id>
+		  <activation><property><name>buildTranslationEn</name></property></activation>
+		  <build>
+			<plugins>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>exec-maven-plugin</artifactId>
+				    <configuration>
+				      <executable>java</executable>
+				      <arguments>
+						<argument>-Xms2g</argument>
+		            	<argument>-Xmx4g</argument>
+				        <argument>-classpath</argument><classpath />
+				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
+				        <argument>/mnt/data/wikipedia/latest/enwiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/en/translations.csv</argument>
+				      </arguments>
+				    </configuration>
+		    	</plugin>
+		    </plugins>
+		  </build>
+		</profile>
+		<profile>
+		  <!-- mvn compile exec:exec -PbuildTranslationFr -->	
+		  <id>buildTranslationFr</id>
+		  <activation><property><name>buildTranslationFr</name></property></activation>
+		  <build>
+			<plugins>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>exec-maven-plugin</artifactId>
+				    <configuration>
+				      <executable>java</executable>
+				      <arguments>
+						<argument>-Xms2g</argument>
+		            	<argument>-Xmx4g</argument>
+				        <argument>-classpath</argument><classpath />
+				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
+				        <argument>/mnt/data/wikipedia/latest/frwiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/fr/translations.csv</argument>
+				      </arguments>
+				    </configuration>
+		    	</plugin>
+		    </plugins>
+		  </build>
+		</profile>
+		<profile>
+		  <!-- mvn compile exec:exec -PbuildTranslationDe -->	
+		  <id>buildTranslationDe</id>
+		  <activation><property><name>buildTranslationDe</name></property></activation>
+		  <build>
+			<plugins>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>exec-maven-plugin</artifactId>
+				    <configuration>
+				      <executable>java</executable>
+				      <arguments>
+						<argument>-Xms2g</argument>
+		            	<argument>-Xmx4g</argument>
+				        <argument>-classpath</argument><classpath />
+				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
+				        <argument>/mnt/data/wikipedia/latest/dewiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/de/translations.csv</argument>
+				      </arguments>
+				    </configuration>
+		    	</plugin>
+		    </plugins>
+		  </build>
+		</profile>
+		<profile>
+		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PbuildInfoboxEn -->	
+		  <id>buildInfoboxEn</id>
+		  <activation><property><name>buildInfoboxEn</name></property></activation>
+		  <build>
+			<plugins>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>exec-maven-plugin</artifactId>
+				    <configuration>
+				      <executable>java</executable>
+				      <arguments>
+						<argument>-Xms2g</argument>
+		            	<argument>-Xmx4g</argument>
+				        <argument>-classpath</argument><classpath />
+				        <argument>com.scienceminer.grisp.nerd.data.ProcessInfoBoxes</argument>
+				        <argument>/mnt/data/wikipedia/dbpedia/infobox_properties_en.tql</argument>
+				        <argument>/mnt/data/wikipedia/latest/en/infoboxes.csv</argument>
+				        <argument>/mnt/data/wikipedia/latest/en/page.csv</argument>
+				        <argument>en</argument>
+				      </arguments>
+				    </configuration>
+		    	</plugin>
+		    </plugins>
+		  </build>
+		</profile>
+	</profiles>
+
 	<repositories>
 		<repository>
 			<id>3rd-party-local-repo</id>
@@ -299,13 +353,11 @@
 			<version>0.8</version>
 		</dependency>
 
-		<dependency>
+		<!--dependency>
 			<groupId>com.sleepycat</groupId>
 			<artifactId>je</artifactId>
 			<version>6.4.25</version>
-			<!--scope>system</scope>
-		    <systemPath>${project.basedir}/lib/je-6.4.25.jar</systemPath-->
-		</dependency>
+		</dependency-->
 
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
@@ -330,12 +382,6 @@
 			<version>1.5.3</version>
 		</dependency>
 
-		<dependency>
-			<groupId>weka.wrapper</groupId>
-			<artifactId>weka-wrapper</artifactId>
-			<version>1.0</version>
-		</dependency>
-		
         <dependency>
 			<groupId>net.arnx</groupId>
 			<artifactId>jsonic</artifactId>
@@ -348,12 +394,12 @@
             <version>3.0.3</version>
         </dependency>
 
-		<dependency>
+		<!--dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-core</artifactId>
             <version>1.2.0</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.apache.avro</groupId>

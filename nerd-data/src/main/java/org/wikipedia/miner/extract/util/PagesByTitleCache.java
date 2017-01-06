@@ -10,8 +10,6 @@ import org.apache.hadoop.conf.*;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.log4j.Logger;
-//import org.mapdb.DB;
-//import org.mapdb.DBMaker;
 import org.wikipedia.miner.db.struct.DbPage;
 import org.wikipedia.miner.model.Page.PageType;
 import org.wikipedia.miner.util.ProgressTracker;
@@ -24,31 +22,15 @@ import static org.fusesource.lmdbjni.Constants.*;
 import java.math.BigInteger;
 
 public class PagesByTitleCache {
-	//private static volatile PagesByTitleCache instance;
-
 	private Env env = null;
 	private String envFilePath = null;
-  	private Database dbPages = null;
+  	private Database dbArticles = null;
+  	private Database dbCategories = null;
 
   	private List<PageType> acceptablePageTypesArticles = new ArrayList<PageType>() ;
 	private List<PageType> acceptablePageTypesCategories = new ArrayList<PageType>() ;
 
 	private boolean isLoaded = false;
-	
-	//private Transaction tx = null;
-
-	/*public static PagesByTitleCache getInstance() throws IOException {
-        if (instance == null)
-			getNewInstance();
-        return instance;
-    }*/
-
-    /**
-     * Creates a new instance.
-     */
-	/*private static synchronized void getNewInstance() throws IOException {
-		instance = new PagesByTitleCache();
-	}*/
 
     public PagesByTitleCache(String envFilePath0, String lang) throws IOException {
     	envFilePath = envFilePath0;
@@ -70,10 +52,11 @@ public class PagesByTitleCache {
     	   	envFilePath = path.toString();
     	}
     	env = new Env();
+    	env.setMaxDbs(2);
     	env.setMapSize(100 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for ~32 million titles
     	env.open(envFilePath);
-		dbPages = env.openDatabase();
-		//dbCategories = env.openDatabase();
+		dbArticles = env.openDatabase("articles");
+		dbCategories = env.openDatabase("categories");
 
 		acceptablePageTypesArticles.add(PageType.article);
 		acceptablePageTypesArticles.add(PageType.redirect);
@@ -86,48 +69,10 @@ public class PagesByTitleCache {
     public void close() {
     	/*if (tx != null)
     		tx.close();*/
- 	   	dbPages.close();
+ 	   	dbArticles.close();
+ 	   	dbCategories.close();
     	env.close();
 	}
-
-	/*private static PagesByTitleCache articlesCache ;
-	private static PagesByTitleCache categoriesCache ;
-	
-	private Map<String,Integer> pageIdsByTitle  ;
-	private Set<PageType> acceptablePageTypes = new HashSet<PageType>() ;
-	
-	public PagesByTitleCache() throws IOException {
-		DB db = DBMaker.newAppendFileDB(File.createTempFile("mapdb-temp", "titles"))
-			       .deleteFilesAfterClose().closeOnJvmShutdown().cacheHardRefEnable().make();
-
-		pageIdsByTitle = db.getHashMap("titles") ;
-		
-	}*/
-	
-	
-	/*public static PagesByTitleCache getArticlesCache() throws IOException {
-		
-		if (articlesCache == null) {
-			articlesCache = new PagesByTitleCache() ;
-			
-			articlesCache.acceptablePageTypes.add(PageType.article) ;
-			articlesCache.acceptablePageTypes.add(PageType.redirect) ;
-			articlesCache.acceptablePageTypes.add(PageType.disambiguation) ;
-		}
-		
-		return articlesCache ;
-	}
-	
-	public static PagesByTitleCache getCategoriesCache() throws IOException {
-		
-		if (categoriesCache == null) {
-			categoriesCache = new PagesByTitleCache() ;
-			
-			categoriesCache.acceptablePageTypes.add(PageType.category) ;
-		}
-		
-		return categoriesCache ;
-	}*/
 	
 	public String getEnvFile() {
 		return this.envFilePath;
@@ -146,14 +91,6 @@ public class PagesByTitleCache {
 		
 		return bytes ;
 	}
-	
-	/*public void loadArticles(List<Path> pageFiles, Reporter reporter) throws IOException {
-		load(pageFiles, reporter, 0);
-	}
-
-	public void loadCategories(List<Path> pageFiles, Reporter reporter) throws IOException { 
-		load(pageFiles, reporter, 1);
-	}*/
 
 	public void loadAll(List<Path> pageFiles, Reporter reporter) throws IOException { 
 		if (isLoaded) {
@@ -186,15 +123,18 @@ public class PagesByTitleCache {
 					try {
 						CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8"))) ;
 		
-						int id = cri.readInt("id") ;
-						DbPage page = new DbPage() ;
-						page.deserialize(cri) ;
+						int id = cri.readInt("id");
+						DbPage page = new DbPage();
+						page.deserialize(cri);
 		
-						String title = page.getTitle() ;
-						PageType type = PageType.values()[page.getType()] ;
+						String title = page.getTitle();
+						PageType type = PageType.values()[page.getType()];
 						
-						if ( acceptablePageTypesArticles.contains(type) ||  acceptablePageTypesCategories.contains(type) ) {
-							dbPages.put(txw, bytes(Util.normaliseTitle(title)), BigInteger.valueOf(id).toByteArray());
+						if ( acceptablePageTypesArticles.contains(type) ) {
+							dbArticles.put(txw, bytes(Util.normaliseTitle(title)), BigInteger.valueOf(id).toByteArray());
+							nbToAdd++;
+						} else if ( acceptablePageTypesCategories.contains(type) ) {
+							dbCategories.put(txw, bytes(Util.normaliseTitle(title)), BigInteger.valueOf(id).toByteArray());
 							nbToAdd++;
 						} 
 						
@@ -218,28 +158,21 @@ public class PagesByTitleCache {
 		
 		long memAfter = r.totalMemory() ;
 		Logger.getLogger(getClass()).info("Memory Used: " + (memAfter - memBefore) / (1024*1024) + "Mb") ;
+		Logger.getLogger(getClass()).info("Number entries in dbArticle: " + getDatabaseSize(dbArticles));
+		Logger.getLogger(getClass()).info("Number entries in dbCategories: " + getDatabaseSize(dbCategories));
 
 		isLoaded = true;
 	}
 	
-	/*public int getArticleId(String title) {
-		String nTitle = Util.normaliseTitle(title) ;
+	public int getArticleId(String title) {
+		String nTitle = Util.normaliseTitle(title);
 		byte[] res = null;
-		try {
-			if (tx == null)
-				tx = env.createReadTransaction(); 
-			else
-				tx.renew();
-			res = dbPages.get(tx, bytes(nTitle));
-		} catch(Exception e) {
-			Logger.getLogger(PagesByTitleCache.class).error("Caught exception while getArticleId: " + title, e) ;
-			if (tx != null)
-				tx.close();
-			tx = null;
-		} finally {
-			if (tx != null)
-				tx.reset();	
-				//tx.close();
+		try (Transaction tx = env.createReadTransaction()) {
+			try {
+				res = dbArticles.get(tx, bytes(nTitle));
+			} catch(LMDBException e) {
+				Logger.getLogger(RedirectCache.class).error("Caught LMDB exception with getPageId: " + title, e) ;
+			}
 		}
 
 		if (res == null)
@@ -249,63 +182,59 @@ public class PagesByTitleCache {
 	}
 
 	public int getCategoryId(String title) {
-		String nTitle = Util.normaliseTitle(title) ;
+		String nTitle = Util.normaliseTitle(title);
 		byte[] res = null;
-		try {
-			if (tx == null)
-				tx = env.createReadTransaction(); 
-			else
-				tx.renew();
-			res = dbPages.get(tx, bytes(nTitle));
-		} catch(Exception e) {
-			Logger.getLogger(PagesByTitleCache.class).error("Caught exception while getCategoryId: " + title, e) ;
-			if (tx != null)	
-				tx.close();
-			tx = null;
-		} finally {
-			if (tx != null)
-				tx.reset();	
-				//tx.close();
+		try (Transaction tx = env.createReadTransaction()) {
+			try {
+				res = dbCategories.get(tx, bytes(nTitle));
+			} catch(LMDBException e) {
+				Logger.getLogger(RedirectCache.class).error("Caught LMDB exception with getPageId: " + title, e) ;
+			}
 		}
 
-		if (res == null)
+		if (res == null) {
 			return -1;
-		else 
+		} else 
 			return new BigInteger(res).intValue();
-	}*/
+	}
 
 	public int getPageId(String title) {
 		String nTitle = Util.normaliseTitle(title);
 		byte[] res = null;
 		try (Transaction tx = env.createReadTransaction()) {
 			try {
-				res = dbPages.get(tx, bytes(nTitle));
+				res = dbArticles.get(tx, bytes(nTitle));
 			} catch(LMDBException e) {
-				Logger.getLogger(RedirectCache.class).error("Caught LMDB exception while getPageId: " + title, e) ;
+				Logger.getLogger(RedirectCache.class).error("Caught LMDB exception with getPageId: " + title, e) ;
 			}
 		}
-		
-		/*try {
-			if (tx == null)
-				tx = env.createReadTransaction(); 
-			else
-				tx.renew();
-			res = dbPages.get(tx, bytes(nTitle));
-		} catch(Exception e) {
-			Logger.getLogger(PagesByTitleCache.class).error("Caught exception while getPageId: " + title, e) ;
-			if (tx != null)
-				tx.close();
-			tx = null;
-		} finally {
-			if (tx != null)
-				tx.reset();	
-				//tx.close();
-		}*/
-
-		if (res == null)
+		if (res == null) {
+			try (Transaction tx = env.createReadTransaction()) {
+				try {
+					res = dbCategories.get(tx, bytes(nTitle));
+				} catch(LMDBException e) {
+					Logger.getLogger(RedirectCache.class).error("Caught LMDB exception with getPageId: " + title, e) ;
+				}
+			}
+		}
+		if (res == null) {
 			return -1;
-		else 
+		} else 
 			return new BigInteger(res).intValue();
 	}
 	
+	private static long getDatabaseSize(Database db) {
+		//return getDatabase(true).count();
+
+		Stat statistics = db.stat();
+		return statistics.ms_entries;
+	}
+
+	public long getArticleDatabaseSize() {
+		return  getDatabaseSize(dbArticles);
+	}
+
+	public long getCategoryDatabaseSize() {
+		return  getDatabaseSize(dbCategories);
+	}
 }

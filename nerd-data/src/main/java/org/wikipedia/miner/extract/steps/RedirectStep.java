@@ -173,7 +173,7 @@ public class RedirectStep extends Configured implements Tool {
 
 				int sourceId = Integer.parseInt(line.substring(0,pos)) ;
 				String targetTitle = line.substring(pos+1) ;
-				int targetId = articleIdsByTitle.getPageId(targetTitle) ;
+				int targetId = articleIdsByTitle.getArticleId(targetTitle) ;
 				if (targetId == -1)
 					Logger.getLogger(Step2Mapper.class).warn("Could not identify id for redirect target '" + targetTitle + "'") ;
 				else {

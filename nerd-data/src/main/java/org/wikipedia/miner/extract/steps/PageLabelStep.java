@@ -95,7 +95,12 @@ public class PageLabelStep extends Configured implements Tool {
 				
 				for (DbSenseForLabel sense:dbLabel.getSenses()) {
 					
-					DbLabelForPage pageLabel = new DbLabelForPage(text, sense.getLinkOccCount(), sense.getLinkDocCount(), sense.getFromTitle(), sense.getFromRedirect(), isPrimary) ;
+					DbLabelForPage pageLabel = new DbLabelForPage(text, 
+							sense.getLinkOccCount(), 
+							sense.getLinkDocCount(), 
+							sense.getFromTitle(), 
+							sense.getFromRedirect(), 
+							isPrimary) ;
 					
 					ArrayList<DbLabelForPage> labels = new ArrayList<DbLabelForPage>() ;
 					labels.add(pageLabel) ;
@@ -118,7 +123,7 @@ public class PageLabelStep extends Configured implements Tool {
 				DbLabelForPageList v = values.next() ;
 				collectedValues.addAll(v.getLabels()) ;
 
-				// PL: this is to avoid mega line when we have too much labels
+				// PL: this is to avoid mega line where we have too much labels, we just take the first 1000
 				if (collectedValues.size() > 1000)
 					break;
 			}

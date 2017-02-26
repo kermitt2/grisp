@@ -119,8 +119,7 @@ public class PageStep extends Configured implements Tool {
 
 				Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
 
-				for (Path cf:cacheFiles) {
-
+				for (Path cf : cacheFiles) {
 					if (cf.getName().equals(new Path(DumpExtractor.OUTPUT_SITEINFO).getName())) {
 						si = new SiteInfo(cf) ;
 					}

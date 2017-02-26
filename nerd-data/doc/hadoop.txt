@@ -1,3 +1,5 @@
+General
+----------------------------------------------------------------------------------------------------------------------------
 Expected produced files: there must be 13 generated csv files
 
 articleParents.csv   label.csv       pageLinkOut.csv              stats.csv
@@ -13,6 +15,7 @@ English Wikipedia XML dump: ~7 h 30
 !! Note !!: right now, works only in pseudo distributed mode (LMDB cache DB are located under local /tmp/) - for cluster level, we need to locate the LMDB databases for cache on the hdfs and uses distributed haddop caches to access to the cache dbs. 
 
 
+--------------------------------------------------------
 Hadoop 2.* config with YARN
 
 // etc/hadoop/hadoop-env.sh 
@@ -116,7 +119,11 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.6.5
     </property>
 </configuration>
 
+----------------------------------------------------------------------------------------------------------------------------
 Preparing the hdfs space:
+
+// start HDFS nodes
+~/tools/hadoop/hadoop-2.6.5//sbin/start-dfs.sh
 
 ~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -mkdir /user
 ~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -mkdir /user/lopez
@@ -133,15 +140,23 @@ Preparing the hdfs space:
 ~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -mkdir /user/lopez/working
 
 
+----------------------------------------------------------------------------------------------------------------------------
 Building the hadoop job jar 
 
-...
+under ~/grisp/nerd-data 
+  $ mvn clean install
+
 will create job jar under:
-./target/com.scienceminer.grisp.nerd-data-0.0.1-job.jar
+  ./target/com.scienceminer.grisp.nerd-data-0.0.1-job.jar
+to be used bellow
 
-launching hadoop process: 
+----------------------------------------------------------------------------------------------------------------------------
+Launching hadoop process: 
 
-//English
+// start YARN
+~/tools/hadoop/hadoop-2.6.5//sbin/start-yarn.sh
+
+//English (path in HDFS, except the jar)
  ~/tools/hadoop/hadoop-2.6.5/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.1-job.jar /user/lopez/enwiki-latest-pages-articles.xml /user/lopez/languages.xml en /user/lopez/en-sent.bin /user/lopez/working /user/lopez/output
 
 // getting the csv files

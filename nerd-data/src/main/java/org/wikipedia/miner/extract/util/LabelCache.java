@@ -18,32 +18,11 @@ import org.fusesource.lmdbjni.*;
 import static org.fusesource.lmdbjni.Constants.*;
 
 public class LabelCache {
-	/*static {
-    	Setup.setLmdbLibraryPath();
-	}*/
-
-	//private static LabelCache cache ;
-	//private static volatile LabelCache instance;
 
 	private Env env;
   	private Database db;
   	private String envFilePath = null;
   	private boolean isLoaded = false ;
-
-  	//private Transaction tx = null;
-
-	/*public static LabelCache getInstance() throws IOException {
-        if (instance == null)
-			getNewInstance();
-        return instance;
-    }*/
-
-    /**
-     * Creates a new instance.
-     */
-	/*private static synchronized void getNewInstance() throws IOException {
-		instance = new LabelCache();
-	}*/
 
     public LabelCache(String envFilePath0, String lang) throws IOException {
     	this.envFilePath = envFilePath0;
@@ -68,13 +47,9 @@ public class LabelCache {
     	env.setMapSize(100 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for ~8 million labels
     	env.open(envFilePath);
 		db = env.openDatabase();
-
-		//tx = null;
     }
 
     public void close() {
-    	/*if (tx != null)
-    		tx.close();*/
  	   	db.close();
     	env.close();
 	}
@@ -119,16 +94,6 @@ public class LabelCache {
 				Logger.getLogger(LabelCache.class).error("Caught exception while isKnown label: " + label, e);
 			}
 		} 
-		/*catch(Exception e) {
-			Logger.getLogger(LabelCache.class).error("Caught exception while isKnown label: " + label, e) ;
-			if (tx != null)	
-				tx.close();
-			tx = null;
-		} finally {
-			if (tx != null)
-				tx.reset();	
-				//tx.close();
-		}*/
 
 		if (res != null)
 			return true;
@@ -178,7 +143,6 @@ public class LabelCache {
 					try {
 						CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream(line.getBytes("UTF8"))) ;
 						String labelText = cri.readString("labelText");
-						//labelVocabulary.add(labelText);
 						if (labelText.length() < 500) {
 							db.put(txw, bytes(labelText), bytes("1"));
 							nbToAdd++;

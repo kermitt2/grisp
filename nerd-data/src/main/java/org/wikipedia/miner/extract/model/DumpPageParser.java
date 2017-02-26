@@ -123,8 +123,9 @@ public class DumpPageParser {
 		
 		//ignore anything that isn't in main, category or template namespace
 		if ( (namespaceKey != SiteInfo.CATEGORY_KEY) && 
-			 (namespaceKey != SiteInfo.MAIN_KEY) && 
-			 (namespaceKey != SiteInfo.TEMPLATE_KEY) ) {
+			 (namespaceKey != SiteInfo.MAIN_KEY) /* && 
+			 (namespaceKey != SiteInfo.TEMPLATE_KEY) */
+			 ) {
 			//Logger.getLogger(DumpPageParser.class).info("Ignoring page " + id + ":" + title) ;
 			return null ;
 		}

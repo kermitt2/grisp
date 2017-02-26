@@ -139,7 +139,7 @@ public class PagesByTitleCache {
 						} 
 						
 						if (reporter != null)
-							reporter.progress() ;
+							reporter.progress();
 						
 					} catch (Exception e) {
 						Logger.getLogger(Util.class).error("Caught exception while gathering page from '" + line + "' in '" + pageFile + "'", e) ;

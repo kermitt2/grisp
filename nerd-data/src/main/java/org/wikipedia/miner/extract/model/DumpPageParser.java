@@ -143,16 +143,15 @@ public class DumpPageParser {
 					redirectTarget = redirectMatcher.group(2) ;
 				else
 					redirectTarget = redirectMatcher.group(3) ;
-				
 			}
 		}
-		if (redirection != null) {
+		if (namespaceKey == SiteInfo.TEMPLATE_KEY) {
+			type = PageType.template;
+		} else if (redirection != null) {
 			type = PageType.redirect;
 			redirectTarget = redirection;
 		} else if (namespaceKey == SiteInfo.CATEGORY_KEY) {
 			type = PageType.category;
-		} else if (namespaceKey == SiteInfo.TEMPLATE_KEY) {
-			type = PageType.template;
 		} else if (namespaceKey == SiteInfo.MAIN_KEY){
 			Matcher disambigMatcher = languageConfiguration.getDisambiguationPattern().matcher(text) ;
 			if (disambigMatcher.find()) {

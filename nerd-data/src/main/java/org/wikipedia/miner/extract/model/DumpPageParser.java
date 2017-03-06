@@ -134,7 +134,7 @@ public class DumpPageParser {
 		PageType type =null;
 		String redirectTarget = null;
 		
-		if (text != null) {
+		/*if (text != null) {
 			Matcher redirectMatcher = languageConfiguration.getRedirectPattern().matcher(text) ;
 			if (redirectMatcher.find()) {
 				type = PageType.redirect ;
@@ -144,10 +144,11 @@ public class DumpPageParser {
 				else
 					redirectTarget = redirectMatcher.group(3) ;
 			}
-		}
-		if (namespaceKey == SiteInfo.TEMPLATE_KEY) {
+		}*/
+		/*if (namespaceKey == SiteInfo.TEMPLATE_KEY) {
 			type = PageType.template;
-		} else if (redirection != null) {
+		} else*/ 
+		if (redirection != null) {
 			type = PageType.redirect;
 			redirectTarget = redirection;
 		} else if (namespaceKey == SiteInfo.CATEGORY_KEY) {

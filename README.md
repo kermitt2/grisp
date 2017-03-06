@@ -48,3 +48,6 @@ For other languages, replace the ending ```En```, but the appropriate lang code,
 > mvn compile exec:exec -Dexec.classpathScope=compile -PbuildInfoboxFr
 ```
 
+### More to come
+
+Next data to be mapped: geonames, geospecies and wikidata

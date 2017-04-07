@@ -19,25 +19,19 @@ import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.model.struct.*;
 
-
-
-
 public class CategoryLinkSummaryStep extends Configured implements Tool {
 	
 	//public enum LinksToSummarize {pageLinks, categoryParents, articleParents} ;
-	public enum Output {categoryParents, articleParents, childCategories, childArticles } ;
+	public enum Output {categoryParents, articleParents, childCategories, childArticles};
 	public static final String KEY_LINKS_TO_SUMMARIZE = "wm.linksToSummarize" ;
 	
-	private ExtractionStep linksToSummarize ;
+	private ExtractionStep linksToSummarize;
 		
 	public CategoryLinkSummaryStep(ExtractionStep linksToSummarize) {
-		
 		this.linksToSummarize = linksToSummarize ;
-		
 	}
 
 	public int run(String[] args) throws Exception {
-
 		JobConf conf = new JobConf(CategoryLinkSummaryStep.class);
 		DumpExtractor.configureJob(conf, args) ;
 		conf.set(KEY_LINKS_TO_SUMMARIZE, linksToSummarize.name()) ;

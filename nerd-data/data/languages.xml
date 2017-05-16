@@ -3,8 +3,9 @@
 <WikipediaLanguageList>
 
     <Language code="en" name="English" localName="English">
-        <RootCategory>Fundamental categories</RootCategory>
-        
+        <!--RootCategory>Fundamental categories</RootCategory-->
+        <RootCategory>Main topic classifications</RootCategory>
+
         <DisambiguationCategory>Disambiguation</DisambiguationCategory>
         
         <DisambiguationTemplate>disambiguation</DisambiguationTemplate>

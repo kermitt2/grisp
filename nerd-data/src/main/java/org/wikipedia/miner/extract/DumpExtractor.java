@@ -42,11 +42,9 @@ import org.wikipedia.miner.extract.util.LabelCache;
 import org.apache.hadoop.filecache.DistributedCache;
 
 /**
- * @author dnk2
  *
  * This class extracts summaries (link graphs, etc) from Wikipedia xml dumps. 
- * It calls a sequence of Hadoop Map/Reduce jobs to do so in a scalable, timely fashion.
- * 
+ * It calls a sequence of Hadoop Map/Reduce jobs.
  * 
  *  
  */

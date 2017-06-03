@@ -236,6 +236,31 @@
 		  </build>
 		</profile>
 		<profile>
+		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PbuildWikidata -->	
+		  <id>buildWikidata</id>
+		  <activation><property><name>buildWikidata</name></property></activation>
+		  <build>
+			<plugins>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>exec-maven-plugin</artifactId>
+				    <configuration>
+				      <executable>java</executable>
+				      <arguments>
+						<argument>-Xms2g</argument>
+		            	<argument>-Xmx4g</argument>
+				        <argument>-classpath</argument><classpath />
+				        <argument>com.scienceminer.grisp.nerd.data.ProcessWikiData</argument>
+				        <argument>/mnt/data/wikipedia/latest/wikidata/latest-all.json.bz2</argument>
+				        <argument>/mnt/data/wikipedia/latest/wikidata/</argument>
+				        <argument>/mnt/data/wikipedia/latest/</argument>
+				      </arguments>
+				    </configuration>
+		    	</plugin>
+		    </plugins>
+		  </build>
+		</profile>
+		<profile>
 		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PbuildInfoboxEn -->	
 		  <id>buildInfoboxEn</id>
 		  <activation><property><name>buildInfoboxEn</name></property></activation>

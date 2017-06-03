@@ -20,6 +20,8 @@ import org.apache.hadoop.fs.*;
  * This class processes the DBpedia info boxes files into
  * csv files as expected by NERD. We assume that these files are small
  * and basic enough to avoid the need of Hadoop and distributed process.
+ *
+ * Beware the crappiness of DBpedia !
  * 
  * @author Patrice Lopez
  *
@@ -220,10 +222,10 @@ public class ProcessInfoBoxes {
 		return result;
 	}
 
-	private void writeCsv(String outputCsvPath) {
+	private void write(String outputPath) {
 		Writer writer =  null;
 		try {
-			writer = new OutputStreamWriter(new FileOutputStream(outputCsvPath), "UTF8");
+			writer = new OutputStreamWriter(new FileOutputStream(outputPath), "UTF8");
 			// iterate through the DB
 			try (Transaction tx = env.createReadTransaction()) {
 				int nbWritten = 0;
@@ -301,7 +303,7 @@ public class ProcessInfoBoxes {
 				
 		long start = System.currentTimeMillis();
 		int nbResult = translate.process(args[0]);
-		translate.writeCsv(args[1]);
+		translate.write(args[1]);
 		long end = System.currentTimeMillis();
 
 		translate.close();

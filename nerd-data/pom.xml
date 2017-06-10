@@ -17,6 +17,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<avro.version>1.7.5</avro.version>
 		<lmdbjni.version>0.4.6</lmdbjni.version>
+		<jackson.version>2.9.0.pr3</jackson.version>
 	</properties>
 	
 	<licenses>
@@ -261,9 +262,9 @@
 		  </build>
 		</profile>
 		<profile>
-		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PbuildInfoboxEn -->	
-		  <id>buildInfoboxEn</id>
-		  <activation><property><name>buildInfoboxEn</name></property></activation>
+		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PmapUAT -->	
+		  <id>mapUAT</id>
+		  <activation><property><name>mapUAT</name></property></activation>
 		  <build>
 			<plugins>
 				<plugin>
@@ -275,11 +276,9 @@
 						<argument>-Xms2g</argument>
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
-				        <argument>com.scienceminer.grisp.nerd.data.ProcessInfoBoxes</argument>
-				        <argument>/mnt/data/wikipedia/dbpedia/infobox_properties_en.tql</argument>
-				        <argument>/mnt/data/wikipedia/latest/en/infoboxes.csv</argument>
-				        <argument>/mnt/data/wikipedia/latest/en/page.csv</argument>
-				        <argument>en</argument>
+				        <argument>com.scienceminer.grisp.nerd.mapping.UAT</argument>
+				        <argument>/home/lopez/resources/UAT/UAT.json</argument>
+				        <argument>/home/lopez/resources/UAT/UAT-nerd.json</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>
@@ -473,6 +472,28 @@
 			<artifactId>lmdbjni-win64</artifactId>
 			<version>${lmdbjni.version}</version>
 		</dependency>
+
+		<!-- jackson for json / yaml processing -->
+		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>com.fasterxml.jackson.dataformat</groupId>
+        	<artifactId>jackson-dataformat-yaml</artifactId>
+        	<version>${jackson.version}</version>
+	    </dependency>
 
 	</dependencies>
 		

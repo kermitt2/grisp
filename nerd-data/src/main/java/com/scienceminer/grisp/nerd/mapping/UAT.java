@@ -74,7 +74,7 @@ public class UAT {
 		}
 	}
 
-	public void injectResults(String inputPath, string resultPath) {
+	public void injectResults(String inputPath, String resultPath) {
 		
 	}
 

@@ -18,6 +18,10 @@ import com.fasterxml.jackson.databind.node.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.io.*;
 
+/**
+ * Mapping UAT (https://github.com/astrothesaurus/UAT) to Wikidata via (N)ERD
+ */
+
 public class UAT {
 
 	static private String REST_URL = "http://localhost:8090/service/disambiguate";
@@ -74,7 +78,7 @@ public class UAT {
 		}
 	}
 
-	public void injectResults(String inputPath, string resultPath) {
+	public void injectResults(String inputPath, String resultPath) {
 		
 	}
 

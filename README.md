@@ -65,4 +65,4 @@ For other languages, replace the ending ```En```, but the appropriate lang code,
 
 ### More to come
 
-Next data to be mapped: geonames, geospecies and wikidata
+Next data to be mapped: geonames, geospecies

@@ -129,7 +129,7 @@ public class ProcessWikiData {
 			nbAll += nb;
 		}
 		System.out.println("total of " + nbAll + " mappings with " + targetLanguages.size() + " languages.");
-		String localResultPath = resultPath + "/wikidata/" + "wikidataIds.csv" ;
+		String localResultPath = resultPath + "wikidataIds.csv" ;
 		writeProp(localResultPath);
 		return nbAll;
 	}
@@ -221,7 +221,7 @@ System.out.println("resultPath: " + resultPath);
 			    							}
 			    							convertedPiece = lang + "|" + pageId;
 			    							if (val != null) {
-			    								convertedPiece += lang + "|" + pageId + "|" + val;
+			    								convertedPiece += "|" + val;
 			    							} 
 					    					db_id.put(tx, bytes(wikidataId), bytes(convertedPiece));
 					    					tempToBeAddedMap.put(wikidataId, convertedPiece);

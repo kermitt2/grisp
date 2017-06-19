@@ -252,9 +252,12 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessWikiData</argument>
-				        <argument>/mnt/data/wikipedia/latest/wikidata/latest-all.json.bz2</argument>
+				        <!--argument>/mnt/data/wikipedia/latest/wikidata/latest-all.json.bz2</argument>
 				        <argument>/mnt/data/wikipedia/latest/wikidata/</argument>
-				        <argument>/mnt/data/wikipedia/latest/</argument>
+				        <argument>/mnt/data/wikipedia/latest/</argument-->
+				        <argument>/home/lopez/resources/wikidata/latest-all.json.bz2</argument>
+				        <argument>/home/lopez/resources/wikidata/</argument>
+				        <argument>/home/lopez/resources/wikipedia/</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>

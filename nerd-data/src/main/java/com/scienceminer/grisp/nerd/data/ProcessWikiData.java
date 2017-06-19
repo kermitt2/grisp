@@ -9,6 +9,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.compress.compressors.*;
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.io.*;
 
 import org.fusesource.lmdbjni.*;
 import static org.fusesource.lmdbjni.Constants.*;
@@ -375,13 +382,16 @@ System.out.println("resultPath: " + resultPath);
 		return builder.toString();
 	}
 
-	public int process(String inputPath, String resultPath) {
+	/*public int process(String inputPath, String resultPath) {
 		int nb = 0;
 		int ignored = 0;
 		BufferedReader reader = null;
-		/*try {
+		try {
 			// open file
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputPath)));
+			BufferedInputStream bis = new BufferedInputStream(new InputStreamReader(new FileInputStream(inputPath)));
+		    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
+		    reader = new BufferedReader(new InputStreamReader(input));
+
 			String line = null;
 			int nbToAdd = 0;
 			Transaction tx = env_data.createWriteTransaction();
@@ -390,7 +400,7 @@ System.out.println("resultPath: " + resultPath);
 				//if (nb > 100000)
 				//	break;
 				if (line.length() == 0) continue;
-				if (line.startsWith("#")) continue;
+				if (line.startsWith("[")) continue;
 //System.out.println(line);
 				if (nbToAdd == 1000) {
 					tx.commit();
@@ -401,63 +411,22 @@ System.out.println("resultPath: " + resultPath);
 					System.out.flush();
 				}
                 
-                List<String> elements = tokenizeTqlEntry(line);
-                if (elements == null) {
-                	//System.out.println("Error when processing tql line: " + line);
-                	ignored++;
-                } else {
-	                // first element gives the page title
-	                String title = getLastPart(elements.get(0));
-	                // second element give the property identifier
-	                String property = getLastPart(elements.get(1)); 
-	               	// third element gives the value of the property, either a string or another page title
-	                String value = getLastPart(elements.get(2));
-	                if ( (value == null) || (value.trim().length() == 0) ) {
-	                	//System.out.println("Error when processing value argument in tql line: " + line);
-	                	ignored++;
-	                	continue;
-	                }
-	                // if value is a page title, we replace it with the page id
-	                int valueId = -1; 
-	                if (elements.get(2).startsWith("<")) {
-	                	valueId = pageCache.getArticleId(value);
-	                }
+				JsonNode rootNode = mapper.readTree(line);
+				JsonNode idNode = rootNode.findPath("id");
+				String itemId = null;
+				if ((idNode != null) && (!idNode.isMissingNode())) {
+					itemId = idNode.textValue();
+				}
+                
+                if (itemId == null)
+                	continue;
 
-	                // fourth element is a weird redundant mess where we can get the wikipedia template name
-	                String template = getTemplateName(elements.get(3));
+				JsonNode claimsNode = rootNode.findPath("claims");
+				if ((claimsNode != null) && (!claimsNode.isMissingNode())) {
 
-	                // get the page id corresponding to the page title
-	                int pageId = pageCache.getArticleId(title);
-	                if (pageId == -1) {
-	                	//System.out.println("Title not found in page id cache in tql line: " + line);
-	                	ignored++;
-	                	continue;
-	                }
+				}
 
-	                StringBuilder propertyString = new StringBuilder();
-	                propertyString.append(property).append("|");
-	                if (valueId != -1) 
-	                	propertyString.append(""+valueId);
-	                else
-	                	propertyString.append(value);
-	                propertyString.append("|").append(template);
-
-	                // we have all the pieces for storing the property
-	                // check if the page id is not already in the db
-	                String val = null;
-					// check if this identifier is already indexed or not
-					try (Transaction txr = env_data.createReadTransaction()) {
-						val = string(db.get(txr, BigInteger.valueOf(pageId).toByteArray()));
-					}
-					if (val == null) {
-						// also look at the temp stuff not yet aded
-		    			val = tempToBeAddedMap.get(new Integer(pageId));
-					}
-					if (val != null) {
-						propertyString.append("|").append(val);
-					}
-					String propString = propertyString.toString();
-					db.put(tx, BigInteger.valueOf(pageId).toByteArray(), bytes(propString));
+					db.put(tx, BigInteger.valueOf(itemId).toByteArray(), bytes(propString));
 					tempToBeAddedMap.put(new Integer(pageId), propString);
 					nbToAdd++;
 					nb++;
@@ -473,12 +442,10 @@ System.out.println("resultPath: " + resultPath);
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-		}*/
+		}
 		System.out.println("\nproperties ignored: " + ignored);
 		return nb;
-	}
-
-
+	}*/
 
 	public static void main(String[] args) throws Exception {
 System.out.println(args.length + " arguments");
@@ -491,10 +458,15 @@ System.out.println(args.length + " arguments");
 			int nbResult = wikidata.processAllProps(args[1], args[2]);
 			long end = System.currentTimeMillis();
 
+			System.out.println(nbResult + " props mapping produced in " + (end - start) + " ms");
+
+			/*start = System.currentTimeMillis();
+			nbResult = wikidata.process(args[1], args[2]);
+			end = System.currentTimeMillis();
+
+			System.out.println(nbResult + " Wikidata statements produced in " + (end - start) + " ms");*/
+
 			wikidata.close();
-
-			System.out.println(nbResult + " ... produced in " + (end - start) + " ms");
-
 		}
 	}
 }

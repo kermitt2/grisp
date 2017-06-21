@@ -163,6 +163,8 @@ System.out.println("resultPath: " + resultPath);
 			String line = null;
 			Transaction tx = env_id.createWriteTransaction();
 			int nbToAdd = 0;
+			String previousPageId = null;
+			Integer previousPageIdInteger = null;
 			try {
     			char[] chars = new char[8192];
     			boolean prelude = true;
@@ -214,6 +216,38 @@ System.out.println("resultPath: " + resultPath);
 	    							int ind = convertedPiece.indexOf("|");
 	    							if (ind != -1) {
 		    							String pageId = convertedPiece.substring(0, ind);
+		    							Integer pageIdInteger = null;
+
+		    							if ( (previousPageId != null) && (pageId.length() < previousPageId.length()) ) {
+//System.out.println(previousPageId + " -> " + pageId);
+
+		    								// from time to time there are apparently page id where the first digit 
+		    								// is lost, we need re-inject this digit, example 33702 (canis lupus) 
+		    								// appears as 3702 incorrectly in the sql mapping 
+
+			    							try {
+			    								pageIdInteger = Integer.parseInt(pageId);
+			    							} catch (Exception e) {
+//System.out.println("parse failure: " + pageId);	
+			    							}
+
+			    							String newPageId = previousPageId.charAt(0) + pageId;
+			    							Integer newPageIdInteger = null;
+			    							try {
+			    								newPageIdInteger = Integer.parseInt(newPageId);
+			    							} catch (Exception e) {
+//System.out.println("parse failure: " + newPageId);	
+			    							}
+
+			    							if ( (pageIdInteger != null) && 
+			    								 (newPageIdInteger != null) && 
+			    								 (newPageIdInteger > pageIdInteger) ) {
+//System.out.println(pageIdInteger + " modified as " + newPageIdInteger);			    								
+			    								pageId = newPageId;
+			    								pageIdInteger = newPageIdInteger;
+			    							}
+		    							}
+
 		    							convertedPiece = convertedPiece.substring(ind+1,convertedPiece.length());
 		    							String wikidataId = convertedPiece;
 		    							if (wikidataId.startsWith("Q")) {
@@ -238,6 +272,8 @@ System.out.println("resultPath: " + resultPath);
 					    					nbToAdd++;
 					    					nb++;
 					    				}
+					    				previousPageId = pageId;
+					    				previousPageIdInteger = pageIdInteger;
 		    						}
 	    						}
 	    					}

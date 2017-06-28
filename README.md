@@ -4,6 +4,8 @@ Knowledge Base stuff
 
 ## Create NERD data
 
+The original and preprocessed files are described [here](nerd-data/data/preprocessed-wikipedia-files.md). 
+
 ### Processing a Wikipedia XML article dump file
 
 Create hadoop job jar:

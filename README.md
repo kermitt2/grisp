@@ -22,7 +22,8 @@ We think it is possible to still improve significantly the processing time, lowe
 
 ### Creating additional cvs translation files
 
-Translation information are not available anymore in the Wikipedia XML dump, downloding the SQL langlink file is necessary. The file must be put together with the XML dump file. Then for each language, the translation cvs file can be generated with the command - here for English: 
+Translation information are not available anymore in the Wikipedia XML dump, downloding the SQL langlink file is necessary (see [here](https://github.com/kermitt2/grisp/blob/master/nerd-data/data/preprocessed-wikipedia-files.md#translation-files)). The file must be put together with the XML dump file. 
+Then for each language, the translation cvs file can be generated with the command - here for English: 
 
 ```
 > mvn compile exec:exec -PbuildTranslationEn

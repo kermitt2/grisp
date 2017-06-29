@@ -33,5 +33,5 @@ In this section we provide already processed with the hadoop job
 
 - FR: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/frwiki-20170620-pages-articles.csv.zip
 - DE: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/dewiki-20170620-pages-articles.csv.zip 
-- EN: 
+- EN: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/enwiki-20170620-pages-articles.csv.zip
 

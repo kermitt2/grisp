@@ -7,19 +7,19 @@ In this section we provide already processed with the hadoop job
 
 These files contains the wikipedia dump files and the translations: 
 
-- FR: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/fr-20170620.csv.zip
-- DE: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/de-20170620.csv.zip 
-- EN: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/en-20170620.csv.zip
+- FR: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/fr-20170620.zip
+- DE: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/de-20170620.zip 
+- EN: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/en-20170620.zip
 
 To use them, just unzip them in a directory, the language specific information will be installed respectively in the `xx` (with xx the language name) directories.  
 
 Wikipedia language specific content and ids: 
 
-- Wikidata IDs: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/wikidataId.csv.zip
+- Wikidata IDs: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/wikidataId-20170629.zip
 
-- FR: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/fr-wikidata-20170629.csv.zip
-- DE: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/de-wikidata-20170629.csv.zip
-- EN: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/en-wikidata-20170629.csv.zip
+- FR: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/fr-wikidata-20170629.zip
+- DE: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/de-wikidata-20170629.zip
+- EN: https://s3.eu-central-1.amazonaws.com/storagescienceminer/NERD/nerd-data-files/en-wikidata-20170629.zip
 
 To install them, unzip them in the root directory where you previously unzipped the language specific wikipedia csv files.
 The wikidata IDs text file will stay in the root directory while the wikidata language specific files will be installed in language sub directories. 

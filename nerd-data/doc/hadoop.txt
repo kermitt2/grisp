@@ -67,6 +67,20 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4
         <value>false</value>
     </property>
 
+// Should the job being scheduled but not executed, might due to lack of disk space on namenode or datanode.
+// This can be avoided by adding to the yarn-site.xml:
+
+  <property>
+     <name>yarn.nodemanager.disk-health-checker.min-healthy-disks</name>
+     <value>0.0</value>
+  </property>
+  <property>
+     <name>yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage</name>
+     <value>100.0</value>
+  </property>
+
+    
+
 // etc/hadoop/mapred-site.xml
 <configuration>
   <!--property>
@@ -139,8 +153,6 @@ hdfs namenode -format
 ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez
 
 ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put ~/grisp/nerd-data/data/languages.xml /user/lopez/
-//~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put ~/nerd/nerd/data/wikipedia/de-sent.bin /user/lopez/
-//~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put ~/nerd/nerd/data/wikipedia/en-sent.bin /user/lopez/
 
 ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/enwiki-latest-pages-articles.xml /user/lopez/
 ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/frwiki-latest-pages-articles.xml /user/lopez/

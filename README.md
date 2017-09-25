@@ -4,6 +4,8 @@ Knowledge Base stuff
 
 ## Create NERD data
 
+The original and preprocessed files are described [here](nerd-data/data/preprocessed-wikipedia-files.md). 
+
 ### Processing a Wikipedia XML article dump file
 
 Create hadoop job jar:
@@ -65,4 +67,4 @@ For other languages, replace the ending ```En```, but the appropriate lang code,
 
 ### More to come
 
-Next data to be mapped: geonames, geospecies and wikidata
+Next data to be mapped: geonames, geospecies

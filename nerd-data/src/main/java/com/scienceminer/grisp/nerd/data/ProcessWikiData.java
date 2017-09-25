@@ -2,7 +2,7 @@ package com.scienceminer.grisp.nerd.data;
 
 import java.util.*;
 import java.util.zip.GZIPInputStream;
-import java.io.*;    
+import java.io.*;
 import java.math.BigInteger;
 
 import org.apache.commons.io.FileUtils;
@@ -25,13 +25,13 @@ import org.wikipedia.miner.extract.util.PagesByTitleCache;
 import org.apache.hadoop.fs.*;
 
 /**
- * This class processes the WikiData JSON dump file (latest-all.json), extracting wikidata 
- * identifiers, properties and relations. This will create the backbone of the global 
- * knowledge model. 
- * 
+ * This class processes the WikiData JSON dump file (latest-all.json), extracting wikidata
+ * identifiers, properties and relations. This will create the backbone of the global
+ * knowledge model.
+ *
  * Language-specific wikipedia are plug on this via the **wiki-latest-page_props.sql file
- * of each language. 
- * 
+ * of each language.
+ *
  * @author Patrice Lopez
  *
  */
@@ -39,7 +39,7 @@ public class ProcessWikiData {
 
 	private Env env_id;
 	private Env env_data;
-  	private Database db_id; // database (map) for storing the page ids in different languages 
+  	private Database db_id; // database (map) for storing the page ids in different languages
   	private Database db_data; // database (map) for storing the properties and relations present in wikidata
   	private String envFilePath_id = null;
 	private String envFilePath_data = null;
@@ -59,8 +59,8 @@ public class ProcessWikiData {
 	  		pageFiles.add(new Path(pathPageCsvPath));
 	  		pageCache.loadAll(pageFiles, null); */
 
-	  		// init LMDB 
-	  		// first temporary DB for storing the page ids in different languages 
+	  		// init LMDB
+	  		// first temporary DB for storing the page ids in different languages
 			File path = new File("/tmp/lmdb-temp-wikidata-id");
 			if (!path.exists()) {
 				path.mkdir();
@@ -96,7 +96,7 @@ public class ProcessWikiData {
 	    	env_data = new Env();
 	    	env_data.setMapSize(200 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for > 40 millions
 	    	env_data.open(envFilePath_data);
-			db_data = env_data.openDatabase();			
+			db_data = env_data.openDatabase();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -136,7 +136,7 @@ public class ProcessWikiData {
 			nbAll += nb;
 		}
 		System.out.println("total of " + nbAll + " mappings with " + targetLanguages.size() + " languages.");
-		String localResultPath = resultPath + "/wikidata/" + "wikidataIds.csv" ;
+		String localResultPath = resultPath + "/" +"wikidataIds.csv" ;
 		writeProp(localResultPath);
 		return nbAll;
 	}
@@ -145,8 +145,9 @@ public class ProcessWikiData {
 	 * Map language specific PageID to Wikidata entity identifier
 	 */
 	private int processProps(String inputPath, String resultPath, String lang) {
-System.out.println("inputPath: " + inputPath);
-System.out.println("resultPath: " + resultPath);
+		System.out.println("inputPath: " + inputPath);
+		System.out.println("resultPath: " + resultPath);
+		
 		int nb = 0;
 		Writer writer =  null;
 		try {
@@ -159,10 +160,12 @@ System.out.println("resultPath: " + resultPath);
 			// output file
 			writer = new OutputStreamWriter(new FileOutputStream(resultPath), "UTF-8");
 
-			final String insertString = "INSERT INTO `page_props` VALUES ("; 
+			final String insertString = "INSERT INTO `page_props` VALUES (";
 			String line = null;
 			Transaction tx = env_id.createWriteTransaction();
 			int nbToAdd = 0;
+			String previousPageId = null;
+			Integer previousPageIdInteger = null;
 			try {
     			char[] chars = new char[8192];
     			boolean prelude = true;
@@ -214,6 +217,38 @@ System.out.println("resultPath: " + resultPath);
 	    							int ind = convertedPiece.indexOf("|");
 	    							if (ind != -1) {
 		    							String pageId = convertedPiece.substring(0, ind);
+		    							Integer pageIdInteger = null;
+
+		    							if ( (previousPageId != null) && (pageId.length() < previousPageId.length()) ) {
+//System.out.println(previousPageId + " -> " + pageId);
+
+		    								// from time to time there are apparently page id where the first digit 
+		    								// is lost, we need re-inject this digit, example 33702 (canis lupus) 
+		    								// appears as 3702 incorrectly in the sql mapping 
+
+			    							try {
+			    								pageIdInteger = Integer.parseInt(pageId);
+			    							} catch (Exception e) {
+//System.out.println("parse failure: " + pageId);	
+			    							}
+
+			    							String newPageId = previousPageId.charAt(0) + pageId;
+			    							Integer newPageIdInteger = null;
+			    							try {
+			    								newPageIdInteger = Integer.parseInt(newPageId);
+			    							} catch (Exception e) {
+//System.out.println("parse failure: " + newPageId);	
+			    							}
+
+			    							if ( (pageIdInteger != null) && 
+			    								 (newPageIdInteger != null) && 
+			    								 (newPageIdInteger > pageIdInteger) ) {
+//System.out.println(pageIdInteger + " modified as " + newPageIdInteger);			    								
+			    								pageId = newPageId;
+			    								pageIdInteger = newPageIdInteger;
+			    							}
+		    							}
+
 		    							convertedPiece = convertedPiece.substring(ind+1,convertedPiece.length());
 		    							String wikidataId = convertedPiece;
 		    							if (wikidataId.startsWith("Q")) {
@@ -228,7 +263,7 @@ System.out.println("resultPath: " + resultPath);
 			    							}
 			    							convertedPiece = lang + "|" + pageId;
 			    							if (val != null) {
-			    								convertedPiece = lang + "|" + pageId + "|" + val;
+			    								convertedPiece += "|" + val;
 			    							} 
 					    					db_id.put(tx, bytes(wikidataId), bytes(convertedPiece));
 					    					tempToBeAddedMap.put(wikidataId, convertedPiece);
@@ -238,6 +273,8 @@ System.out.println("resultPath: " + resultPath);
 					    					nbToAdd++;
 					    					nb++;
 					    				}
+					    				previousPageId = pageId;
+					    				previousPageIdInteger = pageIdInteger;
 		    						}
 	    						}
 	    					}
@@ -288,7 +325,7 @@ System.out.println("resultPath: " + resultPath);
 								int ind1 = value.indexOf("|", pos+1);
 								if (ind1 != -1)
 									langId = value.substring(pos, ind1);
-								else 
+								else
 									break;
 								pos = ind1;
 								int ind2 = value.indexOf("|", pos+1);
@@ -313,15 +350,15 @@ System.out.println("resultPath: " + resultPath);
 										.append(wikidataId)
 										.append(",m{");
 								}
-								builder	
+								builder
 									.append("'")
 									.append(langId)
 									.append(",'")
 									.append(pageId);
-								
+
 							}
 							if (builder != null) {
-								builder	
+								builder
 									.append("}")
 									.append("\n");
 								writer.write(builder.toString());
@@ -350,7 +387,7 @@ System.out.println("resultPath: " + resultPath);
 		}
 		System.out.println("done");
 	}
-	
+
 	private String convertSqlEntry(String element) {
 		if (element.indexOf("wikibase_item") == -1)
 			return null;
@@ -453,7 +490,7 @@ System.out.println(args.length + " arguments");
 			System.err.println("Invalid arguments: [input_path_to_wikidata_json_file] [path_to_language_page_props.sql_directory] [result_directory]");
 		} else {
 			ProcessWikiData wikidata = new ProcessWikiData(args[0], args[1]) ;
-			
+
 			long start = System.currentTimeMillis();
 			int nbResult = wikidata.processAllProps(args[1], args[2]);
 			long end = System.currentTimeMillis();

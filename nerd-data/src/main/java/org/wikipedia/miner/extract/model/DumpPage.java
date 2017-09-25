@@ -2,7 +2,8 @@ package org.wikipedia.miner.extract.model;
 
 import java.util.Date;
 
-import org.wikipedia.miner.model.Page.PageType;
+//import org.wikipedia.miner.model.Page.PageType;
+import com.scienceminer.nerd.kb.model.Page.PageType;
 
 public class DumpPage {
 

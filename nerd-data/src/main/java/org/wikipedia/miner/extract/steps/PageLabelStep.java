@@ -32,17 +32,24 @@ import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.hadoop.record.CsvRecordOutput;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
-import org.wikipedia.miner.db.struct.DbLabel;
-import org.wikipedia.miner.db.struct.DbLabelForPage;
-import org.wikipedia.miner.db.struct.DbLabelForPageList;
-
-import org.wikipedia.miner.db.struct.DbSenseForLabel;
+//import org.wikipedia.miner.db.struct.DbLabel;
+//import org.wikipedia.miner.db.struct.DbLabelForPage;
+//import org.wikipedia.miner.db.struct.DbLabelForPageList;
+//import org.wikipedia.miner.db.struct.DbSenseForLabel;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.model.struct.ExLabel;
 import org.wikipedia.miner.extract.model.struct.ExLinkKey;
 import org.wikipedia.miner.extract.model.struct.ExSenseForLabel;
 
+import com.scienceminer.nerd.kb.model.hadoop.*;
+
+/**
+ * The fourth step in the extraction process.
+ * 
+ * This produces the following sequence file (in <i>&lt;ouput_dir&gt;/step4/</i>)
+ * ...
+ */
 public class PageLabelStep extends Configured implements Tool {
 
 	

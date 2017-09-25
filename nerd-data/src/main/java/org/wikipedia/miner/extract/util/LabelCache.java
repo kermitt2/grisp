@@ -1,7 +1,6 @@
 package org.wikipedia.miner.extract.util;
 
 import java.io.*;
-//import java.nio.file.*;
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +11,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.log4j.Logger;
 
-import org.wikipedia.miner.util.ProgressTracker;
+import org.wikipedia.miner.extract.util.ProgressTracker;
 
 import org.fusesource.lmdbjni.*;
 import static org.fusesource.lmdbjni.Constants.*;
@@ -44,7 +43,7 @@ public class LabelCache {
 
     	//java.nio.file.Path path = Files.createTempDirectory("lmdb-temp-labels");
     	env = new Env();
-    	env.setMapSize(100 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for ~8 million labels
+    	env.setMapSize(800 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for ~64 million labels
     	env.open(envFilePath);
 		db = env.openDatabase();
     }
@@ -53,24 +52,6 @@ public class LabelCache {
  	   	db.close();
     	env.close();
 	}
-
-	/*public static LabelCache get() throws IOException {
-		if (cache == null)
-			cache = new LabelCache() ;
-
-		return cache ;
-	}*/
-
-	//Set<String> labelVocabulary ;
-
-	/*public LabelCache() throws IOException {
-		
-		DB db = DBMaker.newAppendFileDB(File.createTempFile("mapdb-temp", "labels"))
-	       .deleteFilesAfterClose().closeOnJvmShutdown().cacheHardRefEnable().make();
-		
-		labelVocabulary = db.getHashSet("labels");
-	}*/
-	
 	
 	public String getEnvFile() {
 		return this.envFilePath;
@@ -81,11 +62,6 @@ public class LabelCache {
 	}
 
 	public boolean isKnown(String label) {
-		/*if (tx == null)
-			tx = env.createReadTransaction(); 
-		else
-			tx.renew();*/
-
 		byte[] res = null;
 		try (Transaction tx = env.createReadTransaction()) {
 			try {

@@ -9,10 +9,15 @@ import org.apache.hadoop.io.*;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.record.CsvRecordInput;
+
 import org.apache.log4j.Logger;
-import org.wikipedia.miner.db.struct.DbPage;
-import org.wikipedia.miner.model.Page.PageType;
-import org.wikipedia.miner.util.ProgressTracker;
+
+//import org.wikipedia.miner.db.struct.DbPage;
+import com.scienceminer.nerd.kb.model.hadoop.DbPage;
+//import org.wikipedia.miner.model.Page.PageType;
+import com.scienceminer.nerd.kb.model.Page.PageType;
+
+import org.wikipedia.miner.extract.util.ProgressTracker;
 
 //import gnu.trove.map.hash.TObjectIntHashMap;
 

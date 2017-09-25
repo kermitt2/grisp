@@ -13,14 +13,15 @@ import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.wikipedia.miner.extract.util.*;
-import org.wikipedia.miner.util.MarkupStripper;
+
+import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
 
 import org.apache.hadoop.fs.Path;
 
 public class DumpLinkParserTest {
 
 	private DumpLinkParser dumpLinkParser = null;
-	private MarkupStripper stripper = null;
+	private MediaWikiParser stripper = null;
 
 	@Before
 	public void setUp() {
@@ -28,7 +29,7 @@ public class DumpLinkParserTest {
 			LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
 			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
 			dumpLinkParser = new DumpLinkParser(lc, si);
-			stripper = new MarkupStripper();
+			stripper = MediaWikiParser.getInstance();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -67,12 +68,12 @@ public class DumpLinkParserTest {
 				"bla bla [[Category:Hereditary cancers]] blo blo");
 
 			for(String sentence : sentences) {
-
-				Vector<int[]> linkRegions = stripper.gatherComplexRegions(sentence, "\\[\\[", "\\]\\]") ;
-
+				String markup = stripper.toTextWithInternalLinksAndCategoriesOnly(sentence, "en");
+System.out.println(markup);
+				Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, "\\[\\[", "\\]\\]") ;
 				for(int[] linkRegion: linkRegions) {
 
-					String linkMarkup = sentence.substring(linkRegion[0]+2, linkRegion[1]-2) ;
+					String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2) ;
 					try {
 						DumpLink dumpLink = dumpLinkParser.parseLink(linkMarkup) ;
 						System.out.print(dumpLink.toString());

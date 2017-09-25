@@ -29,15 +29,16 @@ import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
 
-import org.wikipedia.miner.db.struct.DbIntList;
+//import org.wikipedia.miner.db.struct.DbIntList;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.util.LanguageConfiguration;
 import org.wikipedia.miner.extract.util.PagesByTitleCache;
 import org.wikipedia.miner.extract.util.SiteInfo;
 import org.wikipedia.miner.extract.util.Util;
-import org.wikipedia.miner.model.Page.PageType;
 
+import com.scienceminer.nerd.kb.model.Page.PageType;
+import com.scienceminer.nerd.kb.model.hadoop.*;
 
 /**
  * The second step in the extraction process.

@@ -62,9 +62,7 @@ public class DumpLinkParser {
 		m = mainPattern.matcher(markup) ;
 		if (m.matches()) {
 			target = m.group(1) ;
-			
 			section = m.group(3) ;
-			
 			anchor = m.group(5) ;
 		} else {
 			throw (new Exception("Could not parse link markup: '" + markup + "'")) ;

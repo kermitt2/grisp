@@ -1,11 +1,11 @@
 General
 ----------------------------------------------------------------------------------------------------------------------------
-Expected produced files: there must be 13 generated csv files
+Expected produced files: there must be 12 generated csv files
 
-articleParents.csv   label.csv       pageLinkOut.csv              stats.csv
+articleParents.csv   label.csv       pageLinkOut.csv              
 categoryParents.csv  page.csv        redirectSourcesByTarget.csv  
 childArticles.csv    pageLabel.csv   redirectTargetsBySource.csv
-childCategories.csv  pageLinkIn.csv  sentenceSplits.csv
+childCategories.csv  pageLinkIn.csv  stats.csv
 
 Intel Core i7-4790K CPU 4.00GHz Haswell, 16GB memory, with 4 cores, 8 threads, SSD, pseudo distributed mode
 
@@ -22,8 +22,8 @@ Hadoop 2.* config with YARN
 
 // etc/hadoop/hadoop-env.sh 
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle
-export HADOOP_PREFIX=/home/lopez/tools/hadoop/hadoop-2.6.5
-export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.6.5/etc/hadoop"}
+export HADOOP_PREFIX=/home/lopez/tools/hadoop/hadoop-2.7.4
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4/etc/hadoop"}
 
 // etc/hadoop/hdfs-site.xml
   <property>
@@ -33,12 +33,12 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.6.5
   
   <property>
      <name>dfs.name.dir</name>
-     <value>/home/lopez/tools/hadoop/hadoop-2.6.5/mydata/hdfs/namenode/</value>
+     <value>/home/lopez/tools/hadoop/hadoop-2.7.4/mydata/hdfs/namenode/</value>
   </property>
 
   <property>
      <name>dfs.data.dir</name>
-     <value>/home/lopez/tools/hadoop/hadoop-2.6.5/mydata/hdfs/datanode/</value>
+     <value>/home/lopez/tools/hadoop/hadoop-2.7.4/mydata/hdfs/datanode/</value>
   </property>
 
 // etc/hadoop/yarn-site.xml
@@ -93,6 +93,11 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.6.5
     <name>mapreduce.reduce.java.opts</name>
     <value>-Xmx7168m</value>
   </property>
+
+  <property>
+    <name>mapreduce.job.ubertask.enable</name>
+    <value>true</value>
+  </property>
   
   <property>
     <name>mapreduce.tasktracker.map.tasks.maximum</name>
@@ -128,21 +133,21 @@ Preparing the hdfs space:
 hdfs namenode -format
 
 // start HDFS nodes
-~/tools/hadoop/hadoop-2.6.5/sbin/start-dfs.sh
+~/tools/hadoop/hadoop-2.7.4/sbin/start-dfs.sh
 
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -mkdir /user
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -mkdir /user/lopez
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez
 
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -put ~/nerd/nerd/data/wikipedia/languages.xml /user/lopez/
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -put ~/nerd/nerd/data/wikipedia/de-sent.bin /user/lopez/
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -put ~/nerd/nerd/data/wikipedia/en-sent.bin /user/lopez/
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put ~/grisp/nerd-data/data/languages.xml /user/lopez/
+//~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put ~/nerd/nerd/data/wikipedia/de-sent.bin /user/lopez/
+//~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put ~/nerd/nerd/data/wikipedia/en-sent.bin /user/lopez/
 
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -put /mnt/data/wikipedia/latest/enwiki-latest-pages-articles.xml /user/lopez/
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -put /mnt/data/wikipedia/latest/frwiki-latest-pages-articles.xml /user/lopez/
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -put /mnt/data/wikipedia/latest/dewiki-latest-pages-articles.xml /user/lopez/
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/enwiki-latest-pages-articles.xml /user/lopez/
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/frwiki-latest-pages-articles.xml /user/lopez/
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/dewiki-latest-pages-articles.xml /user/lopez/
 
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -mkdir /user/lopez/output
-~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -mkdir /user/lopez/working
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez/output
+~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez/working
 
 
 ----------------------------------------------------------------------------------------------------------------------------
@@ -159,23 +164,23 @@ to be used below
 Launching hadoop process: 
 
 // start YARN
-~/tools/hadoop/hadoop-2.6.5//sbin/start-yarn.sh
+~/tools/hadoop/hadoop-2.7.4//sbin/start-yarn.sh
 
 //English (path in HDFS, except the jar)
- ~/tools/hadoop/hadoop-2.6.5/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.1-job.jar /user/lopez/enwiki-latest-pages-articles.xml /user/lopez/languages.xml en /user/lopez/en-sent.bin /user/lopez/working /user/lopez/output
+ ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.2-job.jar /user/lopez/enwiki-latest-pages-articles.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
 
 // getting the csv files
- ~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/en/
+ ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/en/
 
 //French
- ~/tools/hadoop/hadoop-2.6.5/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.1-job.jar /user/lopez/fr   wiki-latest-pages-articles.xml /user/lopez/languages.xml fr /user/lopez/en-sent.bin /user/lopez/working /user/lopez/output
+ ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.2-job.jar /user/lopez/frwiki-latest-pages-articles.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
 
 // getting the csv files
- ~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/fr/
+ ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/fr/
 
 //German
- ~/tools/hadoop/hadoop-2.6.5/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.1-job.jar /user/lopez/dewiki-latest-pages-articles.xml /user/lopez/languages.xml de /user/lopez/de-sent.bin /user/lopez/working /user/lopez/output
+ ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.2-job.jar /user/lopez/dewiki-latest-pages-articles.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
 
 // getting the csv files
- ~/tools/hadoop/hadoop-2.6.5/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/de/
+ ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/de/
 

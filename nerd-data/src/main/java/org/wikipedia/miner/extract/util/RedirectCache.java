@@ -16,7 +16,8 @@ import org.apache.hadoop.io.*;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.log4j.Logger;
-import org.wikipedia.miner.util.ProgressTracker;
+
+import org.wikipedia.miner.extract.util.ProgressTracker;
 
 import org.fusesource.lmdbjni.*;
 import static org.fusesource.lmdbjni.Constants.*;

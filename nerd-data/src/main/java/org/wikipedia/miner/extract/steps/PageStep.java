@@ -19,7 +19,8 @@ import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
 
-import org.wikipedia.miner.db.struct.*;
+//import org.wikipedia.miner.db.struct.*;
+import com.scienceminer.nerd.kb.model.hadoop.*;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.model.DumpPage;

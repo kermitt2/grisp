@@ -13,7 +13,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import java.util.regex.* ;
+import java.util.regex.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -23,37 +23,38 @@ public class LanguageConfiguration {
 	
 	private enum LangTag {Language, RootCategory, DisambiguationCategory, DisambiguationTemplate, RedirectIdentifier, ignorable}
 
-	String rootCategory = null ;  
-	Vector<String> disambigCategories = new Vector<String>() ;
-	Vector<String> disambigTemplates = new Vector<String>() ;
-	Vector<String> redirectIdentifiers = new Vector<String>() ;
-	Pattern disambigPattern ;
-	Pattern redirectPattern ;
+	String rootCategory = null;  
+	Vector<String> disambigCategories = new Vector<String>();
+	Vector<String> disambigTemplates = new Vector<String>();
+	Vector<String> redirectIdentifiers = new Vector<String>();
+	Pattern disambigPattern;
+	Pattern redirectPattern;
+	private String lang = null;
 	
 	public LanguageConfiguration(FileSystem dfs, String langCode, Path languageConfigFile) throws XMLStreamException, FactoryConfigurationError, IOException {
-		this.init(new InputStreamReader(dfs.open(languageConfigFile)), langCode) ;
+		this.init(new InputStreamReader(dfs.open(languageConfigFile)), langCode);
 	}
 	
 	public LanguageConfiguration(String langCode, Path languageConfigFile) throws XMLStreamException, FactoryConfigurationError, IOException {
-		this.init(new FileReader(languageConfigFile.toString().replace("file:","")), langCode) ;
+		this.init(new FileReader(languageConfigFile.toString().replace("file:","")), langCode);
 	}
 	
 	public LanguageConfiguration(String langCode, File languageConfigFile) throws XMLStreamException, FactoryConfigurationError, IOException {
-		this.init(new FileReader(languageConfigFile), langCode) ;
+		this.init(new FileReader(languageConfigFile), langCode);
 	}
 		
 	private void init(InputStreamReader input, String langCode) throws XMLStreamException, FactoryConfigurationError, IOException {
-		
-		XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(input) ;
+		this.lang = langCode;
+		XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(input);
 
-		boolean relevantLanguage = false ;
-		boolean done = false ;
+		boolean relevantLanguage = false;
+		boolean done = false;
 		
-		StringBuffer characters = new StringBuffer() ;
+		StringBuffer characters = new StringBuffer();
 
 		while (xmlStreamReader.hasNext()) {
 			
-			if (done) break ;
+			if (done) break;
 
 			int eventCode = xmlStreamReader.next();
 
@@ -61,7 +62,7 @@ public class LanguageConfiguration {
 
 			case XMLStreamReader.START_ELEMENT :
 				if (resolveLangTag(xmlStreamReader.getLocalName()) == LangTag.Language && xmlStreamReader.getAttributeValue(null, "code").equalsIgnoreCase(langCode))
-					relevantLanguage = true ;
+					relevantLanguage = true;
 				break;
 
 			case XMLStreamReader.END_ELEMENT :
@@ -69,162 +70,165 @@ public class LanguageConfiguration {
 					switch(resolveLangTag(xmlStreamReader.getLocalName())) {
 					case Language:
 						if (relevantLanguage)
-							done = true ; 
-						break ;
+							done = true; 
+						break;
 					case RootCategory:
 						if (rootCategory != null) 
-							throw new XMLStreamException("language configuration specifies multiple root categories") ;
+							throw new XMLStreamException("language configuration specifies multiple root categories");
 						else 
-							rootCategory = characters.toString().trim() ;
-						break ;
+							rootCategory = characters.toString().trim();
+						break;
 					case DisambiguationCategory:
 						disambigCategories.add(characters.toString().trim());
-						break ;
+						break;
 					case DisambiguationTemplate:
 						disambigTemplates.add(characters.toString().trim());
-						break ;
+						break;
 					case RedirectIdentifier:
 						redirectIdentifiers.add(characters.toString().trim());
-						break ;
+						break;
 					}
 				}
-				characters = new StringBuffer() ;
+				characters = new StringBuffer();
 				break;
 
 			case XMLStreamReader.CHARACTERS :
-				characters.append(xmlStreamReader.getText()) ;
-				break ;
+				characters.append(xmlStreamReader.getText());
+				break;
 			}
 		}
 
-		xmlStreamReader.close() ;
+		xmlStreamReader.close();
 		
 		if (!relevantLanguage)
-			throw new XMLStreamException("language configuration does not specify variables for language code '" + langCode + "'") ;
+			throw new XMLStreamException("language configuration does not specify variables for language code '" + langCode + "'");
 		
 		if (rootCategory == null) 
-			throw new XMLStreamException("language configuration does not specify a root category") ;
+			throw new XMLStreamException("language configuration does not specify a root category");
 		
 		if (redirectIdentifiers == null) 
-			throw new XMLStreamException("language configuration does not specify any redirect identifiers") ;
+			throw new XMLStreamException("language configuration does not specify any redirect identifiers");
 		
-		//now construct regex pattern for detecting disambig pages ;
+		//now construct regex pattern for detecting disambig pages;
 		
-		String disambigCategoryRegex = null ;
+		String disambigCategoryRegex = null;
 		if (!disambigCategories.isEmpty()) {
 			
-			StringBuffer tmp = new StringBuffer() ;
+			StringBuffer tmp = new StringBuffer();
 			
-			tmp.append("\\[\\[\\s*") ;
+			tmp.append("\\[\\[\\s*");
 			
 			if (disambigCategories.size() == 1) {
-				tmp.append(disambigCategories.firstElement()) ;
+				tmp.append(disambigCategories.firstElement());
 			} else {
-				tmp.append("(") ;
+				tmp.append("(");
 				for (String dc:disambigCategories) {
-					tmp.append(dc) ;
-					tmp.append("|") ;
+					tmp.append(dc);
+					tmp.append("|");
 				}
-				tmp.deleteCharAt(tmp.length()-1) ;
-				tmp.append(")") ;
+				tmp.deleteCharAt(tmp.length()-1);
+				tmp.append(")");
 			}
-			tmp.append("\\s*\\]\\]") ;
+			tmp.append("\\s*\\]\\]");
 			
-			disambigCategoryRegex = tmp.toString() ;
+			disambigCategoryRegex = tmp.toString();
 		}
 		
-		String disambigTemplateRegex = null ;
+		String disambigTemplateRegex = null;
 		if (!disambigTemplates.isEmpty()) {
 			
-			StringBuffer tmp = new StringBuffer() ;
+			StringBuffer tmp = new StringBuffer();
 			
-			tmp.append("\\{\\{\\s*") ;
+			tmp.append("\\{\\{\\s*");
 			
 			if (disambigTemplates.size() == 1) {
-				tmp.append(disambigTemplates.firstElement()) ;
+				tmp.append(disambigTemplates.firstElement());
 			} else {
-				tmp.append("(") ;
+				tmp.append("(");
 				for (String dt:disambigTemplates) {
-					tmp.append(dt) ;
-					tmp.append("|") ;
+					tmp.append(dt);
+					tmp.append("|");
 				}
-				tmp.deleteCharAt(tmp.length()-1) ;
-				tmp.append(")") ;
+				tmp.deleteCharAt(tmp.length()-1);
+				tmp.append(")");
 			}
-			tmp.append("\\s*\\}\\}") ;
+			tmp.append("\\s*\\}\\}");
 			
-			disambigTemplateRegex = tmp.toString() ;
+			disambigTemplateRegex = tmp.toString();
 		}
 		
 		
 		if (disambigCategoryRegex == null && disambigTemplateRegex == null) {
-			throw new XMLStreamException("language configuration does not specify any categories or templates for identifying disambiguation pages") ;
+			throw new XMLStreamException("language configuration does not specify any categories or templates for identifying disambiguation pages");
 		}
 		
 		if (disambigCategoryRegex != null && disambigTemplateRegex != null) {
-			disambigPattern = Pattern.compile("(" + disambigCategoryRegex + "|" + disambigTemplateRegex + ")", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) ;
+			disambigPattern = Pattern.compile("(" + disambigCategoryRegex + "|" + disambigTemplateRegex + ")", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 		} else {
 			if (disambigCategoryRegex != null)
-				disambigPattern = Pattern.compile(disambigCategoryRegex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) ;
+				disambigPattern = Pattern.compile(disambigCategoryRegex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 			else
-				disambigPattern = Pattern.compile(disambigTemplateRegex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) ;
+				disambigPattern = Pattern.compile(disambigTemplateRegex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 		}
 		
-		StringBuffer redirectRegex = new StringBuffer("\\#") ;
-		redirectRegex.append("(") ;
+		StringBuffer redirectRegex = new StringBuffer("\\#");
+		redirectRegex.append("(");
 		for (String ri:redirectIdentifiers) {
-			redirectRegex.append(ri) ;
-			redirectRegex.append("|") ;
+			redirectRegex.append(ri);
+			redirectRegex.append("|");
 		}
-		redirectRegex.deleteCharAt(redirectRegex.length()-1) ;
-		redirectRegex.append(")[:\\s]*(?:\\[\\[(.*)\\]\\]|(.*))") ;
+		redirectRegex.deleteCharAt(redirectRegex.length()-1);
+		redirectRegex.append(")[:\\s]*(?:\\[\\[(.*)\\]\\]|(.*))");
 		
-		redirectPattern = Pattern.compile(redirectRegex.toString(), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) ;
+		redirectPattern = Pattern.compile(redirectRegex.toString(), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 		
 	}
 	
 	public String getRootCategoryName() {
-		return rootCategory ;
+		return rootCategory;
 	}
 	
 	public Vector<String> getDisambiguationCategoryNames() {
-		return disambigCategories ;
+		return disambigCategories;
 	}
 	
 	public Vector<String> getDisambiguationTemplateNames() {
-		return disambigTemplates ;
+		return disambigTemplates;
 	}
 	
 	public Vector<String> getRedirectIdentifiers() {
-		return redirectIdentifiers ;
+		return redirectIdentifiers;
 	}
 	
 	public Pattern getDisambiguationPattern() {
-		return disambigPattern ;
+		return disambigPattern;
 	}
 	
 	public Pattern getRedirectPattern() {
-		return redirectPattern ;
+		return redirectPattern;
 	}
 	
+	public String getLangCode() {
+		return lang;
+	}
 	
 	private LangTag resolveLangTag(String tagName) {
 
 		try {
-			return LangTag.valueOf(tagName) ;
+			return LangTag.valueOf(tagName);
 		} catch (IllegalArgumentException e) {
-			return LangTag.ignorable ;
+			return LangTag.ignorable;
 		}
 	}
 	
 	public static void main(String args[]) throws XMLStreamException, FactoryConfigurationError, IOException {
 		
-		Configuration conf = new Configuration() ;
+		Configuration conf = new Configuration();
 		
-		Path p = new Path("configs/languages.xml") ;
+		Path p = new Path("configs/languages.xml");
 		
-		FileSystem fs = FileSystem.getLocal(conf) ;
+		FileSystem fs = FileSystem.getLocal(conf);
 		
-		LanguageConfiguration lc = new LanguageConfiguration(fs, "en", p) ;
+		LanguageConfiguration lc = new LanguageConfiguration(fs, "en", p);
 	}
 }

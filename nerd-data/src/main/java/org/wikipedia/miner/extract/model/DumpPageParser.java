@@ -3,7 +3,7 @@ package org.wikipedia.miner.extract.model;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.* ;
+import java.util.regex.*;
 import java.io.*;
 import javax.xml.stream.*;
 
@@ -11,7 +11,8 @@ import org.apache.log4j.*;
 
 import org.wikipedia.miner.extract.util.LanguageConfiguration;
 import org.wikipedia.miner.extract.util.SiteInfo;
-import org.wikipedia.miner.model.Page.PageType ;
+//import org.wikipedia.miner.model.Page.PageType;
+import com.scienceminer.nerd.kb.model.Page.PageType;
 
 /**
  * @author David Milne
@@ -22,34 +23,32 @@ public class DumpPageParser {
 	
 	private Logger log = Logger.getLogger(DumpPageParser.class);
 
+	private XMLInputFactory xmlStreamFactory = XMLInputFactory.newInstance();
 
-	private XMLInputFactory xmlStreamFactory = XMLInputFactory.newInstance() ;
-
-	private enum DumpTag {page, id, title, text, timestamp, ignorable, redirect} ;
+	private enum DumpTag {page, id, title, text, timestamp, ignorable, redirect};
 	
-	private LanguageConfiguration languageConfiguration ;
-	private SiteInfo siteInfo ;
+	private LanguageConfiguration languageConfiguration;
+	private SiteInfo siteInfo;
 	
-	//private Pattern redirectPattern ; 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'") ;
+	//private Pattern redirectPattern; 
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
 
 	public DumpPageParser(LanguageConfiguration lc, SiteInfo si) {
-		this.languageConfiguration = lc ;
-		this.siteInfo = si ;
-
+		this.languageConfiguration = lc;
+		this.siteInfo = si;
 	}
 
 	public DumpPage parsePage(String markup) throws XMLStreamException {
 
-		Integer id = null ;
-		String title = null ;
-		String text = null ;
+		Integer id = null;
+		String title = null;
+		String text = null;
 		String redirection = null;
-		Date lastEdited = null ;
-		StringBuffer characters = new StringBuffer() ;
+		Date lastEdited = null;
+		StringBuffer characters = new StringBuffer();
 
-		XMLStreamReader xmlStreamReader = xmlStreamFactory.createXMLStreamReader(new StringReader(markup)) ;
+		XMLStreamReader xmlStreamReader = xmlStreamFactory.createXMLStreamReader(new StringReader(markup));
 
 		String redirectionTarget = null;
 
@@ -64,7 +63,7 @@ public class DumpPageParser {
 							redirectionTarget = xmlStreamReader.getAttributeValue(null, "title");
 							if (redirectionTarget != null)
 								redirectionTarget = redirectionTarget.trim();
-							break ;	
+							break;	
 					}
 					break;
 				case XMLStreamReader.END_ELEMENT :
@@ -72,30 +71,30 @@ public class DumpPageParser {
 						case id:
 							//only take the first id (there is a 2nd one for the revision) 
 							if (id == null) 
-								id = Integer.parseInt(characters.toString().trim()) ;
-							break ;
+								id = Integer.parseInt(characters.toString().trim());
+							break;
 						case title:
-							title = characters.toString().trim() ;
-							break ;
+							title = characters.toString().trim();
+							break;
 						case text:
-							text = characters.toString().trim() ;
-							break ;
+							text = characters.toString().trim();
+							break;
 						case redirect:
 							// target title redirection is in the attribute value @title!							
 							redirection = redirectionTarget;
 							if (redirection != null)
 								redirection = redirection.trim();
 							redirectionTarget = null;
-							break ;	
+							break;	
 						case timestamp:
 							try {
-								lastEdited = dateFormat.parse(characters.toString().trim()) ;
+								lastEdited = dateFormat.parse(characters.toString().trim());
 							} catch (ParseException e) {
-								lastEdited = null ;
+								lastEdited = null;
 							}
-							break ;
+							break;
 					}
-					characters = new StringBuffer() ;
+					characters = new StringBuffer();
 					break;
 				case XMLStreamReader.CHARACTERS :
 					characters.append(xmlStreamReader.getText());
@@ -105,20 +104,20 @@ public class DumpPageParser {
 		xmlStreamReader.close();
 
 		if (id == null || title == null)// || text == null) 
-			throw new XMLStreamException("Could not parse identifiers for page") ;
-			//throw new XMLStreamException("Could not parse xml markup for page") ;
+			throw new XMLStreamException("Could not parse identifiers for page");
+			//throw new XMLStreamException("Could not parse xml markup for page");
 		
 		//identify namespace - assume 0 (main) if there is no prefix, or if prefix doesn't match any known namespaces
-		Integer namespaceKey = 0 ;
-		int pos = title.indexOf(":") ;
+		Integer namespaceKey = 0;
+		int pos = title.indexOf(":");
 		if (pos > 0) {
-			String namespace = title.substring(0, pos) ;
-			namespaceKey = siteInfo.getNamespaceKey(namespace) ;
+			String namespace = title.substring(0, pos);
+			namespaceKey = siteInfo.getNamespaceKey(namespace);
 			
 			if (namespaceKey == null) 
-				namespaceKey = 0 ;
+				namespaceKey = 0;
 			else 
-				title = title.substring(pos+1) ;	
+				title = title.substring(pos+1);	
 		}
 		
 		//ignore anything that isn't in main, category or template namespace
@@ -126,23 +125,23 @@ public class DumpPageParser {
 			 (namespaceKey != SiteInfo.MAIN_KEY) /* && 
 			 (namespaceKey != SiteInfo.TEMPLATE_KEY) */
 			 ) {
-			//Logger.getLogger(DumpPageParser.class).info("Ignoring page " + id + ":" + title) ;
-			return null ;
+			//Logger.getLogger(DumpPageParser.class).info("Ignoring page " + id + ":" + title);
+			return null;
 		}
 		
-		//identify page type ;
+		//identify page type;
 		PageType type =null;
 		String redirectTarget = null;
 		
 		/*if (text != null) {
-			Matcher redirectMatcher = languageConfiguration.getRedirectPattern().matcher(text) ;
+			Matcher redirectMatcher = languageConfiguration.getRedirectPattern().matcher(text);
 			if (redirectMatcher.find()) {
-				type = PageType.redirect ;
+				type = PageType.redirect;
 				
 				if (redirectMatcher.group(2) != null)
-					redirectTarget = redirectMatcher.group(2) ;
+					redirectTarget = redirectMatcher.group(2);
 				else
-					redirectTarget = redirectMatcher.group(3) ;
+					redirectTarget = redirectMatcher.group(3);
 			}
 		}*/
 		/*if (namespaceKey == SiteInfo.TEMPLATE_KEY) {
@@ -154,7 +153,7 @@ public class DumpPageParser {
 		} else if (namespaceKey == SiteInfo.CATEGORY_KEY) {
 			type = PageType.category;
 		} else if (namespaceKey == SiteInfo.MAIN_KEY){
-			Matcher disambigMatcher = languageConfiguration.getDisambiguationPattern().matcher(text) ;
+			Matcher disambigMatcher = languageConfiguration.getDisambiguationPattern().matcher(text);
 			if (disambigMatcher.find()) {
 				type = PageType.disambiguation;
 			} else if (redirectTarget == null) {
@@ -166,16 +165,16 @@ public class DumpPageParser {
 			type = PageType.invalid;
 		}
 		
-		return new DumpPage(id, namespaceKey, type, title, text, redirectTarget, lastEdited) ;
+		return new DumpPage(id, namespaceKey, type, title, text, redirectTarget, lastEdited);
 	}
 
 
 	private DumpTag resolveDumpTag(String tagName) {
 
 		try {
-			return DumpTag.valueOf(tagName) ;
+			return DumpTag.valueOf(tagName);
 		} catch (IllegalArgumentException e) {
-			return DumpTag.ignorable ;
+			return DumpTag.ignorable;
 		}
 	}
 

@@ -4,9 +4,11 @@
 
     <Language code="en" name="English" localName="English">
         <!--RootCategory>Fundamental categories</RootCategory-->
-        <RootCategory>Main topic classifications</RootCategory>
+        <!--RootCategory>Main topic classifications</RootCategory-->
+        <RootCategory>Contents</RootCategory>
 
         <DisambiguationCategory>Disambiguation</DisambiguationCategory>
+        <DisambiguationCategory>disambiguation</DisambiguationCategory>
         
         <DisambiguationTemplate>disambiguation</DisambiguationTemplate>
         <DisambiguationTemplate>disambig</DisambiguationTemplate>
@@ -30,28 +32,29 @@
 
 	<Language code="de" name="German" localName="Deutsch">
 		<RootCategory>!Hauptkategorie</RootCategory>
+		<!--RootCategory>Sachsystematik</RootCategory-->
 
 		<DisambiguationCategory>Begriffsklärung</DisambiguationCategory>
-
 		<DisambiguationTemplate>Begriffsklärung</DisambiguationTemplate>
 		
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 		<RedirectIdentifier>WEITERLEITUNG</RedirectIdentifier>
 		<RedirectIdentifier>Weiterleitung</RedirectIdentifier>
-		
 	</Language>
         
      <Language code="es" name="Spanish" localName="Castellano">
-		<RootCategory>Artículos</RootCategory>
+		<!--RootCategory>Artículos</RootCategory-->
+		<RootCategory>Índice_de_categorías</RootCategory>
 
-		<DisambiguationCategory>Wikipedia:Desambiguación</DisambiguationCategory>
+		<!--DisambiguationCategory>Wikipedia:Desambiguación</DisambiguationCategory-->
+		<DisambiguationCategory>Desambiguación</DisambiguationCategory>
 
 		<DisambiguationTemplate>desambiguación</DisambiguationTemplate>
-		<DisambiguationTemplate>des</DisambiguationTemplate>
 		<DisambiguationTemplate>desambiguacion</DisambiguationTemplate>
 		<DisambiguationTemplate>disambig</DisambiguationTemplate>
 
+		<RedirectIdentifier>Redirección</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>des</RedirectIdentifier>
 		<RedirectIdentifier>otros usos</RedirectIdentifier>
@@ -63,33 +66,38 @@
 	</Language>
 
 	<Language code="fr" name="French" localName="Français">
-		<RootCategory>Espace encyclopédique</RootCategory>
-		
-		<DisambiguationCategory>homonymie</DisambiguationCategory>
+		<!--RootCategory>Espace encyclopédique</RootCategory-->
+		<RootCategory>Accueil</RootCategory>
+
+		<DisambiguationCategory>Homonymie</DisambiguationCategory>
 		
 		<DisambiguationTemplate>disambiguation</DisambiguationTemplate>
 		<DisambiguationTemplate>Homonymie</DisambiguationTemplate>
+		<DisambiguationTemplate>homonymie</DisambiguationTemplate>
 		<DisambiguationTemplate>Patronymie</DisambiguationTemplate>
         <DisambiguationTemplate>disambig</DisambiguationTemplate>
-        <!--DisambiguationTemplate>geodis</DisambiguationTemplate-->
         <DisambiguationTemplate>Personnes homonymes</DisambiguationTemplate>
-        <!--DisambiguationTemplate>hospitaldis</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>mathdab</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>mountianindex</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>numberdis</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>roaddis</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>schooldis</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>shipindex</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>SIA</DisambiguationTemplate-->
-		<!--DisambiguationTemplate>disambig-cleanup</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>dab</DisambiguationTemplate-->
-        <!--DisambiguationTemplate>surname</DisambiguationTemplate-->
 		
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>redirect</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
 		
+	</Language>
+
+	<Language code="it" name="Italian" localName="Italiano">
+		<!--RootCategory>Enciclopedia</RootCategory-->
+		<RootCategory>Categorie</RootCategory>
+
+		<DisambiguationCategory>Disambiguazione</DisambiguationCategory>
+		<DisambiguationCategory>Disambigua</DisambiguationCategory>
+		
+		<DisambiguationTemplate>disambigua</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambigua</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambiguazione</DisambiguationTemplate>
+
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 	</Language>
 
 </WikipediaLanguageList>

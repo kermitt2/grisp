@@ -21,14 +21,15 @@ import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.record.CsvRecordInput;
-import org.wikipedia.miner.db.struct.DbPage;
-import org.wikipedia.miner.model.Page.PageType;
-import org.wikipedia.miner.util.MarkupStripper;
+
+import com.scienceminer.nerd.kb.model.hadoop.*;
+import com.scienceminer.nerd.kb.model.Page.PageType;
+import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
 
 public class CategoryTest {
 
 	private DumpLinkParser dumpLinkParser = null;
-	private MarkupStripper stripper = null;
+	private MediaWikiParser stripper = null;
 	private PagesByTitleCache pagesByTitle = null;
 
 	//@Before
@@ -37,7 +38,7 @@ public class CategoryTest {
 			LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
 			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
 			dumpLinkParser = new DumpLinkParser(lc, si);
-			stripper = new MarkupStripper();
+			stripper = MediaWikiParser.getInstance();
 			pagesByTitle = new PagesByTitleCache(null, "en");
 			System.out.println("nb of article titles: " + pagesByTitle.getArticleDatabaseSize());
 			System.out.println("nb of category titles: " + pagesByTitle.getArticleDatabaseSize());
@@ -86,7 +87,7 @@ public class CategoryTest {
 
 	
 	//@Test
-	public void testCategoryFromPageDump() {
+	/*public void testCategoryFromPageDump() {
 		try {
 			String markup = "bla bla [[Category:Hereditary cancers]] blo blo, but not [[Hereditary cancers]] bla.";
 			Vector<int[]> linkRegions = stripper.gatherComplexRegions(markup, "\\[\\[", "\\]\\]") ;
@@ -117,6 +118,6 @@ public class CategoryTest {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 }

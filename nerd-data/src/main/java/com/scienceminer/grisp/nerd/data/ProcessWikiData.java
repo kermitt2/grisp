@@ -47,7 +47,7 @@ public class ProcessWikiData {
 
   	// this is the list of languages we consider for target translations, we will ignore the other
   	// languages
-  	private static List<String> targetLanguages = Arrays.asList("en","fr", "de");
+  	private static List<String> targetLanguages = Arrays.asList("en","fr", "de", "es", "it");
 
   	public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
   		try {
@@ -223,12 +223,12 @@ System.out.println("resultPath: " + resultPath);
 			    								val = string(db_id.get(txr, bytes(wikidataId)));
 			    							}
 			    							if (val == null) {
-			    								// also look at the temp stuff not yet aded
+			    								// also look at the temp stuff not yet added
 			    								val = tempToBeAddedMap.get(wikidataId);
 			    							}
 			    							convertedPiece = lang + "|" + pageId;
 			    							if (val != null) {
-			    								convertedPiece += lang + "|" + pageId + "|" + val;
+			    								convertedPiece = lang + "|" + pageId + "|" + val;
 			    							} 
 					    					db_id.put(tx, bytes(wikidataId), bytes(convertedPiece));
 					    					tempToBeAddedMap.put(wikidataId, convertedPiece);
@@ -276,7 +276,7 @@ System.out.println("resultPath: " + resultPath);
 						if ( (keyBytes != null) && (valueBytes != null) ) {
 							String wikidataId = string(keyBytes);
 							String value = string(valueBytes);
-							
+
 							//value = value.replace(",", "%2C");
 							//value = value.replace("%", "%25");
 

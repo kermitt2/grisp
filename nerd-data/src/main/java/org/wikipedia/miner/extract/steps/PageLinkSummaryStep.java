@@ -29,12 +29,21 @@ import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.hadoop.record.CsvRecordOutput;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
-import org.wikipedia.miner.db.struct.DbLinkLocation;
-import org.wikipedia.miner.db.struct.DbLinkLocationList;
+//import org.wikipedia.miner.db.struct.DbLinkLocation;
+//import org.wikipedia.miner.db.struct.DbLinkLocationList;
+
+import com.scienceminer.nerd.kb.model.hadoop.*;
+
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.model.struct.ExLinkKey;
 
+/**
+ * The sixth step in the extraction process.
+ * 
+ * This produces the following sequence file (in <i>&lt;ouput_dir&gt;/step6/</i>)
+ * ...
+ */
 public class PageLinkSummaryStep extends Configured implements Tool {
 	
 	public enum Output {pageLinkOut, pageLinkIn} ;
@@ -56,7 +65,8 @@ public class PageLinkSummaryStep extends Configured implements Tool {
 		// set up input
 
 		conf.setInputFormat(TextInputFormat.class);
-		FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense) + "/" + LabelSensesStep.Output.tempPageLink.name() + "*"));
+		FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense) + 
+			"/" + LabelSensesStep.Output.tempPageLink.name() + "*"));
 				
 		//set up output
 

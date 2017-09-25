@@ -16,7 +16,6 @@ import static org.fusesource.lmdbjni.Constants.*;
  * csv files as expected by NERD. We assume that these files are small
  * and basic enough to avoid the need of Hadoop and distributed process.
  * 
- * Beware the crappiness of DBpedia !
  *
  * @author Patrice Lopez
  *

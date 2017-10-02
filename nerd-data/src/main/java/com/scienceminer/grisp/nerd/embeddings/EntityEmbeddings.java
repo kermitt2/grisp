@@ -42,9 +42,9 @@ import com.martiansoftware.jsap.SimpleJSAP;
  *
  * Example command:
  *
- * mvn exec:java -Dexec.mainClass=com.yahoo.semsearch.fastlinking.w2v.EntityEmbeddings 
+ * mvn exec:java -Dexec.mainClass=com.scienceminer.grisp.nerd.embeddings.EntityEmbeddings 
  * -Dexec.args="-i /home/lopez/nerd/data/wikipedia/training/description.en 
- * -v /mnt/data/wikipedia/embeddings/wiki.en.q.compressed -o /mnt/data/wikipedia/embeddings/entity.en.embeddings"
+ * -v /mnt/data/wikipedia/embeddings/wiki.en.quantized.compressed -o /mnt/data/wikipedia/embeddings/entity.en.embeddings"
  *
  * @author roi blanco (original), with modification patrice lopez
  */

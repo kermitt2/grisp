@@ -32,10 +32,6 @@ import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.hadoop.record.CsvRecordOutput;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
-//import org.wikipedia.miner.db.struct.DbLabel;
-//import org.wikipedia.miner.db.struct.DbLabelForPage;
-//import org.wikipedia.miner.db.struct.DbLabelForPageList;
-//import org.wikipedia.miner.db.struct.DbSenseForLabel;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.model.struct.ExLabel;
@@ -70,12 +66,10 @@ public class PageLabelStep extends Configured implements Tool {
 		conf.setReducerClass(PageLabelReducer.class) ;
 
 		// set up input
-
 		conf.setInputFormat(TextInputFormat.class);
 		FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense) + "/" + LabelSensesStep.Output.tempLabel.name() + "*"));
 				
 		//set up output
-
 		conf.setOutputFormat(PageLabelOutputFormat.class);
 		FileOutputFormat.setOutputPath(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.pageLabel)));
 
@@ -94,13 +88,13 @@ public class PageLabelStep extends Configured implements Tool {
 			ExLabel exlabel = new ExLabel() ;
 			exlabel.deserialize(cri) ;
 			
-			DbLabel dbLabel= DumpExtractor.convert(exlabel) ;
+			DbLabel dbLabel = DumpExtractor.convert(exlabel) ;
 			
 			if (dbLabel.getSenses() != null && !dbLabel.getSenses().isEmpty()) {
 								
 				boolean isPrimary = true ;
 				
-				for (DbSenseForLabel sense:dbLabel.getSenses()) {
+				for (DbSenseForLabel sense : dbLabel.getSenses()) {
 					
 					DbLabelForPage pageLabel = new DbLabelForPage(text, 
 							sense.getLinkOccCount(), 

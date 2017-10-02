@@ -1,6 +1,5 @@
 package org.wikipedia.miner.extract.steps;
 
-
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.DataOutputStream;
@@ -29,7 +28,6 @@ import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
 
-//import org.wikipedia.miner.db.struct.DbIntList;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.util.LanguageConfiguration;
@@ -139,11 +137,6 @@ public class RedirectStep extends Configured implements Tool {
 					if (cf.getName().equals(new Path(job.get(DumpExtractor.KEY_LANG_FILE)).getName())) {
 						lc = new LanguageConfiguration(job.get(DumpExtractor.KEY_LANG_CODE), cf) ;
 					}
-
-					/*if (cf.getName().startsWith(PageStep.Output.tempPage.name())) {
-						Logger.getLogger(Step2Mapper.class).info("Located cached page file " + cf.toString()) ;
-						pageFiles.add(cf) ;
-					}*/
 				}
 
 				if (si == null) 
@@ -152,9 +145,6 @@ public class RedirectStep extends Configured implements Tool {
 				if (lc == null) 
 					throw new Exception("Could not locate '" + job.get(DumpExtractor.KEY_LANG_FILE) + "' in DistributedCache") ;
 
-				/*if (pageFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 1") ;*/
-				
 				mos = new MultipleOutputs(job);
 				
 				articleIdsByTitle = new PagesByTitleCache(articleIdsByTitleDbFile, job.get(DumpExtractor.KEY_LANG_CODE));

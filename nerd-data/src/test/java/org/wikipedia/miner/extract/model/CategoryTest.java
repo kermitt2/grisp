@@ -35,9 +35,9 @@ public class CategoryTest {
 	//@Before
 	public void setUp() {
 		try {
-			LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
+			//LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
 			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
-			dumpLinkParser = new DumpLinkParser(lc, si);
+			dumpLinkParser = new DumpLinkParser(si);
 			stripper = MediaWikiParser.getInstance();
 			pagesByTitle = new PagesByTitleCache(null, "en");
 			System.out.println("nb of article titles: " + pagesByTitle.getArticleDatabaseSize());

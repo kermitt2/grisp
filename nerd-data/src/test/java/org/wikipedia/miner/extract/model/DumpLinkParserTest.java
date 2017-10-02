@@ -26,9 +26,9 @@ public class DumpLinkParserTest {
 	@Before
 	public void setUp() {
 		try {
-			LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
+			//LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
 			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
-			dumpLinkParser = new DumpLinkParser(lc, si);
+			dumpLinkParser = new DumpLinkParser(si);
 			stripper = MediaWikiParser.getInstance();
 		}
 		catch(Exception e) {
@@ -69,13 +69,13 @@ public class DumpLinkParserTest {
 
 			for(String sentence : sentences) {
 				String markup = stripper.toTextWithInternalLinksAndCategoriesOnly(sentence, "en");
-System.out.println(markup);
-				Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, "\\[\\[", "\\]\\]") ;
+
+				Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
 				for(int[] linkRegion: linkRegions) {
 
-					String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2) ;
+					String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);
 					try {
-						DumpLink dumpLink = dumpLinkParser.parseLink(linkMarkup) ;
+						DumpLink dumpLink = dumpLinkParser.parseLink(linkMarkup);
 						System.out.print(dumpLink.toString());
 
 						int ns = dumpLink.getTargetNamespace();
@@ -86,6 +86,47 @@ System.out.println(markup);
 						System.out.println("Could not parse link markup '" + linkMarkup + "'");
 						e.printStackTrace();
 					}
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testLinkParserInDisambiguationText() {
+		try {
+			String sentence = "'''Nardelli''' is an [[Italian language|Italian]] surname, which means a descendant of \"Nardo\",\n" +
+				"a pet form of the name [[Leonardo]] (\"lion-like\").<ref>''Dictionary of American Family Names''.\n" +
+				"Oxford University Press, 2013. Retrieved on 10 January 2016.</ref> The name may refer to:\n" +
+				"*[[Elania Nardelli]] (born 1987), Italian sport shooter\n" +
+				"*[[Francesco Nardelli]] (born 1953), Italian naturalist\n" +
+				"*[[Maria Nardelli]] (born 1954), Italian athlete \n" +
+				"*[[Michael Nardelli]] (born 1983), American actor \n" +
+				"*[[Robert Nardelli]] (born 1948), American businessman\n" +
+				"*[[Stefano Nardelli]] (born 1993), Italian cyclist\n" +
+				"*[[Steve Nardelli]] (born 1948), British musician\n" +
+				"\n" +
+				"==References==\n" +
+				"{{reflist}}\n" +
+				"\n" +
+				"{{surname}}\n" +
+				"[[Category:Italian-language surnames]]";
+
+			String markup = sentence;//stripper.toTextWithInternalLinksAndCategoriesOnly(sentence, "en");
+			Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, "\\*\\s*", "\\[\\[", "\\]\\]");
+			System.out.println("******************** " + linkRegions.size() + " found disamb. links");
+			for(int[] linkRegion: linkRegions) {
+				String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);
+				while(linkMarkup.startsWith("[") || linkMarkup.startsWith(" ")) {
+					linkMarkup = linkMarkup.substring(1);
+				}
+				try {
+					DumpLink dumpLink = dumpLinkParser.parseLink(linkMarkup);
+					System.out.println(dumpLink.toString());
+				} catch (Exception e) {
+					System.out.println("Could not parse link markup '" + linkMarkup + "'");
+					e.printStackTrace();
 				}
 			}
 		} catch(Exception e) {

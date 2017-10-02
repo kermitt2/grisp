@@ -39,7 +39,6 @@ import org.wikipedia.miner.extract.util.LanguageConfiguration;
 import org.wikipedia.miner.extract.util.SiteInfo;
 import org.wikipedia.miner.extract.util.XmlInputFormat;
 
-//import org.wikipedia.miner.util.MarkupStripper;
 import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
 
 /**
@@ -73,14 +72,12 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 		conf.setReducerClass(LabelOccurrencesReducer.class);
 
 		// set up input
-
 		conf.setInputFormat(XmlInputFormat.class);
 		conf.set(XmlInputFormat.START_TAG_KEY, "<page>");
 		conf.set(XmlInputFormat.END_TAG_KEY, "</page>");
 		FileInputFormat.setInputPaths(conf, conf.get(DumpExtractor.KEY_INPUT_FILE));
 
 		//set up output
-
 		conf.setOutputFormat(LabelOutputFormat.class);
 		FileOutputFormat.setOutputPath(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) +"/" + DumpExtractor.getDirectoryName(ExtractionStep.labelOccurrence)));
 
@@ -110,10 +107,8 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 
 		private DumpPageParser pageParser;
 		
-		//private Vector<Path> labelFiles = new Vector<Path>();
 		private LabelCache labelCache;
 
-		//private MarkupStripper stripper = new MarkupStripper();
 		private MediaWikiParser stripper = MediaWikiParser.getInstance();
 		
 		private int maxLabelLength = 15;
@@ -145,14 +140,8 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 				if (lc == null) 
 					throw new Exception("Could not locate '" + job.get(DumpExtractor.KEY_LANG_FILE) + "' in DistributedCache");
 
-				/*if (labelFiles.isEmpty())
-					throw new Exception("Could not gather label files produced in step 3");*/
-
 				pageParser = new DumpPageParser(lc, si);
 				
-				/*labelCache = LabelCache.getInstance();
-				if (!labelCache.isLoaded()) 
-					labelCache.load(labelFiles, null);*/
 				labelCache = new LabelCache(labelDbFile, job.get(DumpExtractor.KEY_LANG_CODE));
 			} catch (Exception e) {
 				Logger.getLogger(LabelOccurrencesMapper.class).error("Could not configure mapper", e);
@@ -170,7 +159,6 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 					HashMap<String, ExLabel> labels = new HashMap<String, ExLabel>();
 
 					String markup = page.getMarkup();
-					//markup = stripper.stripToPlainText(markup, null);
 					markup = stripper.toTextOnly(markup, lc.getLangCode());
 
 					String s = "$ " + markup + " $";

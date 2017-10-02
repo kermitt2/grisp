@@ -64,7 +64,7 @@ public class DumpExtractor {
 	private Path inputFile;
 	private Path langFile;
 	private String lang;
-	private Path sentenceModel;
+	//private Path sentenceModel;
 	private Path workingDir ;
 	private Path finalDir;
 
@@ -79,13 +79,12 @@ public class DumpExtractor {
 	public static final String KEY_OUTPUT_DIR = "wm.workingDir";
 	public static final String KEY_LANG_FILE = "wm.langFile";
 	public static final String KEY_LANG_CODE = "wm.langCode";
-	public static final String KEY_SENTENCE_MODEL = "wm.sentenceModel";
+	//public static final String KEY_SENTENCE_MODEL = "wm.sentenceModel";
 
 	public static final String LOG_ORPHANED_PAGES = "orphanedPages";
 	public static final String LOG_WEIRD_LABEL_COUNT = "wierdLabelCounts";
 	public static final String LOG_MEMORY_USE = "memoryUsage";
 	
-
 	public static final String OUTPUT_SITEINFO = "final/siteInfo.xml";
 	public static final String OUTPUT_PROGRESS = "tempProgress.csv";
 	public static final String OUTPUT_TEMPSTATS = "tempStats.csv";
@@ -126,7 +125,7 @@ public class DumpExtractor {
 		conf.set(KEY_INPUT_FILE, args[0]);
 		conf.set(KEY_LANG_FILE, args[1]);
 		conf.set(KEY_LANG_CODE, args[2]);
-		conf.set(KEY_SENTENCE_MODEL, "en-sent.bin");
+		//conf.set(KEY_SENTENCE_MODEL, "en-sent.bin");
 		conf.set(KEY_OUTPUT_DIR, args[3]);
 		// final dir is args[4]
 
@@ -184,10 +183,10 @@ public class DumpExtractor {
 		if (lc == null)
 			throw new IOException("Could not load language configuration for '" + lang + "' from '" + langFile + "'");
 
-		sentenceModel = new Path("en-sent.bin");
+		/*sentenceModel = new Path("en-sent.bin");
 		fs = getFileStatus(sentenceModel);
 		if (fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.READ)) 
-			throw new IOException("'" + sentenceModel + " is not readable or does not exist");
+			throw new IOException("'" + sentenceModel + " is not readable or does not exist");*/
 
 		//check output directory
 		//workingDir = new Path(args[4]);
@@ -395,12 +394,6 @@ public class DumpExtractor {
 				return result;
 			}
 
-			//finalizeFile(currStep, LabelSensesStep.Output.sentenceSplits.name());
-			
-			// PL: translation links are not present anymore in the article dump, we need to use the langlinks.sql files
-			// in another process
-			//finalizeFile(currStep, LabelSensesStep.Output.translations.name());
-
 			//update progress
 			lastCompletedStep = currStep;
 			writeProgress(lastCompletedStep);
@@ -448,7 +441,7 @@ public class DumpExtractor {
 					}
 				}
 				if (labelFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 4 (pageLabel)");
+					throw new Exception("Could not gather page summary files produced in step 3 (labelSense) 4 (pageLabel)");
 
 				//articleIdsByTitle.loadArticles(pageFiles, null);
 				//articleIdsByTitle.loadCategories(pageFiles, null);
@@ -1071,7 +1064,7 @@ public class DumpExtractor {
 	public static DbLabel convert(ExLabel oldLabel) {
 
 		ArrayList<DbSenseForLabel> senses = new ArrayList<DbSenseForLabel>();
-		for (Map.Entry<Integer,ExSenseForLabel> entry:oldLabel.getSensesById().entrySet()) {
+		for (Map.Entry<Integer,ExSenseForLabel> entry : oldLabel.getSensesById().entrySet()) {
 
 			DbSenseForLabel sense = new DbSenseForLabel();
 			sense.setId(entry.getKey());

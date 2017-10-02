@@ -1,6 +1,5 @@
 package org.wikipedia.miner.extract.util;
 
-//import java.nio.file.*;
 import java.io.*;
 import java.util.*;
 
@@ -12,14 +11,10 @@ import org.apache.hadoop.record.CsvRecordInput;
 
 import org.apache.log4j.Logger;
 
-//import org.wikipedia.miner.db.struct.DbPage;
 import com.scienceminer.nerd.kb.model.hadoop.DbPage;
-//import org.wikipedia.miner.model.Page.PageType;
 import com.scienceminer.nerd.kb.model.Page.PageType;
 
 import org.wikipedia.miner.extract.util.ProgressTracker;
-
-//import gnu.trove.map.hash.TObjectIntHashMap;
 
 import org.fusesource.lmdbjni.*;
 import static org.fusesource.lmdbjni.Constants.*;

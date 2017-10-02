@@ -267,7 +267,7 @@ public class Quantizer {
                 new Switch( "direct", 'd', "direct", "use a direct quantizer and not binary search" ),
                 new Switch( "hashheader", 'h', "hashheader", "if the embeddings file has a header present (will skip it)" ),
                 new FlaggedOption( "quantizer", JSAP.STRING_PARSER, "10", JSAP.NOT_REQUIRED, 'q', "quantizer", "Quantizer value" ),
-                new FlaggedOption( "error", JSAP.STRING_PARSER, "0.35", JSAP.NOT_REQUIRED, 'e', "error", "Error rate" ),
+                new FlaggedOption( "error", JSAP.STRING_PARSER, "0.01", JSAP.NOT_REQUIRED, 'e', "error", "Error rate" ),
                 new Switch( "w2v", 'w', "w2v", "Serialize the quantized vectors using the original w2v format. If you want to compress the vectors later, you must -not- use this option" ),
                 new FlaggedOption( "output", JSAP.STRING_PARSER, JSAP.NO_DEFAULT, JSAP.REQUIRED, 'o', "output", "Compressed version" ), }
         );

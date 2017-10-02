@@ -3,8 +3,6 @@ package org.wikipedia.miner.extract.model;
 import java.util.regex.*;
 
 public class DumpLink {
-	
-	
 	private String targetTitle ;
 	private String targetSection ;
 	private int targetNamespace ;

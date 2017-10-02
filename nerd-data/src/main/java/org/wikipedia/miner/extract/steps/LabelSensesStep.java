@@ -5,10 +5,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
-import opennlp.tools.util.Span;*/
-
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.*;
@@ -20,8 +16,10 @@ import org.apache.hadoop.record.Record;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
-//import org.wikipedia.miner.db.struct.*;
+
 import com.scienceminer.nerd.kb.model.hadoop.*;
+import com.scienceminer.nerd.kb.model.Page.PageType;
+
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.model.*;
@@ -29,7 +27,7 @@ import org.wikipedia.miner.extract.model.struct.ExLabel;
 import org.wikipedia.miner.extract.model.struct.ExSenseForLabel;
 import org.wikipedia.miner.extract.util.*;
 
-//import org.wikipedia.miner.util.MarkupStripper;
+
 import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
 
 /**
@@ -145,16 +143,11 @@ public class LabelSensesStep extends Configured implements Tool {
 		private DumpPageParser pageParser;
 		private DumpLinkParser linkParser;
 
-		//Vector<Path> pageFiles = new Vector<Path>();
 		private PagesByTitleCache pagesByTitle;
 		
-		//Vector<Path> redirectFiles = new Vector<Path>();
 		private RedirectCache redirects = null;
 
-		//private MarkupStripper stripper = new MarkupStripper();
 		private MediaWikiParser stripper = MediaWikiParser.getInstance();
-
-		//private SentenceDetectorME sentenceDetector;
 
 		private MultipleOutputs mos;
 
@@ -166,33 +159,6 @@ public class LabelSensesStep extends Configured implements Tool {
 				for (Path p:DistributedCache.getLocalCacheFiles(job)) {
 					Logger.getLogger(LabelSensesMapper.class).info("Located cached file " + p.toString());
 
-					//Logger.getLogger(LabelSensesMapper.class).info(p.getName() + " v.s " + new Path(job.get(DumpExtractor.KEY_SENTENCE_MODEL)).getName());
-
-					/*if (p.getName().equals(new Path(job.get(DumpExtractor.KEY_SENTENCE_MODEL)).getName())) {
-						Logger.getLogger(LabelSensesMapper.class).info("Located cached sentence model " + p.toString());
-						File sentenceModelFile = new File(p.toString());
-						
-						InputStream sentenceModelStream = new FileInputStream(sentenceModelFile);
-						SentenceModel model = null;
-						try {
-						  model = new SentenceModel(sentenceModelStream);
-						}
-						catch (IOException e) {
-						  e.printStackTrace();
-						}
-						finally {
-						  if (sentenceModelStream != null) {
-						    try {
-						    	sentenceModelStream.close();
-						    }
-						    catch (IOException e) {
-						    }
-						  }
-						}
-
-						sentenceDetector = new SentenceDetectorME(model);
-					}*/
-
 					if (p.getName().equals(new Path(DumpExtractor.OUTPUT_SITEINFO).getName())) {
 						si = new SiteInfo(p);
 					}
@@ -200,50 +166,18 @@ public class LabelSensesStep extends Configured implements Tool {
 					if (p.getName().equals(new Path(job.get(DumpExtractor.KEY_LANG_FILE)).getName())) {
 						lc = new LanguageConfiguration(job.get(DumpExtractor.KEY_LANG_CODE), p);
 					}
-
-					/*if (p.getName().startsWith(PageStep.Output.tempPage.name())) {
-						Logger.getLogger(LabelSensesMapper.class).info("Located cached page file " + p.toString());
-						pageFiles.add(p);
-					}
-
-					if (p.getName().startsWith(RedirectStep.Output.redirectTargetsBySource.name())) {
-						Logger.getLogger(LabelSensesMapper.class).info("Located cached redirect file " + p.toString());
-						redirectFiles.add(p);
-					}*/
 				}
 
 				if (si == null) 
 					throw new Exception("Could not locate '" + DumpExtractor.OUTPUT_SITEINFO + "' in DistributedCache");
 
-				/*if (lc == null) 
-					throw new Exception("Could not locate '" + job.get(DumpExtractor.KEY_LANG_FILE) + "' in DistributedCache");*/
-
-				/*if (sentenceDetector == null) 
-					throw new Exception("Could not load sentence model '" + job.get(DumpExtractor.KEY_SENTENCE_MODEL) + "' from DistributedCache");*/
-
-
-				//if (pageFiles.isEmpty())
-				//	throw new Exception("Could not gather page summary files produced in step 1");
-
-				//if (redirectFiles.isEmpty())
-				//	throw new Exception("Could not gather redirect summary files produced in step 2");
-
 				pageParser = new DumpPageParser(lc, si);
-				linkParser = new DumpLinkParser(lc, si);
+				linkParser = new DumpLinkParser(si);
 
 				mos = new MultipleOutputs(job);
-				
-				//articlesByTitle = PagesByTitleCache.getArticlesCache();
-				//categoriesByTitle = PagesByTitleCache.getCategoriesCache();
 
-				//categoriesByTitle = PagesByTitleCache.getInstance();
-
-				//if (!categoriesByTitle.isLoadedCategories())
-				//	categoriesByTitle.loadCategories(pageFiles, null);
 				pagesByTitle = new PagesByTitleCache(articleIdsByTitleDbFile, job.get(DumpExtractor.KEY_LANG_CODE));
 
-				//if(!redirects.isLoaded()) 
-				//	redirects.load(redirectFiles, null);
 				redirects = new RedirectCache(redirectDbFile, job.get(DumpExtractor.KEY_LANG_CODE));	
 
 			} catch (Exception e) {
@@ -254,12 +188,6 @@ public class LabelSensesStep extends Configured implements Tool {
 
 		@Override
 		public void map(LongWritable key, Text value, OutputCollector<Text, ExLabel> output, Reporter reporter) throws IOException {
-
-			/*if (!articlesByTitle.isLoaded())
-				articlesByTitle.load(pageFiles, reporter);
-			
-			if (!categoriesByTitle.isLoaded())
-				categoriesByTitle.load(pageFiles, reporter);*/	
 			
 			DumpPage page = null;
 
@@ -285,7 +213,8 @@ public class LabelSensesStep extends Configured implements Tool {
 					//TreeMap<String, String> translationsByLangCode = new TreeMap<String, String>();
 
 					ExLabel label;
-
+					String markup = page.getMarkup();
+					//markup = stripper.toTextWithInternalLinksAndCategoriesOnly(markup, lc.getLangCode());
 					switch(page.getType()) {
 
 						case article :
@@ -295,9 +224,31 @@ public class LabelSensesStep extends Configured implements Tool {
 							label.getSensesById().put(page.getId(), new ExSenseForLabel(0, 0, true, false));	
 							labels.put(page.getTitle(), label);
 
+							// we should actually also associate the Label with the referenced disambiguated targets
+							// of the disambiguation page, however how to identify the links corresponding to the 
+							// ambiguous targets from the other links present in the disambiguation page?
+							// pattern of these links in the disambiguation pages seems always like this:
+							// * [[target|label]] 
+
+							// we restrict here the out links to match the above pattern:
+							//String markup = page.getMarkup();
+							//markup = stripper.toTextWithInternalLinksAndCategoriesOnly(markup, lc.getLangCode());
+							
+
+							// and we associate from this article title to the identified disambiguated links
+							if (page.getType() == PageType.disambiguation) {
+								processArticle(markup, page, labels, outLinks, reporter, true);
+								for(Integer targetId : outLinks) {
+									//label.getSensesById().put(targetId, new ExSenseForLabel(0, 0, true, false));	
+									// default prior
+									label.getSensesById().put(targetId, new ExSenseForLabel(1, 1, true, false));	
+									labels.put(page.getTitle(), label);
+								}
+							}
+
 						case category :
 
-							String markup = page.getMarkup();
+							//String markup = page.getMarkup();
 							//markup = stripper.stripAllButInternalLinksAndEmphasis(markup, ' ');
 							//markup = stripper.toTextWithInternalLinksEmphasisOnly(markup, lc.getLangCode());
 							markup = stripper.toTextWithInternalLinksAndCategoriesOnly(markup, lc.getLangCode());
@@ -314,7 +265,7 @@ public class LabelSensesStep extends Configured implements Tool {
 							//int currPos = 0;
 							//for (int currPos : sentenceSplits) {
 								//processSentence(markup.substring(lastPos, currPos), sentenceIndex, page, labels, outLinksAndLocations, reporter);
-							processSentence(markup, 0, page, labels, outLinks, reporter);
+							processArticle(markup, page, labels, outLinks, reporter, false);
 								//lastPos = currPos;
 								//sentenceIndex ++;
 
@@ -350,10 +301,6 @@ public class LabelSensesStep extends Configured implements Tool {
 					for(Integer link : outLinks) {
 						mos.getCollector(Output.tempPageLink.name(), reporter).collect(new IntWritable(page.getId()), new DbLinkLocation(link, dummyLocation));
 					}
-
-					// now emit collected translations
-					//if (!translationsByLangCode.isEmpty())
-					//	mos.getCollector(Output.translations.name(), reporter).collect(new IntWritable(page.getId()), new DbTranslations(translationsByLangCode));
 				}
 
 			} catch (Exception e) {
@@ -373,55 +320,22 @@ public class LabelSensesStep extends Configured implements Tool {
 			}
 		}
 
-
-		/*private TreeSet<Integer> collectSentenceSplits(int pageId, String markup, Reporter reporter) throws IOException {
-
-			TreeSet<Integer> sentenceSplits = new TreeSet<Integer> ();
-
-			//mask links so that it is impossible to split on any punctuation within a link.
-			String markup_linksMasked = stripper.stripRegions(markup, stripper.gatherComplexRegions(markup, "\\[\\[", "\\]\\]"), 'a');
-
-			//also mask content in brackets, so it is impossible to split within these. 
-			markup_linksMasked = stripper.stripRegions(markup_linksMasked, stripper.gatherComplexRegions(markup_linksMasked, "\\(", "\\)"), 'a');
-
-			//add all splits detected by OpenNLP sentenceDetector
-			for(Span span:sentenceDetector.sentPosDetect(markup_linksMasked))
-				sentenceSplits.add(span.getEnd());
-
-			//add all splits detected in markup (multiple newlines, or lines starting with indent or list marker)
-
-			Matcher m = paragraphSplitPattern.matcher(markup_linksMasked);
-
-			int lastPos = 0;
-			while (m.find()) {
-				int pos = m.start();
-
-				if (markup_linksMasked.substring(lastPos, pos).trim().length() > 0)
-					sentenceSplits.add(pos);
-
-				lastPos = pos;
-			}
-
-			// collect sentence splits
-			if (sentenceSplits.size() > 0) {
-				ArrayList<Integer> ss = new ArrayList<Integer>();
-				for (int s : sentenceSplits)
-					ss.add(s);
-
-				mos.getCollector(Output.sentenceSplits.name(), reporter).collect(new IntWritable(pageId), new DbSentenceSplitList(ss));
-			}
-
-			return sentenceSplits;
-		}*/
-
-		//private void processSentence(String sentence, int sentenceIndex, DumpPage page, HashMap<String, ExLabel> labels, TreeMap<Integer, ArrayList<Integer>> outLinksAndLocations, Reporter reporter) throws Exception {
-		private void processSentence(String sentence, int sentenceIndex, DumpPage page, 
-				HashMap<String, ExLabel> labels, List<Integer> outLinks, Reporter reporter) throws Exception {
+		private void processArticle(String markup, DumpPage page, 
+				HashMap<String, ExLabel> labels, List<Integer> outLinks, Reporter reporter, boolean disambiguated) throws Exception {
 			ExLabel label = null;
-			Vector<int[]> linkRegions = Util.gatherComplexRegions(sentence, "\\[\\[", "\\]\\]");
+			Vector<int[]> linkRegions = null;
+			// if we restrict to disambiguation links in a disambiguation page, we need a dot before the linkRegion
+			if (disambiguated) {
+				linkRegions = Util.gatherComplexRegions(markup, "\\*\\s*", "\\[\\[", "\\]\\]");
+			} else {
+				linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
+			}
 
 			for(int[] linkRegion: linkRegions) {
-				String linkMarkup = sentence.substring(linkRegion[0]+2, linkRegion[1]-2);
+				String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);
+				while(linkMarkup.startsWith("[") || linkMarkup.startsWith(" ")) {
+					linkMarkup = linkMarkup.substring(1);
+				}
 				DumpLink link = null;
 				try {
 					link = linkParser.parseLink(linkMarkup);
@@ -451,16 +365,7 @@ public class LabelSensesStep extends Configured implements Tool {
 						}
 
 						labels.put(link.getAnchor(), label);
-						//ArrayList<Integer> locations = outLinksAndLocations.get(targetId); 
 
-						//if (locations == null) 
-							//locations = new ArrayList<Integer>();
-
-						//only add sentence location if it isn't already there. This is sorted, so just check last element.
-						//if (locations.isEmpty() || locations.get(locations.size()-1) < sentenceIndex) 
-							//locations.add(sentenceIndex);
-
-						//outLinksAndLocations.put(targetId, locations);
 						if (!outLinks.contains(targetId))
 							outLinks.add(targetId);
 
@@ -473,7 +378,7 @@ public class LabelSensesStep extends Configured implements Tool {
 		}
 
 		private void gatherCategoryLinksAndTranslations(DumpPage page, String markup, Reporter reporter) throws Exception {
-			Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, "\\[\\[", "\\]\\]");
+			Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
 
 			for(int[] linkRegion: linkRegions) {
 				String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);
@@ -488,13 +393,7 @@ public class LabelSensesStep extends Configured implements Tool {
 				if (link == null)
 					continue;
 
-				/*if (link.getTargetLanguage() != null) {
-					translationsByLangCode.put(link.getTargetLanguage(), link.getAnchor());
-					continue;
-				}*/
-
 				if (link.getTargetNamespace() == SiteInfo.CATEGORY_KEY)  {
-					//Integer parentId = categoriesByTitle.getPageId(link.getTargetTitle());
 					int parentId = pagesByTitle.getCategoryId(link.getTargetTitle());
 					if (parentId != -1) {
 						if (page.getNamespace() == SiteInfo.CATEGORY_KEY)

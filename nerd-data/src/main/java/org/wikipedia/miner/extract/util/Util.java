@@ -36,14 +36,16 @@ public class Util {
 	 * The returned regions (an array of start and end positions) will be either
 	 * non-overlapping or cleanly nested, and sorted by end position. 
 	 */ 
-	public static Vector<int[]> gatherComplexRegions(String markup, String startRegex, String endRegex) {
+	public static Vector<int[]> gatherComplexRegions(String markup, String prefix, String startRegex, String endRegex) {
 		//an array of regions we have identified
 		//each region is given as an array containing start and end character indexes of the region. 
 		Vector<int[]> regions = new Vector<int[]>() ;
 
 		//a stack of region starting positions
 		Vector<Integer> startStack = new Vector<Integer>() ;
-		Pattern p = Pattern.compile("((" + startRegex + ")|(" + endRegex + "))", Pattern.DOTALL) ;
+		if (prefix == null)
+			prefix = "";
+		Pattern p = Pattern.compile("("+prefix+"(" + startRegex + ")|(" + endRegex + "))", Pattern.DOTALL) ;
 		Matcher m = p.matcher(markup) ;
 		
 		while(m.find()) {

@@ -19,7 +19,6 @@ import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
 
-//import org.wikipedia.miner.db.struct.*;
 import com.scienceminer.nerd.kb.model.hadoop.*;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
@@ -106,7 +105,6 @@ public class PageStep extends Configured implements Tool {
 	private static class Step1Mapper extends MapReduceBase implements Mapper<LongWritable, Text, IntWritable, DbPage> {
 
 		private LanguageConfiguration lc ;
-		//private SiteInfo si ;
 		private DumpPageParser dpp ;
 
 		private MultipleOutputs mos ;

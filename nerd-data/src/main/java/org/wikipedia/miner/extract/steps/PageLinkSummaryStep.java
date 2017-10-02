@@ -29,8 +29,6 @@ import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.hadoop.record.CsvRecordOutput;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.Tool;
-//import org.wikipedia.miner.db.struct.DbLinkLocation;
-//import org.wikipedia.miner.db.struct.DbLinkLocationList;
 
 import com.scienceminer.nerd.kb.model.hadoop.*;
 

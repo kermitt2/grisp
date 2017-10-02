@@ -11,7 +11,6 @@ import org.apache.log4j.*;
 
 import org.wikipedia.miner.extract.util.LanguageConfiguration;
 import org.wikipedia.miner.extract.util.SiteInfo;
-//import org.wikipedia.miner.model.Page.PageType;
 import com.scienceminer.nerd.kb.model.Page.PageType;
 
 /**

@@ -240,10 +240,14 @@ public class LabelSensesStep extends Configured implements Tool {
 								processArticle(markup, page, labels, outLinks, reporter, true);
 								for(Integer targetId : outLinks) {
 									//label.getSensesById().put(targetId, new ExSenseForLabel(0, 0, true, false));	
-									// default prior
+									// default prior for senses in case of disambiguation (equal priors)
 									label.getSensesById().put(targetId, new ExSenseForLabel(1, 1, true, false));	
 									labels.put(page.getTitle(), label);
 								}
+								// propagate default priors to the label
+								label.setLinkOccCount(outLinks.size());
+								label.setLinkDocCount(outLinks.size());
+								// label's text counts will be set in the LabelOccurrenceStep
 							}
 
 						case category :
@@ -323,7 +327,7 @@ public class LabelSensesStep extends Configured implements Tool {
 		private void processArticle(String markup, DumpPage page, 
 				HashMap<String, ExLabel> labels, List<Integer> outLinks, Reporter reporter, boolean disambiguated) throws Exception {
 			ExLabel label = null;
-			Vector<int[]> linkRegions = null;
+			List<int[]> linkRegions = null;
 			// if we restrict to disambiguation links in a disambiguation page, we need a dot before the linkRegion
 			if (disambiguated) {
 				linkRegions = Util.gatherComplexRegions(markup, "\\*\\s*", "\\[\\[", "\\]\\]");
@@ -378,7 +382,7 @@ public class LabelSensesStep extends Configured implements Tool {
 		}
 
 		private void gatherCategoryLinksAndTranslations(DumpPage page, String markup, Reporter reporter) throws Exception {
-			Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
+			List<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
 
 			for(int[] linkRegion: linkRegions) {
 				String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);

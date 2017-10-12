@@ -70,7 +70,7 @@ public class DumpLinkParserTest {
 			for(String sentence : sentences) {
 				String markup = stripper.toTextWithInternalLinksAndCategoriesOnly(sentence, "en");
 
-				Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
+				List<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
 				for(int[] linkRegion: linkRegions) {
 
 					String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);
@@ -114,7 +114,7 @@ public class DumpLinkParserTest {
 				"[[Category:Italian-language surnames]]";
 
 			String markup = sentence;//stripper.toTextWithInternalLinksAndCategoriesOnly(sentence, "en");
-			Vector<int[]> linkRegions = Util.gatherComplexRegions(markup, "\\*\\s*", "\\[\\[", "\\]\\]");
+			List<int[]> linkRegions = Util.gatherComplexRegions(markup, "\\*\\s*", "\\[\\[", "\\]\\]");
 			System.out.println("******************** " + linkRegions.size() + " found disamb. links");
 			for(int[] linkRegion: linkRegions) {
 				String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);

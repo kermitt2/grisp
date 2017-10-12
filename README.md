@@ -49,6 +49,8 @@ The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for ea
 
 ### Just for reference: Creating additional infobox csv files with DBPedia
 
+This part is deprecated as we are not using at all DBPedia due to too low quality. 
+
 For generating the complementary csv files capturing the infobox information, the DBpedia infobox tql file can be used. The DBPedia project has already parsed the Wikipedia XML dumps to get the infobox information, so we simply reuse this work for importing in GRISP. 
 
 Note that given the very low quality of DBPedia, its usage is actually more harmful than useful and, after practical experiments, this resource is better be ignored. Wikidata is the right replacement both for data quality and soundness of the work. 

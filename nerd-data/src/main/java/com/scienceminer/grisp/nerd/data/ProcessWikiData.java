@@ -38,12 +38,12 @@ import org.apache.hadoop.fs.*;
 public class ProcessWikiData {
 
 	private Env env_id;
-	private Env env_data;
+	//private Env env_data;
   	private Database db_id; // database (map) for storing the page ids in different languages
-  	private Database db_data; // database (map) for storing the properties and relations present in wikidata
+  	//private Database db_data; // database (map) for storing the properties and relations present in wikidata
   	private String envFilePath_id = null;
 	private String envFilePath_data = null;
-  	//private PagesByTitleCache pageCache = null;
+	private String pathWikidataJSONPath = null;
 
   	// this is the list of languages we consider for target translations, we will ignore the other
   	// languages
@@ -51,6 +51,7 @@ public class ProcessWikiData {
 
   	public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
   		try {
+  			this.pathWikidataJSONPath = pathWikidataJSONPath;
 	  		// init page cache to get page id from page title
 	  		/*pageCache = new PagesByTitleCache(null, lang);
 
@@ -92,11 +93,11 @@ public class ProcessWikiData {
 					e.printStackTrace();
 				}
 			}
-	    	envFilePath_data = path.toString();
+	    	/*envFilePath_data = path.toString();
 	    	env_data = new Env();
 	    	env_data.setMapSize(200 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for > 40 millions
 	    	env_data.open(envFilePath_data);
-			db_data = env_data.openDatabase();
+			db_data = env_data.openDatabase();*/
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -113,8 +114,8 @@ public class ProcessWikiData {
     		e.printStackTrace();
     	}
 
-		db_data.close();
-    	env_data.close();
+		//db_data.close();
+    	//env_data.close();
     	try {
     		File tmpFile = new File(envFilePath_data);
     		if (tmpFile.exists())
@@ -128,6 +129,9 @@ public class ProcessWikiData {
 	 * Map all language specific PageID to Wikidata entity identifier
 	 */
 	public int processAllProps(String inputPath, String resultPath) {
+		// seed entites
+		int nbEntities = processWikidataDump();
+		System.out.println("total of " + nbEntities + " entities.");
 		int nbAll = 0;
 		for(String lang : targetLanguages) {
 			String localResultPath = resultPath + "/" + lang + "/wikidata.txt" ;
@@ -139,6 +143,75 @@ public class ProcessWikiData {
 		String localResultPath = resultPath + "/" +"wikidataIds.csv" ;
 		writeProp(localResultPath);
 		return nbAll;
+	}
+
+
+	/**
+	 * Seed the entity map, with empty language mapping 
+	 */
+	private int processWikidataDump() {
+		Transaction tx = null;
+		BufferedReader reader = null;
+		int nbTotalAdded = 0;
+		try {
+			// open file
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pathWikidataJSONPath));
+			CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
+			reader = new BufferedReader(new InputStreamReader(input));
+
+			String line = null;
+			int nbToAdd = 0;
+			int currentPageId = -1;
+			ObjectMapper mapper = new ObjectMapper();
+			tx = env_id.createWriteTransaction();
+			while ((line=reader.readLine()) != null) {
+				if (line.length() == 0) continue;
+				if (line.startsWith("[")) continue;
+				if (line.startsWith("]")) break;
+
+				if (nbToAdd >= 10000) {
+					try {
+						tx.commit();
+						tx.close();
+						nbToAdd = 0;
+						tx = env_id.createWriteTransaction();
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+				JsonNode rootNode = mapper.readTree(line);
+				JsonNode idNode = rootNode.findPath("id");
+				String itemId = null;
+				if ((idNode != null) && (!idNode.isMissingNode())) {
+					itemId = idNode.textValue();
+				}
+	            
+	            if (itemId == null)
+	            	continue;
+
+				try {
+					db_id.put(tx, bytes(itemId), bytes(""));
+					nbToAdd++;
+					nbTotalAdded++;
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}			
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			// last commit
+			tx.commit();
+			tx.close();
+			try {
+				reader.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return nbTotalAdded;
 	}
 
 	/**
@@ -363,6 +436,16 @@ public class ProcessWikiData {
 									.append("\n");
 								writer.write(builder.toString());
 								nbWritten++;
+							} else {
+								builder = new StringBuilder();
+									builder
+										.append(wikidataId)
+										.append(",m{");
+								builder
+									.append("}")
+									.append("\n");
+								writer.write(builder.toString());
+								nbWritten++;
 							}
 							if (nbWritten == 1000) {
 								writer.flush();
@@ -495,7 +578,7 @@ System.out.println(args.length + " arguments");
 			int nbResult = wikidata.processAllProps(args[1], args[2]);
 			long end = System.currentTimeMillis();
 
-			System.out.println(nbResult + " props mapping produced in " + (end - start) + " ms");
+			System.out.println(nbResult + " props language mapping produced in " + (end - start) + " ms");
 
 			/*start = System.currentTimeMillis();
 			nbResult = wikidata.process(args[1], args[2]);

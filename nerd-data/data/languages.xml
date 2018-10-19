@@ -12,7 +12,6 @@
         
         <DisambiguationTemplate>disambiguation</DisambiguationTemplate>
         <DisambiguationTemplate>disambig</DisambiguationTemplate>
-        <DisambiguationTemplate>disamb</DisambiguationTemplate>
         <DisambiguationTemplate>geodis</DisambiguationTemplate>
         <DisambiguationTemplate>hndis</DisambiguationTemplate>
         <DisambiguationTemplate>hospitaldis</DisambiguationTemplate>
@@ -25,7 +24,6 @@
         <DisambiguationTemplate>SIA</DisambiguationTemplate>
         <DisambiguationTemplate>disambig-cleanup</DisambiguationTemplate>
         <DisambiguationTemplate>dab</DisambiguationTemplate>
-        <DisambiguationTemplate>DAB</DisambiguationTemplate>
         <DisambiguationTemplate>surname</DisambiguationTemplate>
 
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
@@ -51,6 +49,7 @@
 
 		<!--DisambiguationCategory>Wikipedia:Desambiguación</DisambiguationCategory-->
 		<DisambiguationCategory>Desambiguación</DisambiguationCategory>
+
 		<DisambiguationTemplate>desambiguación</DisambiguationTemplate>
 		<DisambiguationTemplate>desambiguacion</DisambiguationTemplate>
 		<DisambiguationTemplate>disambig</DisambiguationTemplate>
@@ -59,9 +58,7 @@
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>des</RedirectIdentifier>
 		<RedirectIdentifier>otros usos</RedirectIdentifier>
-		<RedirectIdentifier>Otros usos</RedirectIdentifier>
 		<RedirectIdentifier>redirige aquí</RedirectIdentifier>
-		<RedirectIdentifier>Redirige aquí</RedirectIdentifier>
 		<RedirectIdentifier>ico-des</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECCIÓN</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECCION</RedirectIdentifier>
@@ -98,32 +95,9 @@
 		<DisambiguationTemplate>disambigua</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambigua</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambiguazione</DisambiguationTemplate>
-		<DisambiguationTemplate>Nota disambigua</DisambiguationTemplate>
-		<!--<DisambiguationTemplate>Nota disambigua 2</DisambiguationTemplate>-->
 
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
-	</Language>
-
-	<Language code="ja" name="Japanese" localName="日本語">
-		<RootCategory>主要カテゴリ</RootCategory>
-
-		<DisambiguationCategory>曖昧さ回避</DisambiguationCategory>
-		<DisambiguationCategory>あいまいさ</DisambiguationCategory>
-		<DisambiguationCategory>曖昧さ</DisambiguationCategory>
-
-		<DisambiguationTemplate>Aimai</DisambiguationTemplate>
-		<DisambiguationTemplate>aimai</DisambiguationTemplate>
-		<DisambiguationTemplate>Disambiguate</DisambiguationTemplate>
-		<DisambiguationTemplate>disambig</DisambiguationTemplate>
-		<DisambiguationTemplate>dab</DisambiguationTemplate>
-
-		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
-		<RedirectIdentifier>Redirect</RedirectIdentifier>
-		<RedirectIdentifier>転送</RedirectIdentifier>
-		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
-		<!--<RedirectIdentifier>通常の時間の流れから独立して過去や未来へ移動す ること。</RedirectIdentifier>-->
-		<!--<RedirectIdentifier>（主として日本の）</RedirectIdentifier>-->
 	</Language>
 
 </WikipediaLanguageList>

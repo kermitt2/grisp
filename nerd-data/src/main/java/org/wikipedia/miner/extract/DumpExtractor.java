@@ -1,626 +1,607 @@
 package org.wikipedia.miner.extract;
 
+import com.scienceminer.nerd.kb.model.Page.PageType;
+import com.scienceminer.nerd.kb.model.hadoop.DbIntList;
+import com.scienceminer.nerd.kb.model.hadoop.DbLabel;
+import com.scienceminer.nerd.kb.model.hadoop.DbPage;
+import com.scienceminer.nerd.kb.model.hadoop.DbSenseForLabel;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TIntShortHashMap;
-
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Vector;
-
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.record.CsvRecordInput;
 import org.apache.hadoop.record.CsvRecordOutput;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.log4j.*;
-
-//import org.wikipedia.miner.db.struct.*;
-import com.scienceminer.nerd.kb.model.hadoop.*;
-import com.scienceminer.nerd.kb.model.Page.PageType;
-
-import org.wikipedia.miner.extract.steps.*;
-import org.wikipedia.miner.extract.util.LanguageConfiguration;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
 import org.wikipedia.miner.extract.model.struct.ExLabel;
 import org.wikipedia.miner.extract.model.struct.ExSenseForLabel;
+import org.wikipedia.miner.extract.steps.*;
+import org.wikipedia.miner.extract.util.*;
 
-import org.wikipedia.miner.extract.util.ProgressTracker;
-
-import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.commons.io.input.BoundedInputStream;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.compress.compressors.*;
-
-import org.wikipedia.miner.extract.util.PagesByTitleCache;
-import org.wikipedia.miner.extract.util.RedirectCache;
-import org.wikipedia.miner.extract.util.LabelCache;
-import org.apache.hadoop.filecache.DistributedCache;
-
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
- *
- * This class extracts summaries (link graphs, etc) from Wikipedia xml dumps. 
+ * This class extracts summaries (link graphs, etc) from Wikipedia xml dumps.
  * It calls a sequence of Hadoop Map/Reduce jobs.
- * 
- *  
  */
 @SuppressWarnings("deprecation")
 public class DumpExtractor {
 
-	private Configuration conf;
+    private Configuration conf;
 
-	private String[] args;
+    private String[] args;
 
-	private Path inputFile;
-	private Path langFile;
-	private String lang;
-	//private Path sentenceModel;
-	private Path workingDir ;
-	private Path finalDir;
+    private Path inputFile;
+    private Path langFile;
+    private String lang;
+    //private Path sentenceModel;
+    private Path workingDir;
+    private Path finalDir;
 
-	private LanguageConfiguration lc;
-	//private Logger logger;
+    private LanguageConfiguration lc;
 
-	public enum ExtractionStep {
-		page, redirect, labelSense, pageLabel, labelOccurrence, pageLink, categoryParent, articleParent, linkCooccurrence, relatedness 	
-	}
 
-	public static final String KEY_INPUT_FILE = "wm.inputDir";
-	public static final String KEY_OUTPUT_DIR = "wm.workingDir";
-	public static final String KEY_LANG_FILE = "wm.langFile";
-	public static final String KEY_LANG_CODE = "wm.langCode";
-	//public static final String KEY_SENTENCE_MODEL = "wm.sentenceModel";
+    public enum ExtractionStep {
+        page, redirect, labelSense, pageLabel, labelOccurrence, pageLink, categoryParent, articleParent, linkCooccurrence, relatedness
+    }
 
-	public static final String LOG_ORPHANED_PAGES = "orphanedPages";
-	public static final String LOG_WEIRD_LABEL_COUNT = "wierdLabelCounts";
-	public static final String LOG_MEMORY_USE = "memoryUsage";
-	
-	public static final String OUTPUT_SITEINFO = "final/siteInfo.xml";
-	public static final String OUTPUT_PROGRESS = "tempProgress.csv";
-	public static final String OUTPUT_TEMPSTATS = "tempStats.csv";
-	public static final String OUTPUT_STATS = "final/stats.csv";
+    public static final String KEY_INPUT_FILE = "wm.inputDir";
+    public static final String KEY_OUTPUT_DIR = "wm.workingDir";
+    public static final String KEY_LANG_FILE = "wm.langFile";
+    public static final String KEY_LANG_CODE = "wm.langCode";
+    //public static final String KEY_SENTENCE_MODEL = "wm.sentenceModel";
 
-	// these are the DB file caches
-	public String articleIdsByTitleDbFile = null;
-	public String redirectDbFile = null;
-	public String labelDbFile = null;
+    public static final String LOG_ORPHANED_PAGES = "orphanedPages";
+    public static final String LOG_WEIRD_LABEL_COUNT = "wierdLabelCounts";
+    public static final String LOG_MEMORY_USE = "memoryUsage";
 
-	public DumpExtractor(String[] args) throws Exception {
-		GenericOptionsParser gop = new GenericOptionsParser(args);
-		conf = gop.getConfiguration();
-		
-		//outputFileSystem = FileSystem.get(conf);
-		this.args = gop.getRemainingArgs();
+    public static final String OUTPUT_SITEINFO = "final/siteInfo.xml";
+    public static final String OUTPUT_PROGRESS = "tempProgress.csv";
+    public static final String OUTPUT_TEMPSTATS = "tempStats.csv";
+    public static final String OUTPUT_STATS = "final/stats.csv";
 
-		configure();
-		configureLogging();
+    // these are the DB file caches
+    public String articleIdsByTitleDbFile = null;
+    public String redirectDbFile = null;
+    public String labelDbFile = null;
+
+    public DumpExtractor(String[] args) throws Exception {
+        GenericOptionsParser gop = new GenericOptionsParser(args);
+        conf = gop.getConfiguration();
+
+        //outputFileSystem = FileSystem.get(conf);
+        this.args = gop.getRemainingArgs();
+
+        configure();
+        configureLogging();
 
 		// PL: to be managed differently, with a property maybe
 		// but setting it in the yarn config fails
 		System.load("/home/lopez/grisp/lib/native/liblmdbjni.so");
 	}
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-		//PropertyConfigurator.configure("log4j.properties");  
+        //PropertyConfigurator.configure("log4j.properties");
 
-		DumpExtractor de = new DumpExtractor(args);
-		int result = de.run();
+        DumpExtractor de = new DumpExtractor(args);
+        int result = de.run();
 
-		System.exit(result);
-	}
+        System.exit(result);
+    }
 
-	public static JobConf configureJob(JobConf conf, String[] args) {
+    public static JobConf configureJob(JobConf conf, String[] args) {
 
-		conf.set(KEY_INPUT_FILE, args[0]);
-		conf.set(KEY_LANG_FILE, args[1]);
-		conf.set(KEY_LANG_CODE, args[2]);
-		//conf.set(KEY_SENTENCE_MODEL, "en-sent.bin");
-		conf.set(KEY_OUTPUT_DIR, args[3]);
-		// final dir is args[4]
+        conf.set(KEY_INPUT_FILE, args[0]);
+        conf.set(KEY_LANG_FILE, args[1]);
+        conf.set(KEY_LANG_CODE, args[2]);
+        //conf.set(KEY_SENTENCE_MODEL, "en-sent.bin");
+        conf.set(KEY_OUTPUT_DIR, args[3]);
+        // final dir is args[4]
 
-		//force one reducer. These don't take very long, and multiple reducers would make finalise file functions more complicated.  
-		
-		//conf.setNumMapTasks(64);
-		//conf.setNumReduceTasks(1);
-		
-		//many of our tasks require pre-loading lots of data, may as well reuse this as much as we can.
-		//conf.setNumTasksToExecutePerJvm(-1);
-		
-		
-		
-		//conf.setInt("mapred.tasktracker.map.tasks.maximum", 2);
-		//conf.setInt("mapred.tasktracker.reduce.tasks.maximum", 1);
-		//conf.set("mapred.child.java.opts", "-Xmx3500M");
+        //force one reducer. These don't take very long, and multiple reducers would make finalise file functions more complicated.
 
-		//conf.setBoolean("mapred.used.genericoptionsparser", true);
+        //conf.setNumMapTasks(64);
+        //conf.setNumReduceTasks(1);
 
-		return conf;
-	}
-
-	private FileSystem getFileSystem(Path path) throws IOException {
-		return path.getFileSystem(conf);
-	}
+        //many of our tasks require pre-loading lots of data, may as well reuse this as much as we can.
+        //conf.setNumTasksToExecutePerJvm(-1);
 
 
-	private Path getPath(String pathStr) {
-		return new Path(pathStr);
-	}
+        //conf.setInt("mapred.tasktracker.map.tasks.maximum", 2);
+        //conf.setInt("mapred.tasktracker.reduce.tasks.maximum", 1);
+        //conf.set("mapred.child.java.opts", "-Xmx3500M");
+
+        //conf.setBoolean("mapred.used.genericoptionsparser", true);
+
+        return conf;
+    }
+
+    private FileSystem getFileSystem(Path path) throws IOException {
+        return path.getFileSystem(conf);
+    }
 
 
-	private FileStatus getFileStatus(Path path) throws IOException {
-		FileSystem fs = path.getFileSystem(conf);
-		return fs.getFileStatus(path);
-	}
-
-	private void configure() throws Exception {
-
-		if (args.length != 5) 
-			throw new IllegalArgumentException("Please specify a xml dump of wikipedia, a language.xml config file, a language code, an hdfs writable working directory, and an output directory");
-
-		
-		//check input file
-		inputFile = getPath(args[0]); 
-		FileStatus fs = getFileStatus(inputFile);
-		if (fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.READ)) 
-			throw new IOException("'" +inputFile + " is not readable or does not exist");
+    private Path getPath(String pathStr) {
+        return new Path(pathStr);
+    }
 
 
-		//check lang file and language
-		langFile = getPath(args[1]);
-		lang = args[2];
-		lc = new LanguageConfiguration(langFile.getFileSystem(conf), lang, langFile);
-		if (lc == null)
-			throw new IOException("Could not load language configuration for '" + lang + "' from '" + langFile + "'");
+    private FileStatus getFileStatus(Path path) throws IOException {
+        FileSystem fs = path.getFileSystem(conf);
+        return fs.getFileStatus(path);
+    }
+
+    private void configure() throws Exception {
+
+        if (args.length != 5)
+            throw new IllegalArgumentException("Please specify a xml dump of wikipedia, a language.xml config file, a language code, an hdfs writable working directory, and an output directory");
+
+
+        //check input file
+        inputFile = getPath(args[0]);
+        FileStatus fs = getFileStatus(inputFile);
+        if (fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.READ))
+            throw new IOException("'" + inputFile + " is not readable or does not exist");
+
+
+        //check lang file and language
+        langFile = getPath(args[1]);
+        lang = args[2];
+        lc = new LanguageConfiguration(langFile.getFileSystem(conf), lang, langFile);
+        if (lc == null)
+            throw new IOException("Could not load language configuration for '" + lang + "' from '" + langFile + "'");
 
 		/*sentenceModel = new Path("en-sent.bin");
 		fs = getFileStatus(sentenceModel);
-		if (fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.READ)) 
+		if (fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.READ))
 			throw new IOException("'" + sentenceModel + " is not readable or does not exist");*/
 
-		//check output directory
-		//workingDir = new Path(args[4]);
-		workingDir = new Path(args[3]);
-		
-		//TODO: this should be dependent on an "overwrite" flag
-		//if (getFileSystem(workingDir).exists(workingDir))
-		//	getFileSystem(workingDir).delete(workingDir, true);
-
-		if (!getFileSystem(workingDir).exists(workingDir))
-			getFileSystem(workingDir).mkdirs(workingDir);
-		
-		fs = getFileStatus(workingDir);
-		if (!fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.WRITE)) 
-			throw new IOException("'" +workingDir + " is not a writable directory");
-
-		//set up directory where final data will be placed
-		//finalDir = new Path(args[5]);
-		finalDir = new Path(args[4]);
-
-		if (getFileSystem(finalDir).exists(finalDir))
-			getFileSystem(finalDir).delete(finalDir, true);
-		
-		getFileSystem(finalDir).mkdirs(finalDir);
-		
-		fs = getFileStatus(finalDir);
-		if (!fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.WRITE)) 
-			throw new IOException("'" +workingDir + " is not a writable directory");
-
-	}
-
-	private void configureLogging() throws IOException {
-		
-		FileSystem fs = getFileSystem(workingDir);
-		
-		Path logDir = new Path(workingDir + "/logs");
-		fs.mkdirs(logDir);
-
-		Logger logger; 
-
-		logger = Logger.getLogger(DumpExtractor.LOG_ORPHANED_PAGES);
-		logger.setAdditivity(false);
-		logger.addAppender(new WriterAppender(new PatternLayout("%-5p: %m%n"), new OutputStreamWriter(fs.create(new Path(logDir + "/" + DumpExtractor.LOG_ORPHANED_PAGES + ".log")))));
-
-		logger = Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT);
-		logger.setAdditivity(false);
-		logger.addAppender(new WriterAppender(new PatternLayout("%-5p: %m%n"), new OutputStreamWriter(fs.create(new Path(logDir + "/" + DumpExtractor.LOG_WEIRD_LABEL_COUNT + ".log")))));
-
-		logger = Logger.getLogger(DumpExtractor.LOG_MEMORY_USE);
-		logger.setAdditivity(false);
-		logger.addAppender(new WriterAppender(new PatternLayout("%-5p: %m%n"), new OutputStreamWriter(fs.create(new Path(logDir + "/" + DumpExtractor.LOG_MEMORY_USE + ".log")))));
-	}
-
-	private int run() throws Exception {
-		FileSystem fs = getFileSystem(workingDir);
-
-		Logger.getLogger(DumpExtractor.class).info("Extracting site info");
-		extractSiteInfo();
-
-		int result = 0;
-
-		ExtractionStep lastCompletedStep = readProgress();		
-		TreeMap<String,Long> stats;
-
-		if (lastCompletedStep != null)
-			stats = readStatistics();
-		else
-			stats = new TreeMap<String, Long>();
-
-		DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-
-		if (lastCompletedStep == null) {
-			ExtractionStep currStep = ExtractionStep.page;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			PageStep step = new PageStep();
-
-			result = ToolRunner.run(new Configuration(), step, args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			//update statistics
-			stats = step.updateStats(stats);
-			stats.put("lastEdit", getLastEdit());
-			writeStatistics(stats);
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-
-		if (lastCompletedStep.compareTo(ExtractionStep.redirect) < 0) {
-			if (articleIdsByTitleDbFile == null) {
-				// create the page title cache for the next step mappers
-				PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null, lang);
-
-				Vector<Path> pageFiles = new Vector<Path>();
-				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
-				FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)));
-				Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
-				for (Path cf : cacheFiles) {
-					if (cf.getName().startsWith(PageStep.Output.tempPage.name())) {
-						pageFiles.add(cf);
-					}
-				}
-				if (pageFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 1 (page)");
-
-				articleIdsByTitle.loadAll(pageFiles, null);
-				articleIdsByTitleDbFile = articleIdsByTitle.getEnvFile();
-				System.out.println("LMDB page cache path = " + articleIdsByTitleDbFile);
-			}
-
-			ExtractionStep currStep = ExtractionStep.redirect;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			RedirectStep step = new RedirectStep(articleIdsByTitleDbFile);
-			result = ToolRunner.run(new Configuration(), step, args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			//finalize redirect files
-			finalizeFile(ExtractionStep.redirect, RedirectStep.Output.redirectSourcesByTarget.name());
-			finalizeFile(ExtractionStep.redirect, RedirectStep.Output.redirectTargetsBySource.name());
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-
-		if (lastCompletedStep.compareTo(ExtractionStep.labelSense) < 0) {
-			if (articleIdsByTitleDbFile == null) {
-				// create the page title cache for the next step mappers
-				PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null, lang);
-
-				Vector<Path> pageFiles = new Vector<Path>();
-				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
-				FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)));
-				Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
-				for (Path cf : cacheFiles) {
-					if (cf.getName().startsWith(PageStep.Output.tempPage.name())) {
-						pageFiles.add(cf);
-					}
-				}
-				if (pageFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 1 (page)");
-
-				//articleIdsByTitle.loadArticles(pageFiles, null);
-				//articleIdsByTitle.loadCategories(pageFiles, null);
-				articleIdsByTitle.loadAll(pageFiles, null);
-				articleIdsByTitleDbFile = articleIdsByTitle.getEnvFile();
-				System.out.println("LMDB page cache path = " + articleIdsByTitleDbFile);
-			}
-
-			if (redirectDbFile == null) {
-				// create the page title cache for the next step mappers
-				RedirectCache redirectsCache = new RedirectCache(null, lang);
-
-				Vector<Path> pageFiles = new Vector<Path>();
-				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
-				FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.redirect)));
-				Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
-				for (Path cf : cacheFiles) {
-					if (cf.getName().startsWith(RedirectStep.Output.redirectTargetsBySource.name())) {
-						pageFiles.add(cf);
-					}
-				}
-				if (pageFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 2 (redirect)");
-
-				//articleIdsByTitle.loadArticles(pageFiles, null);
-				//articleIdsByTitle.loadCategories(pageFiles, null);
-				redirectsCache.load(pageFiles, null);
-				redirectDbFile = redirectsCache.getEnvFile();
-				System.out.println("LMDB redirect cache path = " + articleIdsByTitleDbFile);
-			}
-			ExtractionStep currStep = ExtractionStep.labelSense;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			LabelSensesStep step = new LabelSensesStep(articleIdsByTitleDbFile, redirectDbFile);
-			result = ToolRunner.run(new Configuration(), step, args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-		if (lastCompletedStep.compareTo(ExtractionStep.pageLabel) < 0) {
-			ExtractionStep currStep = ExtractionStep.pageLabel;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			PageLabelStep step = new PageLabelStep();
-			result = ToolRunner.run(new Configuration(), step, args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			finalizeFile(currStep, PageLabelStep.Output.pageLabel.name());
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-		if (lastCompletedStep.compareTo(ExtractionStep.labelOccurrence) < 0) {
-			if (labelDbFile == null) {
-				// create the page title cache for the next step mappers
-				LabelCache labelCache = new LabelCache(null, lang);
-
-				Vector<Path> labelFiles = new Vector<Path>();
-				//Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
-				FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.labelSense)));
-				Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
-				for (Path cf : cacheFiles) {
-					if (cf.getName().startsWith(LabelSensesStep.Output.tempLabel.name())) {
-						labelFiles.add(cf);
-					}
-				}
-				if (labelFiles.isEmpty())
-					throw new Exception("Could not gather page summary files produced in step 3 (labelSense) 4 (pageLabel)");
-
-				//articleIdsByTitle.loadArticles(pageFiles, null);
-				//articleIdsByTitle.loadCategories(pageFiles, null);
-				labelCache.load(labelFiles, null);
-				labelDbFile = labelCache.getEnvFile();
-				System.out.println("LMDB label cache path = " + articleIdsByTitleDbFile);
-			}
-
-			ExtractionStep currStep = ExtractionStep.labelOccurrence;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			LabelOccurrencesStep step = new LabelOccurrencesStep(labelDbFile);
-			result = ToolRunner.run(new Configuration(), step, args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			finalizeLabels();
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-		if (lastCompletedStep.compareTo(ExtractionStep.pageLink) < 0) {
-			ExtractionStep currStep = ExtractionStep.pageLink;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			result = ToolRunner.run(new Configuration(), new PageLinkSummaryStep(), args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			finalizeFile(currStep, PageLinkSummaryStep.Output.pageLinkIn.name());
-			finalizeFile(currStep, PageLinkSummaryStep.Output.pageLinkOut.name());
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-		if (lastCompletedStep.compareTo(ExtractionStep.categoryParent) < 0) {
-			ExtractionStep currStep = ExtractionStep.categoryParent;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			result = ToolRunner.run(new Configuration(), new CategoryLinkSummaryStep(currStep), args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			finalizeFile(currStep, CategoryLinkSummaryStep.Output.categoryParents.name());
-			finalizeFile(currStep, CategoryLinkSummaryStep.Output.childCategories.name());
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-
-		if (lastCompletedStep.compareTo(ExtractionStep.articleParent) < 0) {
-			ExtractionStep currStep = ExtractionStep.articleParent;
-			Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
-			fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
-
-			long startTime = System.currentTimeMillis();
-
-			result = ToolRunner.run(new Configuration(), new CategoryLinkSummaryStep(currStep), args);
-			if (result != 0) {
-				Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
-				return result;
-			}
-
-			finalizeFile(currStep, CategoryLinkSummaryStep.Output.articleParents.name());
-			finalizeFile(currStep, CategoryLinkSummaryStep.Output.childArticles.name());
-
-
-			finalizePages(stats);
-			finalizeStatistics(stats);
-
-			//update progress
-			lastCompletedStep = currStep;
-			writeProgress(lastCompletedStep);
-
-			//print time
-			System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis()-startTime));
-		}
-
-		return result;
-	}
-
-	private ExtractionStep readProgress() {
-
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(new Path(workingDir + "/" + OUTPUT_PROGRESS))));
-
-			int step = reader.read();
-			reader.close();
-
-			return ExtractionStep.values()[step];
-
-		} catch (IOException e) {
-			return null;
-		}
-
-	}
-
-	private void writeProgress(ExtractionStep lastCompletedStep) throws IOException {
-
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_PROGRESS))));
-
-		writer.write(lastCompletedStep.ordinal());
-		writer.close();
-	}
-
-	private TreeMap<String, Long> readStatistics() throws IOException {
-
-		TreeMap<String, Long> stats = new TreeMap<String, Long>();
-
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(new Path(workingDir + "/" + OUTPUT_TEMPSTATS))));
-
-			String line;
-			while ((line=reader.readLine()) != null) {
-
-				CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
-
-				String statName = cri.readString(null);
-				Long statValue = cri.readLong(null);		
-
-				stats.put(statName, statValue);
-			}
-
-			reader.close();
-		} catch (IOException e){
-
-		}
-
-		return stats;
-	}
-
-	private void writeStatistics(TreeMap<String, Long> stats) throws IOException {
-
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_TEMPSTATS))));
-
-		for(Map.Entry<String,Long> e:stats.entrySet()) {
-
-			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-			CsvRecordOutput cro = new CsvRecordOutput(outStream);
-			cro.writeString(e.getKey(), null);
-			cro.writeLong(e.getValue(), null);
-
-			writer.write(outStream.toString("UTF-8"));
-			writer.newLine();
-		}
-
-		writer.close();
-	}
+        //check output directory
+        //workingDir = new Path(args[4]);
+        workingDir = new Path(args[3]);
+
+        //TODO: this should be dependent on an "overwrite" flag
+        //if (getFileSystem(workingDir).exists(workingDir))
+        //	getFileSystem(workingDir).delete(workingDir, true);
+
+        if (!getFileSystem(workingDir).exists(workingDir))
+            getFileSystem(workingDir).mkdirs(workingDir);
+
+        fs = getFileStatus(workingDir);
+        if (!fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.WRITE))
+            throw new IOException("'" + workingDir + " is not a writable directory");
+
+        //set up directory where final data will be placed
+        //finalDir = new Path(args[5]);
+        finalDir = new Path(args[4]);
+
+        if (getFileSystem(finalDir).exists(finalDir))
+            getFileSystem(finalDir).delete(finalDir, true);
+
+        getFileSystem(finalDir).mkdirs(finalDir);
+
+        fs = getFileStatus(finalDir);
+        if (!fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.WRITE))
+            throw new IOException("'" + workingDir + " is not a writable directory");
+
+    }
+
+    private void configureLogging() throws IOException {
+
+        FileSystem fs = getFileSystem(workingDir);
+
+        Path logDir = new Path(workingDir + "/logs");
+        fs.mkdirs(logDir);
+
+        Logger logger;
+
+        logger = Logger.getLogger(DumpExtractor.LOG_ORPHANED_PAGES);
+        logger.setAdditivity(false);
+        logger.addAppender(new WriterAppender(new PatternLayout("%-5p: %m%n"), new OutputStreamWriter(fs.create(new Path(logDir + "/" + DumpExtractor.LOG_ORPHANED_PAGES + ".log")))));
+
+        logger = Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT);
+        logger.setAdditivity(false);
+        logger.addAppender(new WriterAppender(new PatternLayout("%-5p: %m%n"), new OutputStreamWriter(fs.create(new Path(logDir + "/" + DumpExtractor.LOG_WEIRD_LABEL_COUNT + ".log")))));
+
+        logger = Logger.getLogger(DumpExtractor.LOG_MEMORY_USE);
+        logger.setAdditivity(false);
+        logger.addAppender(new WriterAppender(new PatternLayout("%-5p: %m%n"), new OutputStreamWriter(fs.create(new Path(logDir + "/" + DumpExtractor.LOG_MEMORY_USE + ".log")))));
+    }
+
+    private int run() throws Exception {
+        FileSystem fs = getFileSystem(workingDir);
+
+        Logger.getLogger(DumpExtractor.class).info("Extracting site info");
+        extractSiteInfo();
+
+        int result = 0;
+
+        ExtractionStep lastCompletedStep = readProgress();
+        TreeMap<String, Long> stats;
+
+        if (lastCompletedStep != null)
+            stats = readStatistics();
+        else
+            stats = new TreeMap<>();
+
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
+        if (lastCompletedStep == null) {
+            ExtractionStep currStep = ExtractionStep.page;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            PageStep step = new PageStep();
+
+            result = ToolRunner.run(new Configuration(), step, args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            //update statistics
+            stats = step.updateStats(stats);
+            stats.put("lastEdit", getLastEdit());
+            writeStatistics(stats);
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+
+        if (lastCompletedStep.compareTo(ExtractionStep.redirect) < 0) {
+            if (articleIdsByTitleDbFile == null) {
+                // create the page title cache for the next step mappers
+                PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null, lang);
+
+                Vector<Path> pageFiles = new Vector<Path>();
+                //Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
+                FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)));
+                Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
+                for (Path cf : cacheFiles) {
+                    if (cf.getName().startsWith(PageStep.Output.tempPage.name())) {
+                        pageFiles.add(cf);
+                    }
+                }
+                if (pageFiles.isEmpty())
+                    throw new Exception("Could not gather page summary files produced in step 1 (page)");
+
+                articleIdsByTitle.loadAll(pageFiles, null);
+                articleIdsByTitleDbFile = articleIdsByTitle.getEnvFile();
+                System.out.println("LMDB page cache path = " + articleIdsByTitleDbFile);
+            }
+
+            ExtractionStep currStep = ExtractionStep.redirect;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            RedirectStep step = new RedirectStep(articleIdsByTitleDbFile);
+            result = ToolRunner.run(new Configuration(), step, args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            //finalize redirect files
+            finalizeFile(ExtractionStep.redirect, RedirectStep.Output.redirectSourcesByTarget.name());
+            finalizeFile(ExtractionStep.redirect, RedirectStep.Output.redirectTargetsBySource.name());
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+
+        if (lastCompletedStep.compareTo(ExtractionStep.labelSense) < 0) {
+            if (articleIdsByTitleDbFile == null) {
+                // create the page title cache for the next step mappers
+                PagesByTitleCache articleIdsByTitle = new PagesByTitleCache(null, lang);
+
+                Vector<Path> pageFiles = new Vector<Path>();
+                //Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
+                FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)));
+                Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
+                for (Path cf : cacheFiles) {
+                    if (cf.getName().startsWith(PageStep.Output.tempPage.name())) {
+                        pageFiles.add(cf);
+                    }
+                }
+                if (pageFiles.isEmpty())
+                    throw new Exception("Could not gather page summary files produced in step 1 (page)");
+
+                //articleIdsByTitle.loadArticles(pageFiles, null);
+                //articleIdsByTitle.loadCategories(pageFiles, null);
+                articleIdsByTitle.loadAll(pageFiles, null);
+                articleIdsByTitleDbFile = articleIdsByTitle.getEnvFile();
+                System.out.println("LMDB page cache path = " + articleIdsByTitleDbFile);
+            }
+
+            if (redirectDbFile == null) {
+                // create the page title cache for the next step mappers
+                RedirectCache redirectsCache = new RedirectCache(null, lang);
+
+                Vector<Path> pageFiles = new Vector<Path>();
+                //Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
+                FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.redirect)));
+                Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
+                for (Path cf : cacheFiles) {
+                    if (cf.getName().startsWith(RedirectStep.Output.redirectTargetsBySource.name())) {
+                        pageFiles.add(cf);
+                    }
+                }
+                if (pageFiles.isEmpty())
+                    throw new Exception("Could not gather page summary files produced in step 2 (redirect)");
+
+                //articleIdsByTitle.loadArticles(pageFiles, null);
+                //articleIdsByTitle.loadCategories(pageFiles, null);
+                redirectsCache.load(pageFiles, null);
+                redirectDbFile = redirectsCache.getEnvFile();
+                System.out.println("LMDB redirect cache path = " + articleIdsByTitleDbFile);
+            }
+            ExtractionStep currStep = ExtractionStep.labelSense;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            LabelSensesStep step = new LabelSensesStep(articleIdsByTitleDbFile, redirectDbFile);
+            result = ToolRunner.run(new Configuration(), step, args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+        if (lastCompletedStep.compareTo(ExtractionStep.pageLabel) < 0) {
+            ExtractionStep currStep = ExtractionStep.pageLabel;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            PageLabelStep step = new PageLabelStep();
+            result = ToolRunner.run(new Configuration(), step, args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            finalizeFile(currStep, PageLabelStep.Output.pageLabel.name());
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+        if (lastCompletedStep.compareTo(ExtractionStep.labelOccurrence) < 0) {
+            if (labelDbFile == null) {
+                // create the page title cache for the next step mappers
+                LabelCache labelCache = new LabelCache(null, lang);
+
+                Vector<Path> labelFiles = new Vector<Path>();
+                //Path[] cacheFiles = DistributedCache.getLocalCacheFiles(job);
+                FileStatus[] fileStatus = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.labelSense)));
+                Path[] cacheFiles = FileUtil.stat2Paths(fileStatus);
+                for (Path cf : cacheFiles) {
+                    if (cf.getName().startsWith(LabelSensesStep.Output.tempLabel.name())) {
+                        labelFiles.add(cf);
+                    }
+                }
+                if (labelFiles.isEmpty())
+                    throw new Exception("Could not gather page summary files produced in step 3 (labelSense) 4 (pageLabel)");
+
+                //articleIdsByTitle.loadArticles(pageFiles, null);
+                //articleIdsByTitle.loadCategories(pageFiles, null);
+                labelCache.load(labelFiles, null);
+                labelDbFile = labelCache.getEnvFile();
+                System.out.println("LMDB label cache path = " + articleIdsByTitleDbFile);
+            }
+
+            ExtractionStep currStep = ExtractionStep.labelOccurrence;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            LabelOccurrencesStep step = new LabelOccurrencesStep(labelDbFile);
+            result = ToolRunner.run(new Configuration(), step, args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            finalizeLabels();
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+        if (lastCompletedStep.compareTo(ExtractionStep.pageLink) < 0) {
+            ExtractionStep currStep = ExtractionStep.pageLink;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            result = ToolRunner.run(new Configuration(), new PageLinkSummaryStep(), args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            finalizeFile(currStep, PageLinkSummaryStep.Output.pageLinkIn.name());
+            finalizeFile(currStep, PageLinkSummaryStep.Output.pageLinkOut.name());
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+        if (lastCompletedStep.compareTo(ExtractionStep.categoryParent) < 0) {
+            ExtractionStep currStep = ExtractionStep.categoryParent;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            result = ToolRunner.run(new Configuration(), new CategoryLinkSummaryStep(currStep), args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            finalizeFile(currStep, CategoryLinkSummaryStep.Output.categoryParents.name());
+            finalizeFile(currStep, CategoryLinkSummaryStep.Output.childCategories.name());
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+
+        if (lastCompletedStep.compareTo(ExtractionStep.articleParent) < 0) {
+            ExtractionStep currStep = ExtractionStep.articleParent;
+            Logger.getLogger(DumpExtractor.class).info("Starting " + currStep + " step");
+            fs.delete(new Path(workingDir + "/" + getDirectoryName(currStep)), true);
+
+            long startTime = System.currentTimeMillis();
+
+            result = ToolRunner.run(new Configuration(), new CategoryLinkSummaryStep(currStep), args);
+            if (result != 0) {
+                Logger.getLogger(DumpExtractor.class).fatal("Could not complete " + currStep + " step. Check map/reduce user logs for an explanation.");
+                return result;
+            }
+
+            finalizeFile(currStep, CategoryLinkSummaryStep.Output.articleParents.name());
+            finalizeFile(currStep, CategoryLinkSummaryStep.Output.childArticles.name());
+
+
+            finalizePages(stats);
+            finalizeStatistics(stats);
+
+            //update progress
+            lastCompletedStep = currStep;
+            writeProgress(lastCompletedStep);
+
+            //print time
+            System.out.println(currStep + " step completed in " + timeFormat.format(System.currentTimeMillis() - startTime));
+        }
+
+        return result;
+    }
+
+    private ExtractionStep readProgress() {
+
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(new Path(workingDir + "/" + OUTPUT_PROGRESS))));
+
+            int step = reader.read();
+            reader.close();
+
+            return ExtractionStep.values()[step];
+
+        } catch (IOException e) {
+            return null;
+        }
+
+    }
+
+    private void writeProgress(ExtractionStep lastCompletedStep) throws IOException {
+
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_PROGRESS))));
+
+        writer.write(lastCompletedStep.ordinal());
+        writer.close();
+    }
+
+    private TreeMap<String, Long> readStatistics() throws IOException {
+
+        TreeMap<String, Long> stats = new TreeMap<String, Long>();
+
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(new Path(workingDir + "/" + OUTPUT_TEMPSTATS))));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+
+                CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
+
+                String statName = cri.readString(null);
+                Long statValue = cri.readLong(null);
+
+                stats.put(statName, statValue);
+            }
+
+            reader.close();
+        } catch (IOException e) {
+
+        }
+
+        return stats;
+    }
+
+    private void writeStatistics(TreeMap<String, Long> stats) throws IOException {
+
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_TEMPSTATS))));
+
+        for (Map.Entry<String, Long> e : stats.entrySet()) {
+
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+            CsvRecordOutput cro = new CsvRecordOutput(outStream);
+            cro.writeString(e.getKey(), null);
+            cro.writeLong(e.getValue(), null);
+
+            writer.write(outStream.toString("UTF-8"));
+            writer.newLine();
+        }
+
+        writer.close();
+    }
 
 	/*private TIntShortHashMap calculatePageDepths(TreeMap<String, Long> stats, TIntObjectHashMap<TIntArrayList> childCategories, TIntObjectHashMap<TIntArrayList> childArticles) {
 
@@ -688,114 +669,114 @@ public class DumpExtractor {
 	}*/
 
 
-	private TIntObjectHashMap<TIntArrayList> gatherChildren(ExtractionStep step, final String filePrefix) throws IOException  {
+    private TIntObjectHashMap<TIntArrayList> gatherChildren(ExtractionStep step, final String filePrefix) throws IOException {
 
-		FileSystem fs = getFileSystem(workingDir);
-		
-		TIntObjectHashMap<TIntArrayList> children = new TIntObjectHashMap<TIntArrayList>();
+        FileSystem fs = getFileSystem(workingDir);
 
-
-		FileStatus[] fileStatuses = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(step)), new PathFilter() {
-			public boolean accept(Path path) {				
-				return path.getName().startsWith(filePrefix);
-			}
-		});
-
-		for (FileStatus status : fileStatuses) {
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(status.getPath())));
-
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-
-				CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
-
-				int parentId = cri.readInt("parent");
-				DbIntList childIds = new DbIntList();
-				childIds.deserialize(cri);
-
-				if (childIds.getValues() != null && !childIds.getValues().isEmpty()) {
-					TIntArrayList cIds = new TIntArrayList();
-					for (Integer childId:childIds.getValues()) 
-						cIds.add(childId);
-
-					children.put(parentId, cIds);
-				}
-			}
-		}
-
-		return children;
-	}
+        TIntObjectHashMap<TIntArrayList> children = new TIntObjectHashMap<TIntArrayList>();
 
 
-	private void extractSiteInfo() throws IOException, CompressorException {
+        FileStatus[] fileStatuses = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(step)), new PathFilter() {
+            public boolean accept(Path path) {
+                return path.getName().startsWith(filePrefix);
+            }
+        });
+
+        for (FileStatus status : fileStatuses) {
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(status.getPath())));
+
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+
+                CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
+
+                int parentId = cri.readInt("parent");
+                DbIntList childIds = new DbIntList();
+                childIds.deserialize(cri);
+
+                if (childIds.getValues() != null && !childIds.getValues().isEmpty()) {
+                    TIntArrayList cIds = new TIntArrayList();
+                    for (Integer childId : childIds.getValues())
+                        cIds.add(childId);
+
+                    children.put(parentId, cIds);
+                }
+            }
+        }
+
+        return children;
+    }
+
+
+    private void extractSiteInfo() throws IOException, CompressorException {
 
 		/*BufferedInputStream bis = new BufferedInputStream(getFileSystem(inputFile).open(inputFile));
 		CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input));*/
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(inputFile).open(inputFile)));
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_SITEINFO))));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(inputFile).open(inputFile)));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_SITEINFO))));
 
-		String line = null;
-		boolean startedWriting = false;
+        String line = null;
+        boolean startedWriting = false;
 
-		while ((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
 
-			if (!startedWriting && line.matches("\\s*\\<siteinfo\\>\\s*")) 
-				startedWriting = true;
+            if (!startedWriting && line.matches("\\s*\\<siteinfo\\>\\s*"))
+                startedWriting = true;
 
-			if (startedWriting) {
-				writer.write(line);
-				writer.newLine();
+            if (startedWriting) {
+                writer.write(line);
+                writer.newLine();
 
-				if (line.matches("\\s*\\<\\/siteinfo\\>\\s*"))
-					break;
-			}
-		}
+                if (line.matches("\\s*\\<\\/siteinfo\\>\\s*"))
+                    break;
+            }
+        }
 
-		reader.close();
-		writer.close();
-	}
+        reader.close();
+        writer.close();
+    }
 
 
-	private void finalizePages(TreeMap<String, Long> stats) throws IOException {
-		
-		//FileSystem fs = getFileSystem(workingDir);
-		
-		Runtime runtime = Runtime.getRuntime();
-		long memBefore = runtime.totalMemory();
+    private void finalizePages(TreeMap<String, Long> stats) throws IOException {
 
-		//TODO: this looks like a bottle-neck. Can it be parallelized? Should we be using mapDb to avoid out-of-memory issues?
-		TIntObjectHashMap<TIntArrayList> childCategories = gatherChildren(ExtractionStep.categoryParent, CategoryLinkSummaryStep.Output.childCategories.name());
-		TIntObjectHashMap<TIntArrayList> childArticles = gatherChildren(ExtractionStep.articleParent, CategoryLinkSummaryStep.Output.childArticles.name());
-		//TIntShortHashMap pageDepths = calculatePageDepths(stats, childCategories, childArticles);
+        //FileSystem fs = getFileSystem(workingDir);
 
-		long memAfter = runtime.totalMemory();
-		Logger.getLogger(getClass()).info("Memory used for finalizing pages: " + (memAfter - memBefore) / (1024*1024) + "Mb");
-		
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/page.csv"))));
+        Runtime runtime = Runtime.getRuntime();
+        long memBefore = runtime.totalMemory();
 
-		FileStatus[] fileStatuses = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)), new PathFilter() {
-			public boolean accept(Path path) {				
-				return path.getName().startsWith(PageStep.Output.tempPage.name());
-			}
-		});
+        //TODO: this looks like a bottle-neck. Can it be parallelized? Should we be using mapDb to avoid out-of-memory issues?
+        TIntObjectHashMap<TIntArrayList> childCategories = gatherChildren(ExtractionStep.categoryParent, CategoryLinkSummaryStep.Output.childCategories.name());
+        TIntObjectHashMap<TIntArrayList> childArticles = gatherChildren(ExtractionStep.articleParent, CategoryLinkSummaryStep.Output.childArticles.name());
+        //TIntShortHashMap pageDepths = calculatePageDepths(stats, childCategories, childArticles);
 
-		for (FileStatus status:fileStatuses) {
+        long memAfter = runtime.totalMemory();
+        Logger.getLogger(getClass()).info("Memory used for finalizing pages: " + (memAfter - memBefore) / (1024 * 1024) + "Mb");
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(status.getPath())));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/page.csv"))));
 
-			String line = null;
-			while ((line = reader.readLine()) != null) {
+        FileStatus[] fileStatuses = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)), new PathFilter() {
+            public boolean accept(Path path) {
+                return path.getName().startsWith(PageStep.Output.tempPage.name());
+            }
+        });
 
-				CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
+        for (FileStatus status : fileStatuses) {
 
-				int pageId = cri.readInt("id");
-				DbPage page = new DbPage();
-				page.deserialize(cri);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(status.getPath())));
 
-				PageType pageType = PageType.values()[page.getType()];
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+
+                CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
+
+                int pageId = cri.readInt("id");
+                DbPage page = new DbPage();
+                page.deserialize(cri);
+
+                PageType pageType = PageType.values()[page.getType()];
 				/*Short pageDepth = pageDepths.get(pageId);
 
 				if (pageDepth != null) { 
@@ -805,226 +786,226 @@ public class DumpExtractor {
 						Logger.getLogger(DumpExtractor.LOG_ORPHANED_PAGES).warn("Could not identify depth of page " + pageId + ":" + page.getTitle() + "[" + pageType + "]");
 				}*/
 
-				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-				CsvRecordOutput cro = new CsvRecordOutput(outStream);
-				cro.writeInt(pageId, "id");
-				page.serialize(cro);
+                CsvRecordOutput cro = new CsvRecordOutput(outStream);
+                cro.writeInt(pageId, "id");
+                page.serialize(cro);
 
-				writer.write(outStream.toString("UTF-8"));
-			}
+                writer.write(outStream.toString("UTF-8"));
+            }
 
-			reader.close();
-		}
+            reader.close();
+        }
 
-		writer.close();
-	}
+        writer.close();
+    }
 
-	private void finalizeLabels() throws IOException {
-		
-		//FileSystem fs = getFileSystem(workingDir);
-		
+    private void finalizeLabels() throws IOException {
 
-		//merge two sets of labels
-		//one from step 3, which includes all senses and link counts, but not term/doc counts.
-		//one from step 4, which includes term/doc counts, but no senses or link counts.
+        //FileSystem fs = getFileSystem(workingDir);
 
-		//both sets are ordered by label text, so this can be done in one pass with a merge operation.
 
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/label.csv"))));
+        //merge two sets of labels
+        //one from step 3, which includes all senses and link counts, but not term/doc counts.
+        //one from step 4, which includes term/doc counts, but no senses or link counts.
 
-		//gather label files from step 3	
-		FileStatus[] labelFilesA = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.labelSense)), new PathFilter() {
-			public boolean accept(Path path) {				
-				return path.getName().startsWith(LabelSensesStep.Output.tempLabel.name());
-			}
-		});
+        //both sets are ordered by label text, so this can be done in one pass with a merge operation.
 
-		//gather label files from step 4
-		FileStatus[] labelFilesB = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.labelOccurrence)), new PathFilter() {
-			public boolean accept(Path path) {				
-				return path.getName().startsWith(LabelSensesStep.Output.tempLabel.name());
-			}
-		});
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/label.csv"))));
 
-		long bytesTotal = 0;
+        //gather label files from step 3
+        FileStatus[] labelFilesA = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.labelSense)), new PathFilter() {
+            public boolean accept(Path path) {
+                return path.getName().startsWith(LabelSensesStep.Output.tempLabel.name());
+            }
+        });
 
-		for (FileStatus status:labelFilesA) 
-			bytesTotal += status.getLen();
-		for (FileStatus status:labelFilesA) 
-			bytesTotal += status.getLen();
+        //gather label files from step 4
+        FileStatus[] labelFilesB = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.labelOccurrence)), new PathFilter() {
+            public boolean accept(Path path) {
+                return path.getName().startsWith(LabelSensesStep.Output.tempLabel.name());
+            }
+        });
 
-		ProgressTracker pt = new ProgressTracker(bytesTotal, "Finalizing labels", DumpExtractor.class);
+        long bytesTotal = 0;
 
+        for (FileStatus status : labelFilesA)
+            bytesTotal += status.getLen();
+        for (FileStatus status : labelFilesA)
+            bytesTotal += status.getLen();
 
-		//Initialise file readers. 
-		//Slightly hacky, but bytesRead and fileIndexes are single element arrays (rather than ints or longs) so they can be passed by reference.
-		long[]  bytesRead = {0};
+        ProgressTracker pt = new ProgressTracker(bytesTotal, "Finalizing labels", DumpExtractor.class);
 
-		int[] fileIndexA = {0};
-		BufferedReader readerA = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(labelFilesA[fileIndexA[0]].getPath())));
 
-		int[] fileIndexB = {0};
-		BufferedReader readerB = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(labelFilesB[fileIndexB[0]].getPath())));
+        //Initialise file readers.
+        //Slightly hacky, but bytesRead and fileIndexes are single element arrays (rather than ints or longs) so they can be passed by reference.
+        long[] bytesRead = {0};
 
-		String labelTextA = null;
-		String labelTextB = null;
+        int[] fileIndexA = {0};
+        BufferedReader readerA = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(labelFilesA[fileIndexA[0]].getPath())));
 
-		ExLabel labelA = null;
-		ExLabel labelB = null;
+        int[] fileIndexB = {0};
+        BufferedReader readerB = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(labelFilesB[fileIndexB[0]].getPath())));
 
-		while (true) {
+        String labelTextA = null;
+        String labelTextB = null;
 
-			if (labelTextA == null && fileIndexA[0] < labelFilesA.length) {
-				String line = getNextLine(readerA, labelFilesA, fileIndexA, bytesRead);
-				if (line != null) {
-					CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
+        ExLabel labelA = null;
+        ExLabel labelB = null;
 
-					labelTextA = cri.readString("labelText");
-					labelA = new ExLabel();
-					labelA.deserialize(cri);
-				}
-			}
+        while (true) {
 
-			if (labelTextB == null && fileIndexB[0] < labelFilesB.length) {
-				String line = getNextLine(readerB, labelFilesB, fileIndexB, bytesRead);
-				if (line != null) {
-					CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
+            if (labelTextA == null && fileIndexA[0] < labelFilesA.length) {
+                String line = getNextLine(readerA, labelFilesA, fileIndexA, bytesRead);
+                if (line != null) {
+                    CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
 
-					labelTextB = cri.readString("labelText");
-					labelB = new ExLabel();
-					labelB.deserialize(cri);
-				}
-			}
+                    labelTextA = cri.readString("labelText");
+                    labelA = new ExLabel();
+                    labelA.deserialize(cri);
+                }
+            }
 
-			if (labelTextA == null && labelTextB == null) {
-				//done
-				break;
-			}
+            if (labelTextB == null && fileIndexB[0] < labelFilesB.length) {
+                String line = getNextLine(readerB, labelFilesB, fileIndexB, bytesRead);
+                if (line != null) {
+                    CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
 
-			if (labelTextA != null && labelTextB != null && labelTextA.equals(labelTextB)) {
+                    labelTextB = cri.readString("labelText");
+                    labelB = new ExLabel();
+                    labelB.deserialize(cri);
+                }
+            }
 
-				//merge these labels 
-				labelA.setTextDocCount(labelB.getTextDocCount());
-				labelA.setTextOccCount(labelB.getTextOccCount());
+            if (labelTextA == null && labelTextB == null) {
+                //done
+                break;
+            }
 
-				if (labelA.getLinkOccCount() > labelA.getTextOccCount())
-					Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).warn("Label '" + labelTextA + "' occurs " + labelA.getLinkOccCount() + " times as links, but only " + labelA.getTextOccCount() + " times in plain text.");
+            if (labelTextA != null && labelTextB != null && labelTextA.equals(labelTextB)) {
 
-				if (labelA.getLinkDocCount() > labelA.getTextDocCount())
-					Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).warn("Label '" + labelTextA + "' occurs in " + labelA.getLinkDocCount() + " documents as links, but only " + labelA.getTextDocCount() + " in plain text.");
+                //merge these labels
+                labelA.setTextDocCount(labelB.getTextDocCount());
+                labelA.setTextOccCount(labelB.getTextOccCount());
 
-				//print merged label
-				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                if (labelA.getLinkOccCount() > labelA.getTextOccCount())
+                    Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).warn("Label '" + labelTextA + "' occurs " + labelA.getLinkOccCount() + " times as links, but only " + labelA.getTextOccCount() + " times in plain text.");
 
-				CsvRecordOutput cro = new CsvRecordOutput(outStream);
-				cro.writeString(labelTextA, "labelText");
-				convert(labelA).serialize(cro);
+                if (labelA.getLinkDocCount() > labelA.getTextDocCount())
+                    Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).warn("Label '" + labelTextA + "' occurs in " + labelA.getLinkDocCount() + " documents as links, but only " + labelA.getTextDocCount() + " in plain text.");
 
-				writer.write(outStream.toString("UTF-8"));
+                //print merged label
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-				//advance both A and B
-				labelA = null;
-				labelTextA = null;
+                CsvRecordOutput cro = new CsvRecordOutput(outStream);
+                cro.writeString(labelTextA, "labelText");
+                convert(labelA).serialize(cro);
 
-				labelB = null;
-				labelTextB = null;
+                writer.write(outStream.toString("UTF-8"));
 
-				continue;
-			}
+                //advance both A and B
+                labelA = null;
+                labelTextA = null;
 
-			if (labelTextA != null && (labelTextB == null || labelTextA.compareTo(labelTextB) < 0)) {
+                labelB = null;
+                labelTextB = null;
 
-				//found A but no corresponding B. This is OK if A is only a title or redirect, and never used as a link anchor. Otherwise it is worth warning about.
-				if (labelA.getLinkOccCount() > 0)
-					Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).warn("Found label '" + labelTextA + "' without any text occurances. It occurs in " + labelA.getLinkOccCount() + " links.");
+                continue;
+            }
 
-				//write A
-				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            if (labelTextA != null && (labelTextB == null || labelTextA.compareTo(labelTextB) < 0)) {
 
-				CsvRecordOutput cro = new CsvRecordOutput(outStream);
-				cro.writeString(labelTextA, "labelText");
-				convert(labelA).serialize(cro);
+                //found A but no corresponding B. This is OK if A is only a title or redirect, and never used as a link anchor. Otherwise it is worth warning about.
+                if (labelA.getLinkOccCount() > 0)
+                    Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).warn("Found label '" + labelTextA + "' without any text occurances. It occurs in " + labelA.getLinkOccCount() + " links.");
 
-				writer.write(outStream.toString("UTF-8"));
+                //write A
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-				//advance A
-				labelA = null;
-				labelTextA = null;
+                CsvRecordOutput cro = new CsvRecordOutput(outStream);
+                cro.writeString(labelTextA, "labelText");
+                convert(labelA).serialize(cro);
 
-			} else {
+                writer.write(outStream.toString("UTF-8"));
 
-				//found B but no corresponding A. This shouldn't be possible. 
-				Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).error("Found label '" + labelTextB + "' without any senses or link occurances.");
+                //advance A
+                labelA = null;
+                labelTextA = null;
 
-				//write B
-				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            } else {
 
-				CsvRecordOutput cro = new CsvRecordOutput(outStream);
-				cro.writeString(labelTextB, "labelText");
-				convert(labelB).serialize(cro);
+                //found B but no corresponding A. This shouldn't be possible.
+                Logger.getLogger(DumpExtractor.LOG_WEIRD_LABEL_COUNT).error("Found label '" + labelTextB + "' without any senses or link occurances.");
 
-				writer.write(outStream.toString("UTF-8"));
+                //write B
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-				//advance B
-				labelB = null;
-				labelTextB = null;
+                CsvRecordOutput cro = new CsvRecordOutput(outStream);
+                cro.writeString(labelTextB, "labelText");
+                convert(labelB).serialize(cro);
 
-			}
+                writer.write(outStream.toString("UTF-8"));
 
-			pt.update(bytesRead[0]);
-		}
+                //advance B
+                labelB = null;
+                labelTextB = null;
 
-		writer.close();
-	}
+            }
 
-	private void finalizeStatistics(TreeMap<String, Long> stats) throws IOException {
+            pt.update(bytesRead[0]);
+        }
 
-		//BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_STATS))));
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/stats.csv"))));
+        writer.close();
+    }
 
-		for(Map.Entry<String,Long> e:stats.entrySet()) {
+    private void finalizeStatistics(TreeMap<String, Long> stats) throws IOException {
 
-			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        //BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_STATS))));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/stats.csv"))));
 
-			CsvRecordOutput cro = new CsvRecordOutput(outStream);
-			cro.writeString(e.getKey(), null);
-			cro.writeLong(e.getValue(), null);
+        for (Map.Entry<String, Long> e : stats.entrySet()) {
 
-			writer.write(outStream.toString("UTF-8"));
-			writer.newLine();
-		}
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-		writer.close();
-	}
+            CsvRecordOutput cro = new CsvRecordOutput(outStream);
+            cro.writeString(e.getKey(), null);
+            cro.writeLong(e.getValue(), null);
 
-	private void finalizeFile(ExtractionStep step, final String filePrefix) throws IOException {
-		
-		
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/" + filePrefix + ".csv"))));
+            writer.write(outStream.toString("UTF-8"));
+            writer.newLine();
+        }
 
-		FileStatus[] fileStatuses = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(step)), new PathFilter() {
-			public boolean accept(Path path) {				
-				return path.getName().startsWith(filePrefix);
-			}
-		});
+        writer.close();
+    }
 
-		long bytesTotal = 0;
-		for (FileStatus status : fileStatuses) {
-			bytesTotal += status.getLen();
-		}
+    private void finalizeFile(ExtractionStep step, final String filePrefix) throws IOException {
 
-		ProgressTracker pt = new ProgressTracker(bytesTotal, "finalizing " + filePrefix, DumpExtractor.class);
-		long bytesRead = 0;
 
-		for (FileStatus status:fileStatuses) {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/" + filePrefix + ".csv"))));
 
-			BoundedInputStream boundedInput = new BoundedInputStream(getFileSystem(workingDir).open(status.getPath()));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInput), 2048);
+        FileStatus[] fileStatuses = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(step)), new PathFilter() {
+            public boolean accept(Path path) {
+                return path.getName().startsWith(filePrefix);
+            }
+        });
 
-			//BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(status.getPath())));
+        long bytesTotal = 0;
+        for (FileStatus status : fileStatuses) {
+            bytesTotal += status.getLen();
+        }
 
-			String line = null;
+        ProgressTracker pt = new ProgressTracker(bytesTotal, "finalizing " + filePrefix, DumpExtractor.class);
+        long bytesRead = 0;
+
+        for (FileStatus status : fileStatuses) {
+
+            BoundedInputStream boundedInput = new BoundedInputStream(getFileSystem(workingDir).open(status.getPath()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInput), 2048);
+
+            //BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(status.getPath())));
+
+            String line = null;
 			/*try {
     			char[] chars = new char[65536];
     			for(int len; (len = reader.read(chars)) > 0;) {
@@ -1045,127 +1026,127 @@ public class DumpExtractor {
     			reader.close();
 			}*/
 
-			while ((line = reader.readLine()) != null) {
-				if (line.length() > 100000)
-					continue;
-				bytesRead += line.length() + 1;
-				pt.update(bytesRead);
+            while ((line = reader.readLine()) != null) {
+                if (line.length() > 100000)
+                    continue;
+                bytesRead += line.length() + 1;
+                pt.update(bytesRead);
 
-				writer.write(line);
-				writer.newLine();
-			}
+                writer.write(line);
+                writer.newLine();
+            }
 
-			reader.close();
-		}
+            reader.close();
+        }
 
-		writer.close();
-	}
+        writer.close();
+    }
 
-	public static DbLabel convert(ExLabel oldLabel) {
+    public static DbLabel convert(ExLabel oldLabel) {
 
-		ArrayList<DbSenseForLabel> senses = new ArrayList<DbSenseForLabel>();
-		for (Map.Entry<Integer,ExSenseForLabel> entry : oldLabel.getSensesById().entrySet()) {
+        ArrayList<DbSenseForLabel> senses = new ArrayList<DbSenseForLabel>();
+        for (Map.Entry<Integer, ExSenseForLabel> entry : oldLabel.getSensesById().entrySet()) {
 
-			DbSenseForLabel sense = new DbSenseForLabel();
-			sense.setId(entry.getKey());
-			sense.setLinkOccCount(entry.getValue().getLinkOccCount());
-			sense.setLinkDocCount(entry.getValue().getLinkDocCount());
+            DbSenseForLabel sense = new DbSenseForLabel();
+            sense.setId(entry.getKey());
+            sense.setLinkOccCount(entry.getValue().getLinkOccCount());
+            sense.setLinkDocCount(entry.getValue().getLinkDocCount());
 
-			sense.setFromRedirect(entry.getValue().getFromRedirect());
-			sense.setFromTitle(entry.getValue().getFromTitle());
+            sense.setFromRedirect(entry.getValue().getFromRedirect());
+            sense.setFromTitle(entry.getValue().getFromTitle());
 
-			senses.add(sense);
-		}
+            senses.add(sense);
+        }
 
-		Collections.sort(senses, new Comparator<DbSenseForLabel>() {
+        Collections.sort(senses, new Comparator<DbSenseForLabel>() {
 
-			public int compare(DbSenseForLabel a, DbSenseForLabel b) {
+            public int compare(DbSenseForLabel a, DbSenseForLabel b) {
 
-				int cmp = new Long(b.getLinkOccCount()).compareTo(a.getLinkOccCount());
-				if (cmp != 0)
-					return cmp;
+                int cmp = new Long(b.getLinkOccCount()).compareTo(a.getLinkOccCount());
+                if (cmp != 0)
+                    return cmp;
 
-				cmp = new Long(b.getLinkDocCount()).compareTo(a.getLinkDocCount());
-				if (cmp != 0)
-					return cmp;
+                cmp = new Long(b.getLinkDocCount()).compareTo(a.getLinkDocCount());
+                if (cmp != 0)
+                    return cmp;
 
-				return(new Integer(a.getId()).compareTo(b.getId()));
-			}
-		});
+                return (new Integer(a.getId()).compareTo(b.getId()));
+            }
+        });
 
 
-		DbLabel newLabel = new DbLabel(); 
+        DbLabel newLabel = new DbLabel();
 
-		newLabel.setLinkDocCount(oldLabel.getLinkDocCount());
-		newLabel.setLinkOccCount(oldLabel.getLinkOccCount());
-		newLabel.setTextDocCount(oldLabel.getTextDocCount());
-		newLabel.setTextOccCount(oldLabel.getTextOccCount());
+        newLabel.setLinkDocCount(oldLabel.getLinkDocCount());
+        newLabel.setLinkOccCount(oldLabel.getLinkOccCount());
+        newLabel.setTextDocCount(oldLabel.getTextDocCount());
+        newLabel.setTextOccCount(oldLabel.getTextOccCount());
 
-		newLabel.setSenses(senses);
+        newLabel.setSenses(senses);
 
-		return newLabel;
-	}
+        return newLabel;
+    }
 
-	private String getNextLine(BufferedReader reader, FileStatus[] files, int[] fileIndex, long[] bytesRead) throws IOException {
+    private String getNextLine(BufferedReader reader, FileStatus[] files, int[] fileIndex, long[] bytesRead) throws IOException {
 
-		String line = reader.readLine();
+        String line = reader.readLine();
 
-		if (line==null) { 
-			fileIndex[0]++;
-			reader.close();
+        if (line == null) {
+            fileIndex[0]++;
+            reader.close();
 
-			if (fileIndex[0] < files.length) {
-				Path path = files[fileIndex[0]].getPath();
-				
-				reader = new BufferedReader(new InputStreamReader(getFileSystem(path).open(path)));
-				line = reader.readLine();
+            if (fileIndex[0] < files.length) {
+                Path path = files[fileIndex[0]].getPath();
 
-				bytesRead[0] = bytesRead[0] + line.length() + 1;
-			}
-		}
+                reader = new BufferedReader(new InputStreamReader(getFileSystem(path).open(path)));
+                line = reader.readLine();
 
-		return line;		
-	}
+                bytesRead[0] = bytesRead[0] + line.length() + 1;
+            }
+        }
 
-	private Long getLastEdit() throws IOException {
-		
-		FileSystem fs = getFileSystem(workingDir);
-		
+        return line;
+    }
 
-		FileStatus[] fileStatuses = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)), new PathFilter() {
-			public boolean accept(Path path) {				
-				return path.getName().startsWith(PageStep.Output.tempEditDates.name());
-			}
-		});
+    private Long getLastEdit() throws IOException {
 
-		Long lastEdit = null;
+        FileSystem fs = getFileSystem(workingDir);
 
-		for (FileStatus status:fileStatuses) {
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(status.getPath())));
+        FileStatus[] fileStatuses = fs.listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.page)), new PathFilter() {
+            public boolean accept(Path path) {
+                return path.getName().startsWith(PageStep.Output.tempEditDates.name());
+            }
+        });
 
-			String line = null;
-			while ((line = reader.readLine()) != null) {
+        Long lastEdit = null;
 
-				CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
+        for (FileStatus status : fileStatuses) {
 
-				int pageId = cri.readInt(null);
-				long edit = cri.readLong(null);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(status.getPath())));
 
-				if (lastEdit == null || lastEdit < edit)
-					lastEdit = edit;
-			}
-		}
+            String line = null;
+            while ((line = reader.readLine()) != null) {
 
-		return lastEdit;
+                CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream((line + "\n").getBytes("UTF-8")));
 
-	}
+                int pageId = cri.readInt(null);
+                long edit = cri.readLong(null);
 
-	public static String getDirectoryName(ExtractionStep step) {
-		StringBuffer s = new StringBuffer("temp");
-		s.append(Character.toUpperCase(step.name().charAt(0)));
-		s.append(step.name().substring(1));
+                if (lastEdit == null || lastEdit < edit)
+                    lastEdit = edit;
+            }
+        }
 
-		return s.toString();
-	}
+        return lastEdit;
+
+    }
+
+    public static String getDirectoryName(ExtractionStep step) {
+        StringBuffer s = new StringBuffer("temp");
+        s.append(Character.toUpperCase(step.name().charAt(0)));
+        s.append(step.name().substring(1));
+
+        return s.toString();
+    }
 }

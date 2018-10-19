@@ -1,14 +1,8 @@
 package org.wikipedia.miner.extract.steps;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.scienceminer.nerd.mention.ProcessText;
+import com.scienceminer.nerd.utilities.StringPos;
+import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileStatus;
@@ -16,17 +10,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
+import org.grobid.core.lang.Language;
 import org.wikipedia.miner.extract.DumpExtractor;
 import org.wikipedia.miner.extract.DumpExtractor.ExtractionStep;
 import org.wikipedia.miner.extract.model.DumpPage;
@@ -39,7 +26,8 @@ import org.wikipedia.miner.extract.util.LanguageConfiguration;
 import org.wikipedia.miner.extract.util.SiteInfo;
 import org.wikipedia.miner.extract.util.XmlInputFormat;
 
-import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * The (fourth) fifth step in the extraction process.
@@ -155,54 +143,30 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 				DumpPage page = pageParser.parsePage(value.toString());
 				if (page != null) {
 
-					// build up all the labels locally for this document before emitting, to maintain docCounts and occCounts
-					HashMap<String, ExLabel> labels = new HashMap<String, ExLabel>();
-
 					String markup = page.getMarkup();
 					markup = stripper.toTextOnly(markup, lc.getLangCode());
 
-					String s = "$ " + markup + " $";
-					//pd.update();
-					
-					//TODO: make this use an ngrammer
+					final Language lang = new Language(lc.getLangCode());
+					final List<StringPos> ngrams = ProcessText.ngrams(markup, maxLabelLength, lang);
 
-					Pattern p = Pattern.compile("[\\s\\{\\}\\(\\)\"\'\\.\\,\\;\\:\\-\\_]");  
-					//would just match all non-word chars, but we don't want to match utf chars
-					Matcher m = p.matcher(s);
+					HashMap<String, ExLabel> labels = new HashMap<String, ExLabel>();
+					for(StringPos sp : ngrams) {
+						String ngram = sp.getString();
 
-					Vector<Integer> matchIndexes = new Vector<Integer>();
+						if (labelCache.isKnown(ngram)) {
 
-					while (m.find()) 
-						matchIndexes.add(m.start());
+							ExLabel label = labels.get(ngram);
 
-					for (int i=0; i<matchIndexes.size(); i++) {
-
-						int startIndex = matchIndexes.elementAt(i) + 1;
-						
-						if (Character.isWhitespace(s.charAt(startIndex))) 
-							continue;
-
-						for (int j=Math.min(i + maxLabelLength, matchIndexes.size()-1); j > i; j--) {
-							int currIndex = matchIndexes.elementAt(j);	
-							String ngram = s.substring(startIndex, currIndex);
-
-							if (! (ngram.length()==1 && s.substring(startIndex-1, startIndex).equals("'"))&& !ngram.trim().equals("")) {
-								if (labelCache.isKnown(ngram)) {
-									
-									ExLabel label = labels.get(ngram);
-									
-									if (label == null) {
-										label = new ExLabel(0,0,1,1,new TreeMap<Integer, ExSenseForLabel>());
-									} else {
-										label.setTextOccCount(label.getTextOccCount() + 1);
-									}
-									
-									labels.put(ngram, label);
-								}
+							if (label == null) {
+								label = new ExLabel(0,0,1,1,new TreeMap<>());
+							} else {
+								label.setTextOccCount(label.getTextOccCount() + 1);
 							}
+
+							labels.put(ngram, label);
 						}
 					}
-					
+
 					// now emit all of the labels we have gathered
 					for (Map.Entry<String,ExLabel> entry:labels.entrySet()) {
 						output.collect(new Text(entry.getKey()), entry.getValue());
@@ -213,7 +177,7 @@ public class LabelOccurrencesStep extends Configured implements Tool {
 				Logger.getLogger(LabelOccurrencesMapper.class).error("Caught exception", e);
 			}
 		}
-		
+
 		@Override
 		public void close() throws IOException {
 			labelCache.close();

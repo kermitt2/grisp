@@ -36,7 +36,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.10.4</version>
 				<configuration>
 					<aggregate>true</aggregate>
 					<quiet>true</quiet>
@@ -51,84 +51,84 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>${maven-source-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                                <configuration>
-                                    <archive>
-                                        <manifest>
-                                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                                        </manifest>
-                                        <manifestEntries>
-                                            <Implementation-Build>${implementation.build}</Implementation-Build>
-                                            <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
-                                            <X-Compile-Source-JDK>${javac.src.version}</X-Compile-Source-JDK>
-                                            <X-Compile-Target-JDK>${javac.target.version}</X-Compile-Target-JDK>
-                                        </manifestEntries>
-                                    </archive>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${maven-javadoc-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <configuration>
-                                    <quiet>true</quiet>
-                                    <archive>
-                                        <manifest>
-                                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                                        </manifest>
-                                        <manifestEntries>
-                                            <Implementation-Build>${implementation.build}</Implementation-Build>
-                                            <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
-                                            <X-Compile-Source-JDK>${javac.src.version}</X-Compile-Source-JDK>
-                                            <X-Compile-Target-JDK>${javac.target.version}</X-Compile-Target-JDK>
-                                        </manifestEntries>
-                                    </archive>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven-gpg-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id> 
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.ju-n.maven.plugins</groupId>
-                        <artifactId>checksum-maven-plugin</artifactId>
-                        <version>${checksum-maven-plugin.version}</version>
-                    </plugin>
+                    <!-- <plugin>
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-source-plugin</artifactId>
+                         <version>${maven-source-plugin.version}</version>
+                         <executions>
+                             <execution>
+                                 <id>attach-sources</id>
+                                 <goals>
+                                     <goal>jar-no-fork</goal>
+                                 </goals>
+                                 <configuration>
+                                     <archive>
+                                         <manifest>
+                                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                         </manifest>
+                                         <manifestEntries>
+                                             <Implementation-Build>${implementation.build}</Implementation-Build>
+                                             <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
+                                             <X-Compile-Source-JDK>${javac.src.version}</X-Compile-Source-JDK>
+                                             <X-Compile-Target-JDK>${javac.target.version}</X-Compile-Target-JDK>
+                                         </manifestEntries>
+                                     </archive>
+                                 </configuration>
+                             </execution>
+                         </executions>
+                     </plugin>
+                     <plugin>
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-javadoc-plugin</artifactId>
+                         <version>${maven-javadoc-plugin.version}</version>
+                         <executions>
+                             <execution>
+                                 <id>attach-javadocs</id>
+                                 <goals>
+                                     <goal>jar</goal>
+                                 </goals>
+                                 <configuration>
+                                     <quiet>true</quiet>
+                                     <archive>
+                                         <manifest>
+                                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                         </manifest>
+                                         <manifestEntries>
+                                             <Implementation-Build>${implementation.build}</Implementation-Build>
+                                             <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
+                                             <X-Compile-Source-JDK>${javac.src.version}</X-Compile-Source-JDK>
+                                             <X-Compile-Target-JDK>${javac.target.version}</X-Compile-Target-JDK>
+                                         </manifestEntries>
+                                     </archive>
+                                 </configuration>
+                             </execution>
+                         </executions>
+                     </plugin>
+                     <plugin>
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-gpg-plugin</artifactId>
+                         <version>${maven-gpg-plugin.version}</version>
+                         <executions>
+                             <execution>
+                                 <id>sign-artifacts</id>
+                                 <phase>verify</phase>
+                                 <goals>
+                                     <goal>sign</goal>
+                                 </goals>
+                             </execution>
+                         </executions>
+                     </plugin>-->
+                    <!--<plugin>-->
+                        <!--<groupId>net.ju-n.maven.plugins</groupId>-->
+                        <!--<artifactId>checksum-maven-plugin</artifactId>-->
+                        <!--<version>${checksum-maven-plugin.version}</version>-->
+                    <!--</plugin>-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>2.5.2</version>
+                        <version>2.5.3</version>
                         <configuration>
                             <mavenExecutorId>forked-path</mavenExecutorId>
                             <useReleaseProfile>false</useReleaseProfile>

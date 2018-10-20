@@ -237,6 +237,54 @@
 		  </build>
 		</profile>
 		<profile>
+		  <!-- mvn compile exec:exec -PbuildTranslationEs -->	
+		  <id>buildTranslationEs</id>
+		  <activation><property><name>buildTranslationEs</name></property></activation>
+		  <build>
+			<plugins>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>exec-maven-plugin</artifactId>
+				    <configuration>
+				      <executable>java</executable>
+				      <arguments>
+						<argument>-Xms2g</argument>
+		            	<argument>-Xmx4g</argument>
+				        <argument>-classpath</argument><classpath />
+				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
+				        <argument>/mnt/data/wikipedia/latest/eswiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/es/translations.csv</argument>
+				      </arguments>
+				    </configuration>
+		    	</plugin>
+		    </plugins>
+		  </build>
+		</profile>
+		<profile>
+		  <!-- mvn compile exec:exec -PbuildTranslationIt -->	
+		  <id>buildTranslationIt</id>
+		  <activation><property><name>buildTranslationIt</name></property></activation>
+		  <build>
+			<plugins>
+				<plugin>
+				    <groupId>org.codehaus.mojo</groupId>
+				    <artifactId>exec-maven-plugin</artifactId>
+				    <configuration>
+				      <executable>java</executable>
+				      <arguments>
+						<argument>-Xms2g</argument>
+		            	<argument>-Xmx4g</argument>
+				        <argument>-classpath</argument><classpath />
+				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
+				        <argument>/mnt/data/wikipedia/latest/itwiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/it/translations.csv</argument>
+				      </arguments>
+				    </configuration>
+		    	</plugin>
+		    </plugins>
+		  </build>
+		</profile>
+		<profile>
 		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PbuildWikidata -->	
 		  <id>buildWikidata</id>
 		  <activation><property><name>buildWikidata</name></property></activation>

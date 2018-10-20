@@ -1,7 +1,7 @@
 package com.scienceminer.grisp.nerd.data;
 
-import java.util.*;    
-import java.io.*;    
+import java.util.*;
+import java.io.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
@@ -15,7 +15,7 @@ import static org.fusesource.lmdbjni.Constants.*;
  * This class processes the latest Wikipedia cross-language files (.sql) into
  * csv files as expected by NERD. We assume that these files are small
  * and basic enough to avoid the need of Hadoop and distributed process.
- * 
+ *
  *
  * @author Patrice Lopez
  *
@@ -28,10 +28,10 @@ public class ProcessTranslation {
 
   	// this is the list of languages we consider for target translations, we will ignore the other
   	// languages
-  	private static List<String> targetLanguages = Arrays.asList("en","fr", "de");
+  	private static List<String> targetLanguages = Arrays.asList("en", "fr", "de", "it", "es", "ja");
 
   	public ProcessTranslation() {
-  		// init LMDB - the default usage of LMDB will ensure that the entries in the resulting 
+  		// init LMDB - the default usage of LMDB will ensure that the entries in the resulting
   		// translations.csv file will be sorted by the page id
 		File path = new File("/tmp/lmdb-temp-translations");
 		if (!path.exists()) {
@@ -65,7 +65,7 @@ public class ProcessTranslation {
     		e.printStackTrace();
     	}
 	}
-	
+
 	public int process(String inputSqlPath) {
 		int nb = 0;
 		try {
@@ -73,7 +73,7 @@ public class ProcessTranslation {
 			BoundedInputStream boundedInput = new BoundedInputStream(new FileInputStream(inputSqlPath));
 			BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInput), 8192);
 
-			final String insertString = "INSERT INTO `langlinks` VALUES ("; 
+			final String insertString = "INSERT INTO `langlinks` VALUES (";
 			String line = null;
 			Transaction tx = env.createWriteTransaction();
 			int nbToAdd = 0;
@@ -81,13 +81,13 @@ public class ProcessTranslation {
     			char[] chars = new char[8192];
     			boolean prelude = true;
     			String remaining = null;
-    			Map<String, String> tempToBeAddedMap = new TreeMap<String,String>();
+    			Map<String, String> tempToBeAddedMap = new TreeMap<>();
     			for(int len; (len = reader.read(chars)) > 0;) {
     				if (nbToAdd == 10000) {
 						tx.commit();
 						nbToAdd = 0;
 						tx = env.createWriteTransaction();
-						tempToBeAddedMap = new TreeMap<String,String>();
+						tempToBeAddedMap = new TreeMap<>();
 					}
 
     				String piece = String.valueOf(chars);
@@ -140,7 +140,7 @@ public class ProcessTranslation {
 		    								if ( (ind2 != -1) && (val.length()>ind2) ) {
 		    									convertedPiece += "|" + val;
 		    								}
-		    							}		    						
+		    							}
 				    					db.put(tx, bytes(keyId), bytes(convertedPiece));
 				    					tempToBeAddedMap.put(keyId, convertedPiece);
 				    					nbToAdd++;
@@ -211,7 +211,7 @@ public class ProcessTranslation {
 						if ( (keyBytes != null) && (valueBytes != null) ) {
 							String pageId = string(keyBytes);
 							String value = string(valueBytes);
-							
+
 							value = value.replace(",", "%2C");
 							value = value.replace("%", "%25");
 
@@ -223,7 +223,7 @@ public class ProcessTranslation {
 								int ind1 = value.indexOf("|", pos+1);
 								if (ind1 != -1)
 									langId = value.substring(pos, ind1);
-								else 
+								else
 									break;
 								pos = ind1;
 								int ind2 = value.indexOf("|", pos+1);
@@ -248,15 +248,15 @@ public class ProcessTranslation {
 										.append(pageId)
 										.append(",m{");
 								}
-								builder	
+								builder
 									.append("'")
 									.append(langId)
 									.append(",'")
 									.append(translatedTitle);
-								
+
 							}
 							if (builder != null) {
-								builder	
+								builder
 									.append("}")
 									.append("\n");
 								writer.write(builder.toString());
@@ -292,7 +292,7 @@ public class ProcessTranslation {
 		}
 
 		ProcessTranslation translate = new ProcessTranslation() ;
-				
+
 		long start = System.currentTimeMillis();
 		int nbResult = translate.process(args[0]);
 		translate.writeTranslationsCsv(args[1]);

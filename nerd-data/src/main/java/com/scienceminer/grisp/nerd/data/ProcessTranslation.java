@@ -2,6 +2,7 @@ package com.scienceminer.grisp.nerd.data;
 
 import java.util.*;
 import java.io.*;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
@@ -69,8 +70,14 @@ public class ProcessTranslation {
 	public int process(String inputSqlPath) {
 		int nb = 0;
 		try {
+			InputStream inputStream = new FileInputStream(inputSqlPath);
+			if(inputSqlPath.endsWith("gz"))                          {
+				inputStream = new GZIPInputStream(new FileInputStream(inputSqlPath));
+
+			}
+
 			// open file
-			BoundedInputStream boundedInput = new BoundedInputStream(new FileInputStream(inputSqlPath));
+			BoundedInputStream boundedInput = new BoundedInputStream(inputStream);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInput), 8192);
 
 			final String insertString = "INSERT INTO `langlinks` VALUES (";
@@ -112,7 +119,7 @@ public class ProcessTranslation {
 								tx.commit();
 								nbToAdd = 0;
 								tx = env.createWriteTransaction();
-								tempToBeAddedMap = new TreeMap<String,String>();
+								tempToBeAddedMap = new TreeMap<>();
 							}
 
 	    					int posEnd = piece.indexOf("'),(", pos+1);

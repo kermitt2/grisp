@@ -1,6 +1,6 @@
 # GRISP
 
-Knowledge Base stuff.
+Knowledge Base stuff for [entity-fishing](https://github.com/kermitt2/entity-fishing).
 
 ## Create entity-fishing Wikipedia preprocessed data
 
@@ -77,7 +77,7 @@ Next data to be mapped: geonames, geospecies
 
 ## Credits
 
-Many thanks to David Milne for the Wikipedia XML dump processing, the creation of the `entity-fishing` Wikipedia data being basically a fork of his project. 
+Many thanks to David Milne for the Wikipedia XML dump processing. The creation of the `entity-fishing` Wikipedia data is basically a fork of his project. 
 
 ## License
 

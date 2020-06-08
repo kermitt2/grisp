@@ -56,6 +56,29 @@ For  importing Wikidata resources in GRISP, then use the following command:
 
 The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for each language the ``**wiki-latest-page_props.sql.gz`` mapping information (where ** is the language code, e.g. `en`, `fr`, `de`, ...), the correct paths to these files must currently be indicated manually in the `pom.xml` for the task `buildWikidata`. 
 
+### Generating Wikidata property labels for each language
+
+By default, Wikidata property identifiers are not easily readable (e.g. `P31`). In order to associate the property identifiers to a readable language-specific label, we need to generate the language-specific property labels (files `wikidata.txt`) as follow: 
+
+- for English:
+
+```bash
+wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata.txt
+```
+
+- for French: 
+
+```bash
+wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22fr%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata.txt
+```
+
+- for German:
+
+```bash
+wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22de%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata.txt
+```
+
+Just modify the language code in the url for other languages. 
 
 ### Just for History: Creating additional infobox csv files with DBPedia
 

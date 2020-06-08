@@ -1,7 +1,12 @@
-Getting all Wikidata properties in JSON: 
+# Getting all Wikidata properties in JSON: 
 
-https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A
+At the present time (2020), we can obtain the list of all Wikidata properties with the following sparql query (it takes 5-10s): 
 
+> wget https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A
+
+Each property will follow this pattern:
+
+```jsoin
 {
   "head" : {
     "vars" : [ "property", "propertyLabel" ]
@@ -31,3 +36,4 @@ https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3Fpr
     ...
   }
 }
+```

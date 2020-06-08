@@ -1,7 +1,6 @@
-
 # Pre-processed files with Hadoop
  
-In this section we provide already processed with the hadoop job
+In this section we provide datasetes already processed with the hadoop job.
 
 ## CSV files
 

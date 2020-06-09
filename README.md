@@ -38,7 +38,7 @@ For other languages, replace the ending ```En```, but the appropriate lang code,
 > mvn compile exec:exec -PbuildTranslationFr
 ```
 
-Check the correct paths given in argument in the `pom.xml` for the tasks `buildTranslation**`. 
+Check the correct paths given in argument in the `nerd-data/pom.xml` for the tasks `buildTranslation**`. 
 
 ### Creating Wikidata knowledge base backbone and language-specific mapping
 
@@ -46,7 +46,7 @@ Wikidata is a multilingual knowledge base that can be used on top the existing l
 
 The following language specific files must be first downloaded: ``**wiki-latest-page_props.sql.gz`` for each target languages (`en`, `fr`, `de`, `it`, `es`), with `en` at least being mandatory and put in the same subdirectory.
 
-The JSON Wikidata dump file ``latest-all.json.bz2``, compressed must be downloaded. 
+The JSON Wikidata dump file ``latest-all.json.bz2`` must be downloaded. 
 
 For  importing Wikidata resources in GRISP, then use the following command:
 
@@ -54,7 +54,7 @@ For  importing Wikidata resources in GRISP, then use the following command:
 > mvn compile exec:exec -PbuildWikidata
 ```
 
-The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for each language the ``**wiki-latest-page_props.sql.gz`` mapping information (where ** is the language code, e.g. `en`, `fr`, `de`, ...), the correct paths to these files must currently be indicated manually in the `pom.xml` for the task `buildWikidata`. 
+The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for each language the compressed ``**wiki-latest-page_props.sql.gz`` mapping information (where `**` is the language code, e.g. `en`, `fr`, `de`, ...), the correct paths to these files must currently be indicated manually in the `nerd-data/pom.xml` for the task `buildWikidata`. 
 
 ### Generating Wikidata property labels for each language
 

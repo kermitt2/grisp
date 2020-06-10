@@ -180,7 +180,7 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/enwiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/en/enwiki-latest-langlinks.sql</argument>
 				        <argument>/mnt/data/wikipedia/latest/en/translations.csv</argument>
 				      </arguments>
 				    </configuration>
@@ -204,7 +204,7 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/frwiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/fr/frwiki-latest-langlinks.sql</argument>
 				        <argument>/mnt/data/wikipedia/latest/fr/translations.csv</argument>
 				      </arguments>
 				    </configuration>
@@ -228,7 +228,7 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/dewiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/de/dewiki-latest-langlinks.sql</argument>
 				        <argument>/mnt/data/wikipedia/latest/de/translations.csv</argument>
 				      </arguments>
 				    </configuration>
@@ -252,7 +252,7 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/eswiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/es/eswiki-latest-langlinks.sql</argument>
 				        <argument>/mnt/data/wikipedia/latest/es/translations.csv</argument>
 				      </arguments>
 				    </configuration>
@@ -276,7 +276,7 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/itwiki-latest-langlinks.sql</argument>
+				        <argument>/mnt/data/wikipedia/latest/it/itwiki-latest-langlinks.sql</argument>
 				        <argument>/mnt/data/wikipedia/latest/it/translations.csv</argument>
 				      </arguments>
 				    </configuration>

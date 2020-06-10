@@ -1,20 +1,22 @@
 # GRISP
 
-Compile the Language and Knowledge Base data for [entity-fishing](https://github.com/kermitt2/entity-fishing).
+Compile the Language and Knowledge Base data for loading into [entity-fishing](https://github.com/kermitt2/entity-fishing).
 
 ## Create entity-fishing Wikipedia preprocessed data
 
 The sub-module `nerd-data` processes the Wikipedia XML dumps and creates compiled data to be used by [entity-fishing](https://github.com/kermitt2/entity-fishing), a machine learning tool for extracting and disambiguating Wikidata entities in text and PDF at scale. 
 
-The processing is an adaptation of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing, which relies on Hadoop. For reference, the original and preprocessed files are described [here](nerd-data/data/preprocessed-wikipedia-files.md). 
+The processing is an adaptation of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing, which relies on Hadoop. The main Modifications include the usage of the [Sweble MediaWiki document parser](https://en.wikipedia.org/wiki/Sweble) for Wikipedia pages (the most comprehensive, reliable and fast MediaWiki parser following our tests, apart MediaWiki itself), a complete review of the compiled statistics, the usage of LMDB to avoid distributed data, additional extraction related to multilinguality and various speed optimization.
 
-The Wikipedia processing supports current Wikipedia dumps (May 2020) and was successfully tested with English, German, French, Spanish and Italian XML dumps. Japanese dump should also be well supported, see the branch `Japanese`. Wikipedia XML dumps are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/).
+The Wikipedia processing supports current the Wikipedia dumps (May 2020) and was successfully tested with English, German, French, Spanish and Italian XML dumps. Japanese dump should also be well supported, see the branch `Japanese`. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
 
 ### Processing a Wikipedia XML article dump file
 
 Create the hadoop job jar:
 
 ```
+> cd nerd-data
+
 > mvn clean package
 ```
 
@@ -22,17 +24,17 @@ Then see instructions under [nerd-data/doc/hadoop.md](nerd-data/doc/hadoop.md) f
 
 This processing is an adaptation and optimization of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing. It enables the support of the latest Wikipedia dump files. The processing is considerably faster than with WikipediaMiner and a single server is enough for processing the lastest XML dumps in a reasonnable time. For December 2016 English Wikipedia XML dump: around 7 hours 30 minutes. For December 2016 French and German Wikipedia XML dump: around 2 hours 30 minutes (in pseudo distributed mode, one server Intel Core i7-4790K CPU 4.00GHz Haswell, 16GB memory, with 4 cores, 8 threads, SSD). 
 
-We think that it is possible to still improve significantly the processing time, lower memory consumption, and avoid completely Hadoop - simply by optimizing the processing for a common single multi-thread machine. 
+We think that it is possible to still improve significantly the processing time, lower memory consumption, and avoid completely Hadoop - simply by optimizing the processing for a common single multi-thread machine. But given that the current state of the library gives satisfactory performance, we leave these improvements for the future if necessary. 
 
 ### Creating additional cvs translation files
 
-Translation information are not available anymore in the Wikipedia XML dump, downloading the SQL langlink file is necessary (e.g. `enwiki-latest-langlinks.sql.gz`). The file must be put together with the XML dump file. Then for each language, the translation cvs file can be generated with the command - here for English: 
+Translation information are not available anymore in the Wikipedia XML dump, so downloading the SQL langlink file is necessary (e.g. `enwiki-latest-langlinks.sql.gz`). This file must be put together with the XML dump file. Then for each language, the translation cvs file can be generated with the command - here for English: 
 
 ```
 > mvn compile exec:exec -PbuildTranslationEn
 ```
 
-For other languages, replace the ending ```En```, but the appropriate lang code, e.g. for French:
+For other languages, replace the ending ```En```, with the appropriate lang codes (among `De`, `Fr`, `Es`, `It`, `Jp`), e.g. for French language:
 
 ```
 > mvn compile exec:exec -PbuildTranslationFr
@@ -78,7 +80,75 @@ wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%2
 wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22de%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata.txt
 ```
 
-Just modify the language code in the url for other languages. 
+Just modify the language code in the url for other languages. Put all these language-specific Wikidata property naming into their corresponding language-specific data directory.
+
+### Final hierarchy of files 
+
+Here how the final data tree should look like from the root directory (for 3 languages, additional languages follow the same pattern), ready to be loaded and further optimized in embedded databases by [entity-fishing](https://github.com/kermitt2/entity-fishing): 
+
+```
+.
+├── de
+│   ├── articleParents.csv
+│   ├── categoryParents.csv
+│   ├── childArticles.csv
+│   ├── childCategories.csv
+│   ├── dewiki-latest-pages-articles.xml.gz
+│   ├── label.csv
+│   ├── page.csv
+│   ├── pageLabel.csv
+│   ├── pageLinkIn.csv
+│   ├── pageLinkOut.csv
+│   ├── redirectSourcesByTarget.csv
+│   ├── redirectTargetsBySource.csv
+│   ├── sentenceSplits.csv
+│   ├── stats.csv
+│   ├── translations.csv
+│   └── wikidata.txt
+├── en
+│   ├── articleParents.csv
+│   ├── categoryParents.csv
+│   ├── childArticles.csv
+│   ├── childCategories.csv
+│   ├── enwiki-latest-pages-articles.xml.gz
+│   ├── label.csv
+│   ├── page.csv
+│   ├── pageLabel.csv
+│   ├── pageLinkIn.csv
+│   ├── pageLinkOut.csv
+│   ├── redirectSourcesByTarget.csv
+│   ├── redirectTargetsBySource.csv
+│   ├── sentenceSplits.csv
+│   ├── stats.csv
+│   ├── translations.csv
+│   └── wikidata.txt
+├── fr
+│   ├── articleParents.csv
+│   ├── categoryParents.csv
+│   ├── childArticles.csv
+│   ├── childCategories.csv
+│   ├── frwiki-latest-pages-articles.xml.gz
+│   ├── label.csv
+│   ├── page.csv
+│   ├── pageLabel.csv
+│   ├── pageLinkIn.csv
+│   ├── pageLinkOut.csv
+│   ├── redirectSourcesByTarget.csv
+│   ├── redirectTargetsBySource.csv
+│   ├── sentenceSplits.csv
+│   ├── stats.csv
+│   ├── translations.csv
+│   └── wikidata.txt
+└── wikidataIds.csv  
+```
+
+Note:
+
+- the full article dump for each language must be present in the language-specific directories (they are required to generate definitions for entities, create training data, compute additional entity embeddings),
+
+- the wikidata identifiers csv file text file will stay in the root directory while the wikidata language specific files will be installed in language-specific sub directories. 
+
+
 
 ### Just for History: Creating additional infobox csv files with DBPedia
 
@@ -102,11 +172,11 @@ For other languages, replace the ending ```En```, but the appropriate lang code,
 
 ### More to come
 
-Next data to be mapped: geonames, geospecies
+We considering generating more KB data to be mapped: geonames, geospecies, etc.
 
 ## Credits
 
-Many thanks to David Milne for the Wikipedia XML dump processing. The present pre-processing of the Wikipedia data is originally a fork of his project. 
+Many thanks to David Milne for the Wikipedia XML dump processing. The present pre-processing of the Wikipedia data is originally a fork of a part of his project. 
 
 ## License
 

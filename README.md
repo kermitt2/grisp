@@ -1,16 +1,16 @@
 # GRISP
 
-Compile the Language and Knowledge Base data for loading into [entity-fishing](https://github.com/kermitt2/entity-fishing).
+Pre-process the Language and Knowledge Base data for loading into [entity-fishing](https://github.com/kermitt2/entity-fishing).
 
-## Create entity-fishing Wikipedia preprocessed data
+## Create entity-fishing Wikipedia and Wikidata preprocessed data
 
-The sub-module `nerd-data` processes the Wikipedia XML dumps and creates compiled data to be used by [entity-fishing](https://github.com/kermitt2/entity-fishing), a machine learning tool for extracting and disambiguating Wikidata entities in text and PDF at scale. 
+The sub-module `nerd-data` pre-processes the Wikipedia XML dumps and creates compiled data to be used by [entity-fishing](https://github.com/kermitt2/entity-fishing), a machine learning tool for extracting and disambiguating Wikidata entities in text and PDF at scale. 
 
-The processing is an adaptation of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing, which relies on Hadoop. The main Modifications include the usage of the [Sweble MediaWiki document parser](https://en.wikipedia.org/wiki/Sweble) for Wikipedia pages (the most comprehensive, reliable and fast MediaWiki parser following our tests, apart MediaWiki itself), a complete review of the compiled statistics, the usage of LMDB to avoid distributed data, additional extraction related to multilinguality and various speed optimization.
+The pre-processing is an adaptation of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing, which relies on Hadoop. The main Modifications include the usage of the [Sweble MediaWiki document parser](https://en.wikipedia.org/wiki/Sweble) for Wikipedia pages (the most comprehensive, reliable and fast MediaWiki parser following our tests, apart MediaWiki itself), a complete review of the compiled statistics, the usage of LMDB to avoid distributed data, additional extraction related to multilinguality and various speed optimization.
 
-The Wikipedia processing supports current the Wikipedia dumps (May 2020) and was successfully tested with English, German, French, Spanish and Italian XML dumps. Japanese dump should also be well supported, see the branch `Japanese`. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
+The Wikipedia pre-processing supports current the Wikipedia dumps (May 2020) and was successfully tested with English, German, French, Spanish and Italian XML dumps. Japanese dump should also be well supported, see the branch `Japanese`. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
 
-### Processing a Wikipedia XML article dump file
+### Pre-processing a Wikipedia XML article dump file
 
 Create the hadoop job jar:
 
@@ -101,7 +101,6 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── pageLinkOut.csv
 │   ├── redirectSourcesByTarget.csv
 │   ├── redirectTargetsBySource.csv
-│   ├── sentenceSplits.csv
 │   ├── stats.csv
 │   ├── translations.csv
 │   └── wikidata.txt
@@ -118,7 +117,6 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── pageLinkOut.csv
 │   ├── redirectSourcesByTarget.csv
 │   ├── redirectTargetsBySource.csv
-│   ├── sentenceSplits.csv
 │   ├── stats.csv
 │   ├── translations.csv
 │   └── wikidata.txt
@@ -135,7 +133,6 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── pageLinkOut.csv
 │   ├── redirectSourcesByTarget.csv
 │   ├── redirectTargetsBySource.csv
-│   ├── sentenceSplits.csv
 │   ├── stats.csv
 │   ├── translations.csv
 │   └── wikidata.txt
@@ -144,13 +141,14 @@ Here how the final data tree should look like from the root directory (for 3 lan
 
 Note:
 
+- it is expected to have 15 files in each language-specific directory,
+
 - the full article dump for each language must be present in the language-specific directories (they are required to generate definitions for entities, create training data, compute additional entity embeddings),
 
-- the wikidata identifiers csv file text file will stay in the root directory while the wikidata language specific files will be installed in language-specific sub directories. 
+- the wikidata identifiers csv file `wikidataIds.csv` is in the root directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` are installed in each language-specific sub-directory. 
 
 
-
-### Just for History: Creating additional infobox csv files with DBPedia
+## Just for History: Creating additional infobox csv files with DBPedia
 
 This part is deprecated as we are not using at all DBPedia due to too low quality. 
 

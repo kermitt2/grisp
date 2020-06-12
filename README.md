@@ -146,9 +146,9 @@ Note:
 
 - it is expected to have 15 files in each language-specific directory,
 
-- the full Wikipedia article dump for each language must be present in the language-specific directories (e.g. `enwiki-latest-pages-articles.xml.gz`, they are required to generate definitions for entities, create training data, compute additional entity embeddings),
+- the full Wikipedia article dump for each language must be present in the language-specific directories (e.g. `enwiki-latest-pages-articles.xml.bz2` or `enwiki-latest-pages-articles.xml.gz` or `enwiki-latest-pages-articles.xml`, they are required to generate definitions for entities, create training data, compute additional entity embeddings) ; the dump file can be compressed in bz2, gz or uncompressed - all these variants should be loaded appropriately by entity-fishing,
 
-- the wikidata identifiers csv file `wikidataIds.csv` and the full wikidata JSON dump file `latest-all.json.bz2` are under a `wikidata` sub-directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` are installed in each language-specific sub-directory. 
+- the wikidata identifiers csv file `wikidataIds.csv` and the full wikidata JSON dump file `latest-all.json.bz2` are under a `wikidata` sub-directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` are installed in each language-specific sub-directory,
 
 - in entity-fishing the loading of these files is automatic when building the project or starting the service (if not present), be sure to indicate the path to these above files in the entity-fishing config files.
 

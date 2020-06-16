@@ -8,7 +8,7 @@
 	<groupId>com.scienceminer.grisp.nerd-data</groupId>
 	<artifactId>com.scienceminer.grisp.nerd-data</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	
 	<name>NERD-data</name>
 	<description>Data creation for NERD</description>
@@ -27,6 +27,49 @@
 		</license>
 	</licenses>
 	
+	<pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <repositories>
+    	<repository>
+			<id>3rd-party-local-repo</id>
+			<name>This is a local repository included in the project, to access 3rd party libs.</name>
+			<url>file:///${basedir}/../lib/</url>
+			<layout>default</layout>
+		</repository>
+        <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+	    	<id>sonatype-oss-public</id>
+		    <url>https://oss.sonatype.org/content/groups/public/</url>
+		    <releases>
+		      <enabled>true</enabled>
+		    </releases>
+		    <snapshots>
+		      <enabled>true</enabled>
+		    </snapshots>
+	  	</repository>		
+    </repositories>
+
 	<build>
 		<resources>
 			<resource>
@@ -338,30 +381,7 @@
 		</profile>
 	</profiles>
 
-	<repositories>
-		<repository>
-			<id>3rd-party-local-repo</id>
-			<name>This is a local repository included in the project, to access 3rd party libs.</name>
-			<url>file:///${basedir}/../lib/</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-	    	<id>sonatype-oss-public</id>
-		    <url>https://oss.sonatype.org/content/groups/public/</url>
-		    <releases>
-		      <enabled>true</enabled>
-		    </releases>
-		    <snapshots>
-		      <enabled>true</enabled>
-		    </snapshots>
-	  </repository>		
-	</repositories>
+	
 	
 	<dependencies>	
 		<!-- Wikimedia markup parser -->
@@ -379,8 +399,8 @@
         <!-- entity-fishing library -->
 		<dependency>
 			<groupId>com.scienceminer.nerd</groupId>
-			<artifactId>nerd</artifactId>
-			<version>0.0.3</version>
+			<artifactId>entity-fishing</artifactId>
+			<version>0.0.4</version>
 			<!--scope>system</scope>
 		    <systemPath>${project.basedir}/../lib/com/scienceminer/nerd/nerd/0.0.3/nerd-0.0.3.jar</systemPath-->
 		</dependency>

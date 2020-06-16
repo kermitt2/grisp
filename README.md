@@ -10,6 +10,10 @@ The pre-processing is an adaptation of the [WikipediaMiner 2.0](https://github.c
 
 The Wikipedia pre-processing supports current the Wikipedia dumps (May 2020) and was successfully tested with English, German, French, Spanish and Italian XML dumps. Japanese dump should also be well supported, see the branch `Japanese`. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
 
+### Preliminary install
+
+[entity-fishing](https://github.com/kermitt2/entity-fishing) needs to be installed first on the system and built, without the knowledge-base and language data. See the documentation. 
+
 ### Pre-processing a Wikipedia XML article dump file
 
 Create the hadoop job jar:
@@ -93,7 +97,7 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── categoryParents.csv
 │   ├── childArticles.csv
 │   ├── childCategories.csv
-│   ├── dewiki-latest-pages-articles.xml.gz
+│   ├── dewiki-latest-pages-articles.xml.bz2
 │   ├── label.csv
 │   ├── page.csv
 │   ├── pageLabel.csv
@@ -109,7 +113,7 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── categoryParents.csv
 │   ├── childArticles.csv
 │   ├── childCategories.csv
-│   ├── enwiki-latest-pages-articles.xml.gz
+│   ├── enwiki-latest-pages-articles.xml.bz2
 │   ├── label.csv
 │   ├── page.csv
 │   ├── pageLabel.csv
@@ -125,7 +129,7 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── categoryParents.csv
 │   ├── childArticles.csv
 │   ├── childCategories.csv
-│   ├── frwiki-latest-pages-articles.xml.gz
+│   ├── frwiki-latest-pages-articles.xml.bz2
 │   ├── label.csv
 │   ├── page.csv
 │   ├── pageLabel.csv
@@ -146,7 +150,7 @@ Note:
 
 - it is expected to have 15 files in each language-specific directory,
 
-- the full Wikipedia article dump for each language must be present in the language-specific directories (e.g. `enwiki-latest-pages-articles.xml.bz2` or `enwiki-latest-pages-articles.xml.gz` or `enwiki-latest-pages-articles.xml`, they are required to generate definitions for entities, create training data, compute additional entity embeddings) ; the dump file can be compressed in bz2, gz or uncompressed - all these variants should be loaded appropriately by entity-fishing,
+- the full Wikipedia article dump for each language must be present in the language-specific directories (e.g. `enwiki-latest-pages-articles.xml.bz2` or `enwiki-latest-pages-articles.xml.gz` or `enwiki-latest-pages-articles.xml`, they are required to generate definitions for entities, create training data, compute additional entity embeddings) ; the dump file can be compressed in `bz2`, `gzip` or uncompressed - all these variants should be loaded appropriately by entity-fishing,
 
 - the wikidata identifiers csv file `wikidataIds.csv` and the full wikidata JSON dump file `latest-all.json.bz2` are under a `wikidata` sub-directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` are installed in each language-specific sub-directory,
 

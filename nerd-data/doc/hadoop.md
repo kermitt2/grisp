@@ -180,11 +180,15 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put ~/grisp/nerd-data/data/languages.xml /user/lopez/
 
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/enwiki-latest-pages-articles.xml /user/lopez/
+
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/frwiki-latest-pages-articles.xml /user/lopez/
+
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -put /mnt/data/wikipedia/latest/dewiki-latest-pages-articles.xml /user/lopez/
 
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez/output
+
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez/working
+
 
 
 ## Building the hadoop job jar 
@@ -193,7 +197,7 @@ Under `~/grisp/nerd-data`:
 
 >  mvn clean install
 
-will create job jar under `./target/com.scienceminer.grisp.nerd-data-0.0.3-job.jar` to be used below.
+will create job jar under `./target/com.scienceminer.grisp.nerd-data-0.0.4-job.jar` to be used below.
 
 ## Launching hadoop process: 
 
@@ -203,7 +207,7 @@ will create job jar under `./target/com.scienceminer.grisp.nerd-data-0.0.3-job.j
 
 * English (path in HDFS, except the jar):
 
-> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.3-job.jar /user/lopez/enwiki-latest-pages-articles.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
+> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/enwiki-latest-pages-articles.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
 
 When done, getting the csv files for the English language:
 
@@ -211,7 +215,7 @@ When done, getting the csv files for the English language:
 
 * French:
 
->  ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.3-job.jar /user/lopez/frwiki-latest-pages-articles.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
+>  ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/frwiki-latest-pages-articles.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
 
 Getting the csv files for French:
 
@@ -219,7 +223,7 @@ Getting the csv files for French:
 
 * German:
 
-> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.3-job.jar /user/lopez/dewiki-latest-pages-articles.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
+> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/dewiki-latest-pages-articles.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
 
 Getting the csv files for German: 
 
@@ -227,7 +231,7 @@ Getting the csv files for German:
 
 * Italian:
 
-> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.3-job.jar /user/lopez/itwiki-latest-pages-articles.xml /user/lopez/languages.xml it /user/lopez/working /user/lopez/output
+> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/itwiki-latest-pages-articles.xml /user/lopez/languages.xml it /user/lopez/working /user/lopez/output
 
 Getting the csv files for Italian:
 
@@ -235,7 +239,7 @@ Getting the csv files for Italian:
 
 * Spanish:
 
-> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.3-job.jar /user/lopez/eswiki-latest-pages-articles.xml /user/lopez/languages.xml es /user/lopez/working /user/lopez/output
+> ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/eswiki-latest-pages-articles.xml /user/lopez/languages.xml es /user/lopez/working /user/lopez/output
 
 Getting the csv files for Spanish:
 

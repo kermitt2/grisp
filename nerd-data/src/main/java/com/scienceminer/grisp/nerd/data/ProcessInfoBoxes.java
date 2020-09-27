@@ -24,7 +24,7 @@ import org.apache.hadoop.fs.*;
  * csv files as expected by NERD. We assume that these files are small
  * and basic enough to avoid the need of Hadoop and distributed process.
  *
- * Beware the crappiness of DBpedia !
+ * Beware the noisiness of DBpedia !
  * 
  * @author Patrice Lopez
  *

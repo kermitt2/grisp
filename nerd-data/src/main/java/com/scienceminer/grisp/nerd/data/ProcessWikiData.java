@@ -116,13 +116,13 @@ public class ProcessWikiData {
 
 		//db_data.close();
     	//env_data.close();
-    	try {
+    	/*try {
     		File tmpFile = new File(envFilePath_data);
     		if (tmpFile.exists())
 	    		FileUtils.deleteDirectory(tmpFile);
     	} catch(Exception e) {
     		e.printStackTrace();
-    	}
+    	}*/
 	}
 
 	/**

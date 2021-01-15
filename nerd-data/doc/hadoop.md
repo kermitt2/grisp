@@ -2,6 +2,10 @@
 
 ## General
 
+### Hadoop
+
+The preprocessing uses Hadoop `2.*` (latest version is `2.9.2` from `2020-07-03`), which must be downloaded and installed according to your environment. It has not been tested with Hadoop `3`. In your Hadoop installation, some config files under `etc/hadoop/` might need to be adjusted for the task, we provide below our configuration files, but the spotted number can of course be adapted to take advantage of more CPU and memory for a more modern machine. 
+
 ### Expected produced files
 
 For each language, there must be 12 generated csv files
@@ -25,7 +29,7 @@ Note: at the present time, the process works only in pseudo distributed mode (LM
 
 ## Configuration files for YARN
 
-Hadoop 2.* config with YARN: 
+We give here the Hadoop 2.* config files with YARN that we are using to process successfully the Wikidata and Wikipedia dumps. You can adapt them according to the capacity of your server. 
 
 * `etc/hadoop/hadoop-env.sh`
 
@@ -53,8 +57,10 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4
      <name>dfs.data.dir</name>
      <value>/home/lopez/tools/hadoop/hadoop-2.7.4/mydata/hdfs/datanode/</value>
   </property>
+```
 
-// etc/hadoop/yarn-site.xml
+* `etc/hadoop/yarn-site.xml`
+```xml
     <property>
         <name>yarn.nodemanager.aux-services</name>
         <value>mapreduce_shuffle</value>
@@ -167,10 +173,13 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4
 
 * Prepare the namenode:
 
-> hdfs namenode -format
+```bash
+> bin/hdfs namenode -format
+```
 
-* start the HDFS nodes:
+* start the HDFS nodes and copy the files to be processed on the HDFS:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/sbin/start-dfs.sh
 
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user
@@ -188,8 +197,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez/output
 
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -mkdir /user/lopez/working
-
-
+```
 
 ## Building the hadoop job jar 
 
@@ -203,44 +211,65 @@ will create job jar under `./target/com.scienceminer.grisp.nerd-data-0.0.4-job.j
 
 * start YARN:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4//sbin/start-yarn.sh
+```
 
 * English (path in HDFS, except the jar):
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/enwiki-latest-pages-articles.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
+```
 
 When done, getting the csv files for the English language:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/en/
+```
 
 * French:
 
+```bash
 >  ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/frwiki-latest-pages-articles.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
+```
 
 Getting the csv files for French:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/fr/
+```
 
 * German:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/dewiki-latest-pages-articles.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
+```
 
 Getting the csv files for German: 
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/de/
+```
 
 * Italian:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/itwiki-latest-pages-articles.xml /user/lopez/languages.xml it /user/lopez/working /user/lopez/output
+```
 
 Getting the csv files for Italian:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/it/
+```
 
 * Spanish:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.4-job.jar /user/lopez/eswiki-latest-pages-articles.xml /user/lopez/languages.xml es /user/lopez/working /user/lopez/output
-
+```
 Getting the csv files for Spanish:
 
+```bash
 > ~/tools/hadoop/hadoop-2.7.4/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/es/
+```

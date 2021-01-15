@@ -6,7 +6,7 @@ At the present time (2020), we can obtain the list of all Wikidata properties wi
 
 Each property will follow this pattern:
 
-```jsoin
+```json
 {
   "head" : {
     "vars" : [ "property", "propertyLabel" ]

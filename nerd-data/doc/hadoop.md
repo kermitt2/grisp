@@ -118,7 +118,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4
   </property>
   <property>
     <name>mapreduce.map.memory.mb</name>
-    <value>2048</value>
+    <value>3072</value>
   </property>
   <property>
     <name>mapreduce.reduce.memory.mb</name>
@@ -130,7 +130,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-2.7.4
   </property>
   <property>
     <name>mapreduce.reduce.java.opts</name>
-    <value>-Xmx7168m</value>
+    <value>-Xmx8192m</value>
   </property>
 
   <property>

@@ -401,6 +401,12 @@
 			<groupId>com.scienceminer.nerd</groupId>
 			<artifactId>entity-fishing</artifactId>
 			<version>0.0.4</version>
+            <exclusions>
+                <exclusion> 
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>   
 			<!--scope>system</scope>
 		    <systemPath>${project.basedir}/../lib/com/scienceminer/nerd/nerd/0.0.3/nerd-0.0.3.jar</systemPath-->
 		</dependency>

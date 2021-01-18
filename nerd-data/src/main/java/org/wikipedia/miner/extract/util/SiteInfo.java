@@ -91,9 +91,6 @@ public class SiteInfo {
 		xmlStreamReader.close() ;
 	
 	}
-	
-	
-	
 
 	public String getBase() {
 		return base;

@@ -1,14 +1,9 @@
 package org.wikipedia.miner.extract.util;
 
-//import gnu.trove.map.hash.TIntIntHashMap;
-//import gnu.trove.set.TIntSet;
-//import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.*;
 import java.util.concurrent.*;  
 
 import java.io.*;
-//import java.nio.file.*;
 import java.util.List;
 
 import org.apache.hadoop.fs.*;
@@ -32,14 +27,6 @@ public class RedirectCache {
   	private Database db;
   	private String envFilePath = null;
   	private boolean isLoaded = false ;
-
-  	//private Transaction tx = null; 
-
-	/*public static RedirectCache getInstance() throws IOException {
-        if (instance == null)
-			getNewInstance();
-        return instance;
-    }*/
 
     /**
      * Creates a new instance.
@@ -83,23 +70,6 @@ public class RedirectCache {
  	   	db.close();
     	env.close();
 	}
-
-	/*private static RedirectCache cache ;
-
-	public static RedirectCache get() {
-		if (cache == null)
-			cache = new RedirectCache() ;
-
-		return cache ;
-	}
-	
-	//private TIntIntHashMap redirectTargetsBySource ;
-	private ConcurrentMap<Integer, Integer> redirectTargetsBySource = null;
-	
-	public RedirectCache() {
-		//redirectTargetsBySource = new TIntIntHashMap() ;
-		redirectTargetsBySource = new ConcurrentHashMap<Integer, Integer>();
-	}*/
 
 	public String getEnvFile() {
 		return this.envFilePath;
@@ -184,12 +154,6 @@ public class RedirectCache {
 	}
 
 	public int getTargetId(int sourceId) {
-		//if (!redirectTargetsBySource.contains(sourceId))
-			//return null ;
-
-		//return redirectTargetsBySource.get(sourceId) ;
-		//return db.get(sourceId) ;
-		//Transaction tx = null; 
 		byte[] res = null;
 		try (Transaction tx = env.createReadTransaction()) {
 			try {
@@ -197,16 +161,7 @@ public class RedirectCache {
 			} catch(LMDBException e) {
 				Logger.getLogger(RedirectCache.class).error("Caught LMDB exception while getTargetId: " + sourceId, e) ;
 			}
-		} /*catch(Exception e) {
-			Logger.getLogger(RedirectCache.class).error("Caught exception while getTargetId: " + sourceId, e) ;
-			if (tx != null)
-				tx.close();
-			tx = null;
-		} finally {
-			if (tx != null)
-				tx.reset();	
-				//tx.close();
-		}*/
+		} 
 
 		if (res == null)
 			return -1;
@@ -216,7 +171,6 @@ public class RedirectCache {
 
 	public int getTargetId(String targetTitle, PagesByTitleCache articlesById) throws IOException {
 
-		//Integer currId = PagesByTitleCache.getArticlesCache().getPageId(targetTitle) ;
 		int currId = articlesById.getPageId(targetTitle);
 		if (currId == -1)
 			return -1 ;
@@ -226,7 +180,6 @@ public class RedirectCache {
 		while (currId != -1) {
 
 			//if there is no entry for this id, then this isn't a redirect, so no need to continue
-			//if (!redirectTargetsBySource.containsKey(currId))
 			if (getTargetId(currId) == -1)	
 				return currId ;
 
@@ -237,7 +190,6 @@ public class RedirectCache {
 			} else {
 				//recurse to the next id
 				targetsSeen.add(currId) ;
-				//currId = redirectTargetsBySource.get(currId);
 				currId = getTargetId(currId);
 			}
 		}

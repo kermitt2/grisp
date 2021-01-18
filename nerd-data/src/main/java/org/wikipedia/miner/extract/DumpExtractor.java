@@ -25,7 +25,6 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.*;
 
-//import org.wikipedia.miner.db.struct.*;
 import com.scienceminer.nerd.kb.model.hadoop.*;
 import com.scienceminer.nerd.kb.model.Page.PageType;
 
@@ -46,7 +45,6 @@ import org.wikipedia.miner.extract.util.RedirectCache;
 import org.wikipedia.miner.extract.util.LabelCache;
 import org.apache.hadoop.filecache.DistributedCache;
 
-
 /**
  *
  * This class extracts summaries (link graphs, etc) from Wikipedia xml dumps. 
@@ -64,12 +62,10 @@ public class DumpExtractor {
 	private Path inputFile;
 	private Path langFile;
 	private String lang;
-	//private Path sentenceModel;
 	private Path workingDir ;
 	private Path finalDir;
 
 	private LanguageConfiguration lc;
-	//private Logger logger;
 
 	public enum ExtractionStep {
 		page, redirect, labelSense, pageLabel, labelOccurrence, pageLink, categoryParent, articleParent, linkCooccurrence, relatedness 	
@@ -99,7 +95,6 @@ public class DumpExtractor {
 		GenericOptionsParser gop = new GenericOptionsParser(args);
 		conf = gop.getConfiguration();
 		
-		//outputFileSystem = FileSystem.get(conf);
 		this.args = gop.getRemainingArgs();
 
 		configure();
@@ -125,25 +120,7 @@ public class DumpExtractor {
 		conf.set(KEY_INPUT_FILE, args[0]);
 		conf.set(KEY_LANG_FILE, args[1]);
 		conf.set(KEY_LANG_CODE, args[2]);
-		//conf.set(KEY_SENTENCE_MODEL, "en-sent.bin");
 		conf.set(KEY_OUTPUT_DIR, args[3]);
-		// final dir is args[4]
-
-		//force one reducer. These don't take very long, and multiple reducers would make finalise file functions more complicated.  
-		
-		//conf.setNumMapTasks(64);
-		//conf.setNumReduceTasks(1);
-		
-		//many of our tasks require pre-loading lots of data, may as well reuse this as much as we can.
-		//conf.setNumTasksToExecutePerJvm(-1);
-		
-		
-		
-		//conf.setInt("mapred.tasktracker.map.tasks.maximum", 2);
-		//conf.setInt("mapred.tasktracker.reduce.tasks.maximum", 1);
-		//conf.set("mapred.child.java.opts", "-Xmx3500M");
-
-		//conf.setBoolean("mapred.used.genericoptionsparser", true);
 
 		return conf;
 	}
@@ -167,14 +144,12 @@ public class DumpExtractor {
 
 		if (args.length != 5) 
 			throw new IllegalArgumentException("Please specify a xml dump of wikipedia, a language.xml config file, a language code, an hdfs writable working directory, and an output directory");
-
 		
 		//check input file
 		inputFile = getPath(args[0]); 
 		FileStatus fs = getFileStatus(inputFile);
 		if (fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.READ)) 
 			throw new IOException("'" +inputFile + " is not readable or does not exist");
-
 
 		//check lang file and language
 		langFile = getPath(args[1]);
@@ -183,18 +158,8 @@ public class DumpExtractor {
 		if (lc == null)
 			throw new IOException("Could not load language configuration for '" + lang + "' from '" + langFile + "'");
 
-		/*sentenceModel = new Path("en-sent.bin");
-		fs = getFileStatus(sentenceModel);
-		if (fs.isDir() || !fs.getPermission().getUserAction().implies(FsAction.READ)) 
-			throw new IOException("'" + sentenceModel + " is not readable or does not exist");*/
-
 		//check output directory
-		//workingDir = new Path(args[4]);
 		workingDir = new Path(args[3]);
-		
-		//TODO: this should be dependent on an "overwrite" flag
-		//if (getFileSystem(workingDir).exists(workingDir))
-		//	getFileSystem(workingDir).delete(workingDir, true);
 
 		if (!getFileSystem(workingDir).exists(workingDir))
 			getFileSystem(workingDir).mkdirs(workingDir);
@@ -204,7 +169,6 @@ public class DumpExtractor {
 			throw new IOException("'" +workingDir + " is not a writable directory");
 
 		//set up directory where final data will be placed
-		//finalDir = new Path(args[5]);
 		finalDir = new Path(args[4]);
 
 		if (getFileSystem(finalDir).exists(finalDir))
@@ -219,7 +183,6 @@ public class DumpExtractor {
 	}
 
 	private void configureLogging() throws IOException {
-		
 		FileSystem fs = getFileSystem(workingDir);
 		
 		Path logDir = new Path(workingDir + "/logs");
@@ -375,8 +338,6 @@ public class DumpExtractor {
 				if (pageFiles.isEmpty())
 					throw new Exception("Could not gather page summary files produced in step 2 (redirect)");
 
-				//articleIdsByTitle.loadArticles(pageFiles, null);
-				//articleIdsByTitle.loadCategories(pageFiles, null);
 				redirectsCache.load(pageFiles, null);
 				redirectDbFile = redirectsCache.getEnvFile();
 				System.out.println("LMDB redirect cache path = " + articleIdsByTitleDbFile);
@@ -443,8 +404,6 @@ public class DumpExtractor {
 				if (labelFiles.isEmpty())
 					throw new Exception("Could not gather page summary files produced in step 3 (labelSense) 4 (pageLabel)");
 
-				//articleIdsByTitle.loadArticles(pageFiles, null);
-				//articleIdsByTitle.loadCategories(pageFiles, null);
 				labelCache.load(labelFiles, null);
 				labelDbFile = labelCache.getEnvFile();
 				System.out.println("LMDB label cache path = " + articleIdsByTitleDbFile);
@@ -607,7 +566,7 @@ public class DumpExtractor {
 
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_TEMPSTATS))));
 
-		for(Map.Entry<String,Long> e:stats.entrySet()) {
+		for(Map.Entry<String,Long> e : stats.entrySet()) {
 
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
@@ -621,72 +580,6 @@ public class DumpExtractor {
 
 		writer.close();
 	}
-
-	/*private TIntShortHashMap calculatePageDepths(TreeMap<String, Long> stats, TIntObjectHashMap<TIntArrayList> childCategories, TIntObjectHashMap<TIntArrayList> childArticles) {
-
-		TIntShortHashMap pageDepths = new TIntShortHashMap();
-
-
-		Short currDepth = 0;
-		Integer currCat = stats.get(PageStep.Counter.rootCategoryId.name()).intValue();
-
-		Vector<Integer> currLevel = new Vector<Integer>();
-		Vector<Integer> nextLevel = new Vector<Integer>();
-
-		while (currCat != null){
-
-			if (!pageDepths.containsKey(currCat)) {
-
-				//save this categories depth
-				pageDepths.put(currCat, currDepth);
-
-				//save depths for this categories child articles
-				TIntArrayList childArts = childArticles.get(currCat);
-
-				if (childArts != null) {
-					for(int i=0; i<childArts.size(); i++) {
-						Integer childArt = childArts.get(i);
-
-						if (!pageDepths.containsKey(childArt)) {					
-							pageDepths.put(childArt, (short)(currDepth + 1));
-						}
-					}
-				}
-
-				//push child categories on to stack to process
-				TIntArrayList childCats = childCategories.get(currCat);
-				if (childCats != null) {
-
-					for(int i=0; i<childCats.size(); i++) {
-						Integer childCat = childCats.get(i);
-
-						if (!pageDepths.containsKey(childCat))
-							nextLevel.add(childCat);
-					}
-				}
-			}
-
-			if (currLevel.isEmpty()) {
-
-				currLevel = nextLevel;
-				nextLevel = new Vector<Integer>();
-
-				currDepth++;
-			}
-
-			if (currLevel.isEmpty()) {
-				currCat = null;
-			} else {
-				currCat = currLevel.firstElement();
-				currLevel.removeElementAt(0);
-			}
-		}
-
-		stats.put("maxCategoryDepth", (long)currDepth);
-
-		return pageDepths;
-	}*/
-
 
 	private TIntObjectHashMap<TIntArrayList> gatherChildren(ExtractionStep step, final String filePrefix) throws IOException  {
 
@@ -729,11 +622,6 @@ public class DumpExtractor {
 
 
 	private void extractSiteInfo() throws IOException, CompressorException {
-
-		/*BufferedInputStream bis = new BufferedInputStream(getFileSystem(inputFile).open(inputFile));
-		CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(input));*/
-
 		BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(inputFile).open(inputFile)));
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_SITEINFO))));
 
@@ -769,7 +657,6 @@ public class DumpExtractor {
 		//TODO: this looks like a bottle-neck. Can it be parallelized? Should we be using mapDb to avoid out-of-memory issues?
 		TIntObjectHashMap<TIntArrayList> childCategories = gatherChildren(ExtractionStep.categoryParent, CategoryLinkSummaryStep.Output.childCategories.name());
 		TIntObjectHashMap<TIntArrayList> childArticles = gatherChildren(ExtractionStep.articleParent, CategoryLinkSummaryStep.Output.childArticles.name());
-		//TIntShortHashMap pageDepths = calculatePageDepths(stats, childCategories, childArticles);
 
 		long memAfter = runtime.totalMemory();
 		Logger.getLogger(getClass()).info("Memory used for finalizing pages: " + (memAfter - memBefore) / (1024*1024) + "Mb");
@@ -782,7 +669,7 @@ public class DumpExtractor {
 			}
 		});
 
-		for (FileStatus status:fileStatuses) {
+		for (FileStatus status : fileStatuses) {
 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(status.getPath())));
 
@@ -796,15 +683,6 @@ public class DumpExtractor {
 				page.deserialize(cri);
 
 				PageType pageType = PageType.values()[page.getType()];
-				/*Short pageDepth = pageDepths.get(pageId);
-
-				if (pageDepth != null) { 
-					page.setDepth(pageDepth.intValue());
-				} else {
-					if (pageType != PageType.redirect)
-						Logger.getLogger(DumpExtractor.LOG_ORPHANED_PAGES).warn("Could not identify depth of page " + pageId + ":" + page.getTitle() + "[" + pageType + "]");
-				}*/
-
 				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
 				CsvRecordOutput cro = new CsvRecordOutput(outStream);
@@ -821,15 +699,11 @@ public class DumpExtractor {
 	}
 
 	private void finalizeLabels() throws IOException {
-		
-		//FileSystem fs = getFileSystem(workingDir);
-		
+		// merge two sets of labels
+		// one from step 3, which includes all senses and link counts, but not term/doc counts.
+		// one from step 4, which includes term/doc counts, but no senses or link counts.
 
-		//merge two sets of labels
-		//one from step 3, which includes all senses and link counts, but not term/doc counts.
-		//one from step 4, which includes term/doc counts, but no senses or link counts.
-
-		//both sets are ordered by label text, so this can be done in one pass with a merge operation.
+		// both sets are ordered by label text, so this can be done in one pass with a merge operation.
 
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/label.csv"))));
 
@@ -840,7 +714,7 @@ public class DumpExtractor {
 			}
 		});
 
-		//gather label files from step 4
+		// gather label files from step 4
 		FileStatus[] labelFilesB = getFileSystem(workingDir).listStatus(new Path(workingDir + "/" + getDirectoryName(ExtractionStep.labelOccurrence)), new PathFilter() {
 			public boolean accept(Path path) {				
 				return path.getName().startsWith(LabelSensesStep.Output.tempLabel.name());
@@ -849,16 +723,16 @@ public class DumpExtractor {
 
 		long bytesTotal = 0;
 
-		for (FileStatus status:labelFilesA) 
+		for (FileStatus status : labelFilesA) 
 			bytesTotal += status.getLen();
-		for (FileStatus status:labelFilesA) 
+		for (FileStatus status : labelFilesA) 
 			bytesTotal += status.getLen();
 
 		ProgressTracker pt = new ProgressTracker(bytesTotal, "Finalizing labels", DumpExtractor.class);
 
 
-		//Initialise file readers. 
-		//Slightly hacky, but bytesRead and fileIndexes are single element arrays (rather than ints or longs) so they can be passed by reference.
+		// Initialise file readers. 
+		// Slightly hacky, but bytesRead and fileIndexes are single element arrays (rather than ints or longs) so they can be passed by reference.
 		long[]  bytesRead = {0};
 
 		int[] fileIndexA = {0};
@@ -979,11 +853,9 @@ public class DumpExtractor {
 	}
 
 	private void finalizeStatistics(TreeMap<String, Long> stats) throws IOException {
-
-		//BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(workingDir).create(new Path(workingDir + "/" + OUTPUT_STATS))));
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getFileSystem(finalDir).create(new Path(finalDir + "/stats.csv"))));
 
-		for(Map.Entry<String,Long> e:stats.entrySet()) {
+		for(Map.Entry<String,Long> e : stats.entrySet()) {
 
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
@@ -1017,34 +889,12 @@ public class DumpExtractor {
 		ProgressTracker pt = new ProgressTracker(bytesTotal, "finalizing " + filePrefix, DumpExtractor.class);
 		long bytesRead = 0;
 
-		for (FileStatus status:fileStatuses) {
+		for (FileStatus status : fileStatuses) {
 
 			BoundedInputStream boundedInput = new BoundedInputStream(getFileSystem(workingDir).open(status.getPath()));
 			BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInput), 2048);
 
-			//BufferedReader reader = new BufferedReader(new InputStreamReader(getFileSystem(workingDir).open(status.getPath())));
-
 			String line = null;
-			/*try {
-    			char[] chars = new char[65536];
-    			for(int len; (len = reader.read(chars)) > 0;) {
-    				// get line per line
-    				int eol = 0;
-    				while() {
-	    				for(int p=eol+1; p<65536; p++) {
-	    					if ( (chars[p] == '\n') || (chars[p] == '\r') ) {
-	    						eol = p;
-	    						break;
-	    					}
-	    				}
-	    			}
-
-        			// process chars.
-    			}
-			} finally {
-    			reader.close();
-			}*/
-
 			while ((line = reader.readLine()) != null) {
 				if (line.length() > 100000)
 					continue;
@@ -1093,7 +943,6 @@ public class DumpExtractor {
 			}
 		});
 
-
 		DbLabel newLabel = new DbLabel(); 
 
 		newLabel.setLinkDocCount(oldLabel.getLinkDocCount());
@@ -1140,7 +989,7 @@ public class DumpExtractor {
 
 		Long lastEdit = null;
 
-		for (FileStatus status:fileStatuses) {
+		for (FileStatus status : fileStatuses) {
 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(status.getPath())));
 

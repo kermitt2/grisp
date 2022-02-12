@@ -99,7 +99,7 @@ public class RedirectStep extends Configured implements Tool {
 		MultipleOutputs.addNamedOutput(conf, Output.redirectTargetsBySource.name(), TextOutputFormat.class,
 				IntWritable.class, IntWritable.class);
 		
-		conf.set("mapred.textoutputformat.separator", ",");
+		conf.set("mapreduce.output.textoutputformat.separator", ",");
 		
 		//run job
 		JobClient.runJob(conf);

@@ -123,7 +123,7 @@ public class LabelSensesStep extends Configured implements Tool {
 		MultipleOutputs.addNamedOutput(conf, Output.fatalErrors.name(), TextOutputFormat.class,
 				IntWritable.class, Text.class);
 
-		conf.set("mapred.textoutputformat.separator", ",");
+		conf.set("mapreduce.output.textoutputformat.separator", ",");
 
 		JobClient.runJob(conf);
 		return 0;

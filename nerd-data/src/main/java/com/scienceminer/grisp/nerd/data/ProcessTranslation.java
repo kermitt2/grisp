@@ -2,10 +2,11 @@ package com.scienceminer.grisp.nerd.data;
 
 import java.util.*;    
 import java.io.*;    
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.commons.io.input.BoundedInputStream;
+//import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.IOUtils;
 
 import org.fusesource.lmdbjni.*;
@@ -13,8 +14,7 @@ import static org.fusesource.lmdbjni.Constants.*;
 
 /**
  * This class processes the latest Wikipedia cross-language files (.sql) into
- * csv files as expected by NERD. We assume that these files are small
- * and basic enough to avoid the need of Hadoop and distributed process.
+ * csv files as expected by entity-fishing.
  * 
  *
  * @author Patrice Lopez
@@ -28,7 +28,7 @@ public class ProcessTranslation {
 
   	// this is the list of languages we consider for target translations, we will ignore the other
   	// languages
-  	private static List<String> targetLanguages = Arrays.asList("en", "fr", "de", "it", "es");
+  	private static List<String> targetLanguages = Arrays.asList("en", "fr", "de", "it", "es", "ar", "zh");
 
   	public ProcessTranslation() {
   		// init LMDB - the default usage of LMDB will ensure that the entries in the resulting 
@@ -68,10 +68,14 @@ public class ProcessTranslation {
 	
 	public int process(String inputSqlPath) {
 		int nb = 0;
+		InputStream inputStream = null;
 		try {
 			// open file
-			BoundedInputStream boundedInput = new BoundedInputStream(new FileInputStream(inputSqlPath));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(boundedInput), 8192);
+			inputStream = new FileInputStream(inputSqlPath);
+			if (inputSqlPath.endsWith(".gz")) {
+				inputStream = new GZIPInputStream(inputStream);
+			}			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream), 8192);
 
 			final String insertString = "INSERT INTO `langlinks` VALUES ("; 
 			String line = null;
@@ -160,6 +164,14 @@ public class ProcessTranslation {
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return nb;
 	}

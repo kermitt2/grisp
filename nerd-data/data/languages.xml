@@ -100,4 +100,21 @@
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 	</Language>
 
+	<Language code="ar" name="Arabic" localName="عربى">
+		<!--RootCategory>تصنيف:التصنيف_الرئيسي</RootCategory-->
+		<RootCategory>ويكيبيديا:تصفح</RootCategory>
+
+		<DisambiguationCategory>ويكيبيديا:توضيح</DisambiguationCategory>
+		<DisambiguationCategory>تصنيف:صفحات_توضيح</DisambiguationCategory>
+		<DisambiguationCategory>كلمة_(توضيح)</DisambiguationCategory>
+
+		<DisambiguationTemplate>ويكيبيديا:توضيح</DisambiguationTemplate>
+		<DisambiguationTemplate>قالب:توضيح</DisambiguationTemplate>
+
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>redirect</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+	</Language>
+
 </WikipediaLanguageList>

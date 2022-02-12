@@ -8,16 +8,16 @@
 	<groupId>com.scienceminer.grisp.nerd-data</groupId>
 	<artifactId>com.scienceminer.grisp.nerd-data</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	
 	<name>NERD-data</name>
-	<description>Data creation for NERD</description>
+	<description>Data creation for entity-fishing</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<avro.version>1.7.5</avro.version>
 		<lmdbjni.version>0.4.6</lmdbjni.version>
-		<jackson.version>2.10.0</jackson.version>
+		<jackson.version>2.10.1</jackson.version>
 	</properties>
 	
 	<licenses>
@@ -223,8 +223,8 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/en/enwiki-latest-langlinks.sql</argument>
-				        <argument>/mnt/data/wikipedia/latest/en/translations.csv</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/en/enwiki-latest-langlinks.sql.gz</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/en/translations.csv</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>
@@ -247,8 +247,8 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/fr/frwiki-latest-langlinks.sql</argument>
-				        <argument>/mnt/data/wikipedia/latest/fr/translations.csv</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/fr/frwiki-latest-langlinks.sql.gz</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/fr/translations.csv</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>
@@ -271,8 +271,8 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/de/dewiki-latest-langlinks.sql</argument>
-				        <argument>/mnt/data/wikipedia/latest/de/translations.csv</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/de/dewiki-latest-langlinks.sql.gz</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/de/translations.csv</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>
@@ -295,8 +295,8 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/es/eswiki-latest-langlinks.sql</argument>
-				        <argument>/mnt/data/wikipedia/latest/es/translations.csv</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/es/eswiki-latest-langlinks.sql.gz</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/es/translations.csv</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>
@@ -319,8 +319,8 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/mnt/data/wikipedia/latest/it/itwiki-latest-langlinks.sql</argument>
-				        <argument>/mnt/data/wikipedia/latest/it/translations.csv</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/it/itwiki-latest-langlinks.sql.gz</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/it/translations.csv</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>
@@ -343,9 +343,9 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessWikiData</argument>
-				        <argument>/mnt/data/wikidata/latest-all.json.bz2</argument>
-				        <argument>/mnt/data/wikipedia/latest/wikidata/</argument>
-				        <argument>/mnt/data/wikipedia/latest/</argument>
+				        <argument>/media/lopez/data/wikidata/latest-all.json.bz2</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/wikidata/</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/</argument>
 				        <!--argument>/home/lopez/resources/wikidata/latest-all.json.bz2</argument>
 				        <argument>/home/lopez/resources/wikidata/</argument>
 				        <argument>/home/lopez/resources/wikipedia/</argument-->
@@ -400,7 +400,7 @@
 		<dependency>
 			<groupId>com.scienceminer.nerd</groupId>
 			<artifactId>entity-fishing</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5</version>
             <exclusions>
                 <exclusion> 
                     <groupId>org.slf4j</groupId>
@@ -460,7 +460,7 @@
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-compress</artifactId>
-		    <version>1.19</version>
+		    <version>1.21</version>
 		</dependency>
 		<dependency>
 			  <groupId>org.apache.commons</groupId>

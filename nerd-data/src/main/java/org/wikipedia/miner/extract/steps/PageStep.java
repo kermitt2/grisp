@@ -79,7 +79,7 @@ public class PageStep extends Configured implements Tool {
 				IntWritable.class, LongWritable.class);
 		
 
-		conf.set("mapred.textoutputformat.separator", ",");
+		conf.set("mapreduce.output.textoutputformat.separator", ",");
 
 		RunningJob runningJob = JobClient.runJob(conf);
 		counters = runningJob.getCounters() ;

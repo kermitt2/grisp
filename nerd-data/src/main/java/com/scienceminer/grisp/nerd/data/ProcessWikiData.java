@@ -47,7 +47,7 @@ public class ProcessWikiData {
 
   	// this is the list of languages we consider for target translations, we will ignore the other
   	// languages
-  	private static List<String> targetLanguages = Arrays.asList("en","fr", "de", "es", "it");
+  	private static List<String> targetLanguages = Arrays.asList("en","fr", "de", "es", "it", "ar", "zh");
 
   	public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
   		try {

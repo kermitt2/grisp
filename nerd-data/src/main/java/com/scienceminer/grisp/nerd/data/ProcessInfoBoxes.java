@@ -21,8 +21,7 @@ import org.apache.hadoop.fs.*;
  * DEPRECATED
  * 
  * This class processes the DBpedia info boxes files into
- * csv files as expected by NERD. We assume that these files are small
- * and basic enough to avoid the need of Hadoop and distributed process.
+ * csv files as expected by NERD. 
  *
  * Beware the noisiness of DBpedia !
  * 

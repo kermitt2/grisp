@@ -26,7 +26,6 @@ The GRISP pre-processor uses the Wikidata dump file in JSON format. Then for eac
 
 For instance for covering Wikidata in English, German, French, Spanish and Italian, downloading the resources will result in the following file list and size:
 
-
 ```
 total 94G
 drwxrwxr-x 2 lopez lopez 4.0K Jan 12 16:29 ./

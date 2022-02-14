@@ -384,6 +384,8 @@ public class LabelSensesStep extends Configured implements Tool {
 		private void gatherCategoryLinksAndTranslations(DumpPage page, String markup, Reporter reporter) throws Exception {
 			List<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
 
+			//System.out.println("gatherCategoryLinksAndTranslations, nb link region:" + linkRegions.size());
+
 			for(int[] linkRegion: linkRegions) {
 				String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);
 

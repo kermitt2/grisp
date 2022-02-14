@@ -28,6 +28,9 @@ public class DumpPageParser {
 	
 	private LanguageConfiguration languageConfiguration;
 	private SiteInfo siteInfo;
+
+	// true if right to left written language (e.g. arabic)
+	private boolean right2left = false;
 	
 	//private Pattern redirectPattern; 
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -36,6 +39,9 @@ public class DumpPageParser {
 	public DumpPageParser(LanguageConfiguration lc, SiteInfo si) {
 		this.languageConfiguration = lc;
 		this.siteInfo = si;
+
+		if (lc.getLangCode().equals("ar"))
+			this.right2left = true;
 	}
 
 	public DumpPage parsePage(String markup) throws XMLStreamException {
@@ -108,6 +114,8 @@ public class DumpPageParser {
 		
 		//identify namespace - assume 0 (main) if there is no prefix, or if prefix doesn't match any known namespaces
 		Integer namespaceKey = 0;
+
+		// for right to left languages, this is the opposite
 		int pos = title.indexOf(":");
 		if (pos > 0) {
 			String namespace = title.substring(0, pos);

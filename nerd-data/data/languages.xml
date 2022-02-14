@@ -101,15 +101,16 @@
 	</Language>
 
 	<Language code="ar" name="Arabic" localName="عربى">
-		<!--RootCategory>تصنيف:التصنيف_الرئيسي</RootCategory-->
-		<RootCategory>ويكيبيديا:تصفح</RootCategory>
+		<!--RootCategory>التصنيف_الرئيسي</RootCategory-->
+		<!--RootCategory>تصفح</RootCategory-->
+		<RootCategory>بوابات_تصفح</RootCategory>
 
-		<DisambiguationCategory>ويكيبيديا:توضيح</DisambiguationCategory>
-		<DisambiguationCategory>تصنيف:صفحات_توضيح</DisambiguationCategory>
+		<DisambiguationCategory>توضيح</DisambiguationCategory>
+		<DisambiguationCategory>صفحات_توضيح</DisambiguationCategory>
 		<DisambiguationCategory>كلمة_(توضيح)</DisambiguationCategory>
 
-		<DisambiguationTemplate>ويكيبيديا:توضيح</DisambiguationTemplate>
-		<DisambiguationTemplate>قالب:توضيح</DisambiguationTemplate>
+		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
+		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
 
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>redirect</RedirectIdentifier>

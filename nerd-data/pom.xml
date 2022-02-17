@@ -368,7 +368,7 @@
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessWikiData</argument>
 				        <argument>/media/lopez/data/wikidata/latest-all.json.bz2</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/wikidata/</argument>
+				        <argument>/media/lopez/data/wikipedia/latest/</argument>
 				        <argument>/media/lopez/data/wikipedia/latest/</argument>
 				        <!--argument>/home/lopez/resources/wikidata/latest-all.json.bz2</argument>
 				        <argument>/home/lopez/resources/wikidata/</argument>

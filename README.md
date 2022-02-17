@@ -98,24 +98,24 @@ The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for ea
 
 ### Generating Wikidata property labels for each language
 
-By default, Wikidata property identifiers are not easily readable (e.g. `P31`). In order to associate the property identifiers to a readable language-specific label, we need to generate the language-specific property labels (files `wikidata.txt`) as follow: 
+By default, Wikidata property identifiers are not easily readable (e.g. `P31`). In order to associate the property identifiers to a readable language-specific label, we need to generate the language-specific property labels (files `xx/wikidata-properties.json` where `xx` is the two letter language code) as follow: 
 
 - for English:
 
 ```bash
-wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata.txt
+wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O en/wikidata-properties.json
 ```
 
 - for French: 
 
 ```bash
-wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22fr%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata.txt
+wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22fr%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O fr/wikidata-properties.json
 ```
 
 - for German:
 
 ```bash
-wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22de%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata.txt
+wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22de%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O de/wikidata-properties.json
 ```
 
 Just modify the language code in the url for other languages. Put all these language-specific Wikidata property naming into their corresponding language-specific data directory.
@@ -141,6 +141,7 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── redirectTargetsBySource.csv
 │   ├── stats.csv
 │   ├── translations.csv
+│   └── wikidata-properties.json
 │   └── wikidata.txt
 ├── en
 │   ├── articleParents.csv
@@ -157,6 +158,7 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── redirectTargetsBySource.csv
 │   ├── stats.csv
 │   ├── translations.csv
+│   └── wikidata-properties.json
 │   └── wikidata.txt
 ├── fr
 │   ├── articleParents.csv
@@ -173,6 +175,7 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── redirectTargetsBySource.csv
 │   ├── stats.csv
 │   ├── translations.csv
+│   └── wikidata-properties.json
 │   └── wikidata.txt
 ├── wikidata
 │   ├── wikidataIds.csv 
@@ -182,11 +185,11 @@ Here how the final data tree should look like from the root directory (for 3 lan
 
 Note:
 
-- it is expected to have 15 files in each language-specific directory,
+- it is expected to have 16 files in each language-specific directory,
 
 - the full Wikipedia article dump for each language must be present in the language-specific directories (e.g. `enwiki-latest-pages-articles.xml.bz2` or `enwiki-latest-pages-articles.xml.gz` or `enwiki-latest-pages-articles.xml`, they are required to generate definitions for entities, create training data, compute additional entity embeddings) ; the dump file can be compressed in `bz2`, `gzip` or uncompressed - all these variants should be loaded appropriately by entity-fishing,
 
-- the wikidata identifiers csv file `wikidataIds.csv` and the full wikidata JSON dump file `latest-all.json.bz2` are under a `wikidata` sub-directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` are installed in each language-specific sub-directory,
+- the wikidata identifiers csv file `wikidataIds.csv` and the full wikidata JSON dump file `latest-all.json.bz2` are under a `wikidata` sub-directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` and `wikidata-properties.json` are installed in each language-specific sub-directory,
 
 - in entity-fishing the loading of these files is automatic when building the project or starting the service (if not present), be sure to indicate the path to these above files in the entity-fishing config files.
 

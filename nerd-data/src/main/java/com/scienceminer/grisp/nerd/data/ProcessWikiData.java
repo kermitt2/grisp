@@ -76,12 +76,12 @@ public class ProcessWikiData {
 			}
 	    	envFilePath_id = path.toString();
 	    	env_id = new Env();
-	    	env_id.setMapSize(200 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for > 40 millions
+	    	env_id.setMapSize(1000 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for > 200 millions
 	    	env_id.open(envFilePath_id);
 			db_id = env_id.openDatabase();
 
 			// second temporary DB for storing the properties and relations present in wikidata
-			path = new File("/tmp/lmdb-temp-wikidata-data");
+			/*path = new File("/tmp/lmdb-temp-wikidata-data");
 			if (!path.exists()) {
 				path.mkdir();
 				System.out.println("new temp wikidata DB: " + path.toString());
@@ -92,7 +92,7 @@ public class ProcessWikiData {
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
-			}
+			}*/
 	    	/*envFilePath_data = path.toString();
 	    	env_data = new Env();
 	    	env_data.setMapSize(200 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for > 40 millions

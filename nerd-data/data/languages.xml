@@ -121,10 +121,25 @@
 		<RedirectIdentifier>redirect</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>تحويل</RedirectIdentifier>
 	</Language>
 
+	<Language code="zh" name="Mandarin" localName="中文">
+		<RootCategory>总览</RootCategory>
 
-	<!--Language code="ja" name="Japanese" localName="日本語">
+		<DisambiguationCategory>消歧义</DisambiguationCategory>
+		<DisambiguationCategory>消歧義模板</DisambiguationCategory>
+
+		<DisambiguationTemplate>消歧義模板</DisambiguationTemplate>
+
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>redirect</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>重定向</RedirectIdentifier>
+	</Language>
+
+	<Language code="ja" name="Japanese" localName="日本語">
 		<RootCategory>主要カテゴリ</RootCategory>
 
 		<DisambiguationCategory>曖昧さ回避</DisambiguationCategory>
@@ -141,6 +156,6 @@
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 		<RedirectIdentifier>転送</RedirectIdentifier>
 		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
-	</Language-->
+	</Language>
 
 </WikipediaLanguageList>

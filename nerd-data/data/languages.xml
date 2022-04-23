@@ -158,4 +158,23 @@
 		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
 	</Language>
 
+	<Language code="ru" name="Russian" localName="Русский">
+		<RootCategory>Содержание</RootCategory>
+
+		<DisambiguationCategory>Неоднозначность</DisambiguationCategory>
+		<DisambiguationCategory>Disambiguation</DisambiguationCategory>
+		<DisambiguationCategory>Disambig</DisambiguationCategory>
+
+		<DisambiguationTemplate>Неоднозначность</DisambiguationTemplate>
+		<DisambiguationTemplate>Многозначность</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambiguation</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambig</DisambiguationTemplate>
+		<DisambiguationTemplate></DisambiguationTemplate>
+
+		<RedirectIdentifier>Перенаправления</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+	</Language>
+
 </WikipediaLanguageList>

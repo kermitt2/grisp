@@ -9,7 +9,7 @@ wget -c https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2
 # Donwload Wikipedia resources by language (around 44GB, in Feb. 2022 for the 7 indicated languages)
 
 ## declare an array variable
-declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh")
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru")
 
 ## now loop through the above array
 for i in "${languages[@]}"

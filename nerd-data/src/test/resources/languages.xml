@@ -12,6 +12,7 @@
         
         <DisambiguationTemplate>disambiguation</DisambiguationTemplate>
         <DisambiguationTemplate>disambig</DisambiguationTemplate>
+        <DisambiguationTemplate>disamb</DisambiguationTemplate>
         <DisambiguationTemplate>geodis</DisambiguationTemplate>
         <DisambiguationTemplate>hndis</DisambiguationTemplate>
         <DisambiguationTemplate>hospitaldis</DisambiguationTemplate>
@@ -24,6 +25,7 @@
         <DisambiguationTemplate>SIA</DisambiguationTemplate>
         <DisambiguationTemplate>disambig-cleanup</DisambiguationTemplate>
         <DisambiguationTemplate>dab</DisambiguationTemplate>
+        <DisambiguationTemplate>DAB</DisambiguationTemplate>
         <DisambiguationTemplate>surname</DisambiguationTemplate>
 
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
@@ -58,7 +60,9 @@
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>des</RedirectIdentifier>
 		<RedirectIdentifier>otros usos</RedirectIdentifier>
+		<RedirectIdentifier>Otros usos</RedirectIdentifier>
 		<RedirectIdentifier>redirige aquí</RedirectIdentifier>
+		<RedirectIdentifier>Redirige aquí</RedirectIdentifier>
 		<RedirectIdentifier>ico-des</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECCIÓN</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECCION</RedirectIdentifier>
@@ -95,9 +99,82 @@
 		<DisambiguationTemplate>disambigua</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambigua</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambiguazione</DisambiguationTemplate>
+		<DisambiguationTemplate>Nota disambigua</DisambiguationTemplate>
 
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="ar" name="Arabic" localName="عربى">
+		<!--RootCategory>التصنيف_الرئيسي</RootCategory-->
+		<!--RootCategory>تصفح</RootCategory-->
+		<RootCategory>بوابات_تصفح</RootCategory>
+
+		<DisambiguationCategory>توضيح</DisambiguationCategory>
+		<DisambiguationCategory>صفحات_توضيح</DisambiguationCategory>
+		<DisambiguationCategory>كلمة_(توضيح)</DisambiguationCategory>
+
+		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
+		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
+
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>redirect</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>تحويل</RedirectIdentifier>
+	</Language>
+
+	<Language code="zh" name="Mandarin" localName="中文">
+		<RootCategory>总览</RootCategory>
+
+		<DisambiguationCategory>消歧义</DisambiguationCategory>
+		<DisambiguationCategory>消歧義模板</DisambiguationCategory>
+
+		<DisambiguationTemplate>消歧義模板</DisambiguationTemplate>
+
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>redirect</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>重定向</RedirectIdentifier>
+	</Language>
+
+	<Language code="ja" name="Japanese" localName="日本語">
+		<RootCategory>主要カテゴリ</RootCategory>
+
+		<DisambiguationCategory>曖昧さ回避</DisambiguationCategory>
+		<DisambiguationCategory>あいまいさ</DisambiguationCategory>
+		<DisambiguationCategory>曖昧さ</DisambiguationCategory>
+
+		<DisambiguationTemplate>Aimai</DisambiguationTemplate>
+		<DisambiguationTemplate>aimai</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambiguate</DisambiguationTemplate>
+		<DisambiguationTemplate>disambig</DisambiguationTemplate>
+		<DisambiguationTemplate>dab</DisambiguationTemplate>
+
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>転送</RedirectIdentifier>
+		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
+	</Language>
+
+	<Language code="ru" name="Russian" localName="Русский">
+		<RootCategory>Содержание</RootCategory>
+
+		<DisambiguationCategory>Неоднозначность</DisambiguationCategory>
+		<DisambiguationCategory>Disambiguation</DisambiguationCategory>
+		<DisambiguationCategory>Disambig</DisambiguationCategory>
+
+		<DisambiguationTemplate>Неоднозначность</DisambiguationTemplate>
+		<DisambiguationTemplate>Многозначность</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambiguation</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambig</DisambiguationTemplate>
+		<DisambiguationTemplate></DisambiguationTemplate>
+
+		<RedirectIdentifier>Перенаправления</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
 	</Language>
 
 </WikipediaLanguageList>

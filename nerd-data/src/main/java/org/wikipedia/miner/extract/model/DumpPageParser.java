@@ -115,7 +115,7 @@ public class DumpPageParser {
 		//identify namespace - assume 0 (main) if there is no prefix, or if prefix doesn't match any known namespaces
 		Integer namespaceKey = 0;
 
-		// for right to left languages, this is the opposite
+		// for right to left languages, this is the opposite -> to be checked
 		int pos = title.indexOf(":");
 		if (pos > 0) {
 			String namespace = title.substring(0, pos);

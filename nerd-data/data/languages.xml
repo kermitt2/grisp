@@ -115,7 +115,6 @@
 		<DisambiguationCategory>كلمة_(توضيح)</DisambiguationCategory>
 
 		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
-		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
 
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>redirect</RedirectIdentifier>
@@ -127,8 +126,9 @@
 	<Language code="zh" name="Mandarin" localName="中文">
 		<RootCategory>总览</RootCategory>
 
+		<DisambiguationCategory>disambig</DisambiguationCategory>
 		<DisambiguationCategory>消歧义</DisambiguationCategory>
-		<DisambiguationCategory>消歧義模板</DisambiguationCategory>
+		<DisambiguationCategory>字消歧義</DisambiguationCategory>
 
 		<DisambiguationTemplate>消歧義模板</DisambiguationTemplate>
 

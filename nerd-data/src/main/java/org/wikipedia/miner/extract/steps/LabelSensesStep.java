@@ -235,7 +235,8 @@ public class LabelSensesStep extends Configured implements Tool {
 							//markup = stripper.toTextWithInternalLinksAndCategoriesOnly(markup, lc.getLangCode());
 							
 
-							// and we associate from this article title to the identified disambiguated links
+							// and we associate from this article title to the identified disambiguated links 
+							// (last boolean true for processArticle)
 							if (page.getType() == PageType.disambiguation) {
 								processArticle(markup, page, labels, outLinks, reporter, true);
 								for(Integer targetId : outLinks) {
@@ -249,6 +250,8 @@ public class LabelSensesStep extends Configured implements Tool {
 								label.setLinkDocCount(outLinks.size());
 								// label's text counts will be set in the LabelOccurrenceStep
 							}
+
+							// Note that there is no break here, so process continue...
 
 						case category :
 
@@ -326,6 +329,7 @@ public class LabelSensesStep extends Configured implements Tool {
 
 		private void processArticle(String markup, DumpPage page, 
 				HashMap<String, ExLabel> labels, List<Integer> outLinks, Reporter reporter, boolean disambiguated) throws Exception {
+
 			ExLabel label = null;
 			List<int[]> linkRegions = null;
 			// if we restrict to disambiguation links in a disambiguation page, we need a dot before the linkRegion

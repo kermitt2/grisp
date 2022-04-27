@@ -152,10 +152,15 @@
 		<DisambiguationTemplate>disambig</DisambiguationTemplate>
 		<DisambiguationTemplate>dab</DisambiguationTemplate>
 
+		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
+		<RedirectIdentifier>Wikipedia:リダイレクト</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
-		<RedirectIdentifier>転送</RedirectIdentifier>
-		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
+		<RedirectIdentifier>redirect</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>R</RedirectIdentifier>
+		<RedirectIdentifier>RDR</RedirectIdentifier>
+		<RedirectIdentifier>ショートカット</RedirectIdentifier>
 	</Language>
 
 	<Language code="ru" name="Russian" localName="Русский">
@@ -169,7 +174,6 @@
 		<DisambiguationTemplate>Многозначность</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambiguation</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambig</DisambiguationTemplate>
-		<DisambiguationTemplate></DisambiguationTemplate>
 
 		<RedirectIdentifier>Перенаправления</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>

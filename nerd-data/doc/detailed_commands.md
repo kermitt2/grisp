@@ -1,39 +1,4 @@
-
-
-
-### Downloading the resource files from Wikidata and Wikipedia
-
-The GRISP pre-processor uses the Wikidata dump file in JSON format. Then for each language to be supported, 3 files must be downloaded:
-
-- `**wiki-********-pages-articles-multistream.xml.bz2`, which gives the full article content for the given language
-
-- `**wiki-********-langlinks.sql.gz`, which gives the cross-language correspondences 
-
-- `**wiki-********-page_props.sql.gz`, whick gives the association between the language-specific page ID and the wikidata entities
-
-For instance for covering Wikidata in English, German, French, Spanish and Italian, downloading the resources will result in the following file list and size:
-
-```
-total 94G
-drwxrwxr-x 2 lopez lopez 4.0K Jan 12 16:29 ./
-drwxrwxr-x 5 lopez lopez 4.0K Jan 12 01:23 ../
--rw-rw-r-- 1 lopez lopez 232M Jan  1 20:30 dewiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  74M Jan  1 21:02 dewiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 5.7G Jan  2 05:05 dewiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 396M Jan  1 11:09 enwiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez 280M Jan  1 10:59 enwiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez  18G Jan  3 07:28 enwiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 236M Jan  1 19:26 eswiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  43M Jan  1 19:15 eswiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 3.4G Jan  2 04:45 eswiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 267M Jan  1 19:29 frwiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  75M Jan  1 19:15 frwiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 4.8G Jan  2 05:03 frwiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 228M Jan  1 19:55 itwiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  44M Jan  1 19:40 itwiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 3.1G Jan  2 04:51 itwiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez  58G Jan  6 17:12 latest-all.json.bz2
-```
+The script under `grisp/scripts/wikipedia-resources.sh` takes care of the download and some processing of the Wikidata and Wikipedia resources. After downloading, three data extractions are realized for every indicated languages. We document here the commands for running these processing individually. However you should normally not call these commands yourself as it is handled by the script. 
 
 ### Creating additional cvs translation files
 
@@ -120,6 +85,3 @@ wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%2
 ```
 
 Just modify the language code in the url for other languages. Put all these language-specific Wikidata property naming into their corresponding language-specific data directory.
-
-
-

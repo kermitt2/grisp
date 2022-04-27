@@ -10,51 +10,65 @@ The pre-processing is an adaptation of the [WikipediaMiner 2.0](https://github.c
 
 The Wikipedia pre-processing supports current the Wikipedia dumps (May 2020) and was successfully tested with English, German, French, Spanish and Italian XML dumps. Japanese dump should also be well supported, see the branch `Japanese`. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
 
-### Preliminary install
+### Preliminary install of entity-fishing and GRISP
 
-[entity-fishing](https://github.com/kermitt2/entity-fishing) needs to be installed first on the system and built, without the knowledge-base and language data. See the documentation. 
+[entity-fishing](https://github.com/kermitt2/entity-fishing) needs to be installed first on the system and built, without the knowledge-base and language data:
 
-### Downloading the resource files from Wikidata and Wikipedia
-
-The GRISP pre-processor uses the Wikidata dump file in JSON format. Then for each language to be supported, 3 files must be downloaded:
-
-- `**wiki-********-pages-articles-multistream.xml.bz2`, which gives the full article content for the given language
-
-- `**wiki-********-langlinks.sql.gz`, which gives the cross-language correspondences 
-
-- `**wiki-********-page_props.sql.gz`, whick gives the association between the language-specific page ID and the wikidata entities
-
-For instance for covering Wikidata in English, German, French, Spanish and Italian, downloading the resources will result in the following file list and size:
-
-```
-total 94G
-drwxrwxr-x 2 lopez lopez 4.0K Jan 12 16:29 ./
-drwxrwxr-x 5 lopez lopez 4.0K Jan 12 01:23 ../
--rw-rw-r-- 1 lopez lopez 232M Jan  1 20:30 dewiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  74M Jan  1 21:02 dewiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 5.7G Jan  2 05:05 dewiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 396M Jan  1 11:09 enwiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez 280M Jan  1 10:59 enwiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez  18G Jan  3 07:28 enwiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 236M Jan  1 19:26 eswiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  43M Jan  1 19:15 eswiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 3.4G Jan  2 04:45 eswiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 267M Jan  1 19:29 frwiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  75M Jan  1 19:15 frwiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 4.8G Jan  2 05:03 frwiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez 228M Jan  1 19:55 itwiki-20210101-langlinks.sql.gz
--rw-rw-r-- 1 lopez lopez  44M Jan  1 19:40 itwiki-20210101-page_props.sql.gz
--rw-rw-r-- 1 lopez lopez 3.1G Jan  2 04:51 itwiki-20210101-pages-articles-multistream.xml.bz2
--rw-rw-r-- 1 lopez lopez  58G Jan  6 17:12 latest-all.json.bz2
+```console
+git clone https://github.com/kermitt2/entity-fishing
+cd entity-fishing
+./gradlew clean build -x test
 ```
 
-### Pre-processing a Wikipedia XML article dump file
+The `-x test` when building is important to skip tests, because there is no knowledge-base and language resource data available for the tests yet. 
+
+Then install and build GRISP:
+
+```console
+git clone https://github.com/kermitt2/grisp
+cd grisp
+./gradlew clean install 
+```
+
+### Script for preparing the Wikidata and Wikipedia resources 
+
+A script is available to:
+* download the different resources needed fromn Wikidata and Wikipedia for a set of specified languages
+* create cvs translation files between languages
+* generate Wikidata property labels for each language
+* creating Wikidata knowledge base backbone and language-specific mapping with Wikidata entities
+
+The script has been tested on a Linux setup, but it is likely to work also on MacOS. To run the script:
+
+```console
+cd grisp/scripts/
+./wikipedia-resources.sh [instal path of GRISP] [storage path of the data resources]
+```
+
+For example:
+
+```console
+./wikipedia-resources.sh /home/lopez/grisp/ /media/lopez/data/wikipedia/latest/
+```
+
+The above mentioned steps are realized successively by the scripts. By default all the languages will be covered, but you can change to a subset of languages by modifying the script at the following line:
+
+```bash
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru")
+```
+
+Note that English `"en"` at least is mandatory to further running entity-fishing. 
+
+Be aware that the data path must have enough storage: as of April 2022, 70GB are needed for Wikidata dump and 50GB for all the language resources. To accomodate all resources, including the next Hadoop processing step, consider 150GB for the 9 languages. 
+
+### Haddop processing of Wikipedia XML article dump files
+
+The parsing and processing of the Wikipedia XML article dump files is computationally expensive and we are using an Hadoop process for this purpose. A pseudo distributed mode (just running the process on one machine with several CPU) is enough for reasonnable processing time. A "real" distributed mode has not been tested for the moment and is thus currently not supported. 
 
 Create the hadoop job jar:
 
-```
-> cd nerd-data
-
+```console
+cd grisp/nerd-data
 > mvn clean package
 ```
 
@@ -63,92 +77,6 @@ Then see instructions under [nerd-data/doc/hadoop.md](nerd-data/doc/hadoop.md) f
 This processing is an adaptation and optimization of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing. It enables the support of the latest Wikipedia dump files. The processing is considerably faster than with WikipediaMiner and a single server is enough for processing the lastest XML dumps in a reasonnable time. For December 2016 English Wikipedia XML dump: around 7 hours 30 minutes. For December 2016 French and German Wikipedia XML dump: around 2 hours 30 minutes (in pseudo distributed mode, one server Intel Core i7-4790K CPU 4.00GHz Haswell, 16GB memory, with 4 cores, 8 threads, SSD). 
 
 We think that it is possible to still improve significantly the processing time, lower memory consumption, and avoid completely Hadoop - simply by optimizing the processing for a common single multi-thread machine. But given that the current state of the library gives satisfactory performance, we leave these improvements for the future if necessary. 
-
-### Creating additional cvs translation files
-
-Translation information are not available anymore in the Wikipedia XML dump, so downloading the SQL langlink file is necessary (e.g. `enwiki-latest-langlinks.sql.gz`). This file must be put together with the XML dump file. Then for each language, the translation cvs file can be generated with the command - here for English: 
-
-```console
-cd nerd-data
-mvn compile exec:exec -PbuildTranslation -Dlang="en" -Dinput="/somewhere/en/enwiki-latest-langlinks.sql.gz" -Doutput"somewhere/en/" 
-```
-
-The command line takes 3 arguments: 
-
-* `-Dlang` is the language code of the target language for which the translation are generated
-* `-Dinput` is the path to the downloaded SQL langlink file gzipped (e.g. `enwiki-latest-langlinks.sql.gz` for english)
-* `-Doutput` is the path to the directory where to write the result csv translation file 
-
-For example:
-
-```console
-mvn compile exec:exec -PbuildTranslation -Dlang=en -Dinput=/media/lopez/data/wikipedia/latest/ja.old/jawiki-latest-langlinks.sql.gz -Doutput=/media/lopez/data/wikipedia/latest/ja
-```
-
-For other languages, replace the ```en```, with the appropriate lang codes (among supported ones `de`, `fr`, `es`, `it`, `jp`, etc.), e.g. for Japanese language:
-
-```
-mvn compile exec:exec -PbuildTranslation -Dlang=ja -Dinput=/media/lopez/data/wikipedia/latest/ja.old/jawiki-latest-langlinks.sql.gz -Doutput=/media/lopez/data/wikipedia/latest/ja
-```
-
-### Creating Wikidata knowledge base backbone and language-specific mapping
-
-Wikidata is a multilingual knowledge base that can be used on top the existing language-specific wikipedia. It provides conceptual information such as properties and semantic relations built in a controled way. 
-
-The following language specific files must be first downloaded: ``**wiki-latest-page_props.sql.gz`` for each target languages (`en`, `fr`, `de`, `it`, `es`, etc.), with `en` at least being mandatory and put in the same subdirectory.
-
-The JSON Wikidata dump file ``latest-all.json.bz2`` must be downloaded. 
-
-For  importing Wikidata resources in GRISP, then adapt the following command:
-
-```
-> cd nerd-data
-> mvn compile exec:exec -PbuildWikidata -Dinput=/somewhere/wikidata/latest-all.json.bz2 -Doutput=/somewhere/ 
-```
-
-The command line takes 2 arguments: 
-
-* `-Dinput` is the path to the downloaded full Wikidata JSON dump bzip2 file (e.g. `latest-all.json.bz2`)
-* `-Doutput` is the path to the directory where to write the language-specific entity mapping file, it is expecting one subdirectory per language (`en/`, `fr/`, etc.) each one containing its specific ``**wiki-latest-page_props.sql.gz``
-
-For example: 
-
-```console
-mvn compile exec:exec -PbuildWikidata -Dinput=/media/lopez/data/wikipedia/latest/wikidata/latest-all.json.bz2 -Doutput=/media/lopez/data/wikipedia/latest
-```
-
-with: 
-
-```
-ls /media/lopez/data/wikipedia/latest
-ar  de  en  es  fr  it  ja  ru  wikidata  zh
-```
-
-The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for each language the compressed ``**wiki-latest-page_props.sql.gz`` mapping information (where `**` is the language code, e.g. `en`, `fr`, `de`, ...). 
-
-### Generating Wikidata property labels for each language
-
-By default, Wikidata property identifiers are not easily readable (e.g. `P31`). In order to associate the property identifiers to a readable language-specific label, we need to generate the language-specific property labels (files `xx/wikidata-properties.json` where `xx` is the two letter language code) as follow: 
-
-- for English:
-
-```bash
-wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22en%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O en/wikidata-properties.json
-```
-
-- for French: 
-
-```bash
-wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22fr%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O fr/wikidata-properties.json
-```
-
-- for German:
-
-```bash
-wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22de%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O de/wikidata-properties.json
-```
-
-Just modify the language code in the url for other languages. Put all these language-specific Wikidata property naming into their corresponding language-specific data directory.
 
 ### Final hierarchy of files 
 
@@ -161,7 +89,9 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── categoryParents.csv
 │   ├── childArticles.csv
 │   ├── childCategories.csv
-│   ├── dewiki-latest-pages-articles.xml.bz2
+│   ├── dewiki-latest-langlinks.sql.gz
+│   ├── dewiki-latest-page_props.sql.gz
+│   ├── dewiki-latest-pages-articles-multistream.xml.bz2
 │   ├── label.csv
 │   ├── page.csv
 │   ├── pageLabel.csv
@@ -178,7 +108,9 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── categoryParents.csv
 │   ├── childArticles.csv
 │   ├── childCategories.csv
-│   ├── enwiki-latest-pages-articles.xml.bz2
+│   ├── enwiki-latest-langlinks.sql.gz
+│   ├── enwiki-latest-page_props.sql.gz
+│   ├── enwiki-latest-pages-articles-multistream.xml.bz2
 │   ├── label.csv
 │   ├── page.csv
 │   ├── pageLabel.csv
@@ -195,7 +127,9 @@ Here how the final data tree should look like from the root directory (for 3 lan
 │   ├── categoryParents.csv
 │   ├── childArticles.csv
 │   ├── childCategories.csv
-│   ├── frwiki-latest-pages-articles.xml.bz2
+│   ├── frwiki-latest-langlinks.sql.gz
+│   ├── frwiki-latest-page_props.sql.gz
+│   ├── frwiki-latest-pages-articles-multistream.xml.bz2
 │   ├── label.csv
 │   ├── page.csv
 │   ├── pageLabel.csv
@@ -215,33 +149,15 @@ Here how the final data tree should look like from the root directory (for 3 lan
 
 Note:
 
-- it is expected to have 16 files in each language-specific directory,
+- it is expected to have 15 files in each language-specific directory, plus 3 Wikipedia dump files (the `.bz2` `.gz` files),
 
-- the full Wikipedia article dump for each language must be present in the language-specific directories (e.g. `enwiki-latest-pages-articles.xml.bz2` or `enwiki-latest-pages-articles.xml.gz` or `enwiki-latest-pages-articles.xml`, they are required to generate definitions for entities, create training data, compute additional entity embeddings) ; the dump file can be compressed in `bz2`, `gzip` or uncompressed - all these variants should be loaded appropriately by entity-fishing,
+- the full Wikipedia article dump for each language must be present in the language-specific directories (e.g. `enwiki-latest-pages-articles-multistream.xml.bz2` or `enwiki-latest-pages-articles-multistream.xml.gz` or `enwiki-latest-pages-articles-multistream.xml`, they are required to generate definitions for entities, create training data, compute additional entity embeddings) ; the dump file can be compressed in `bz2`, `gzip` or uncompressed - all these variants should be loaded appropriately by entity-fishing,
 
 - the wikidata identifiers csv file `wikidataIds.csv` and the full wikidata JSON dump file `latest-all.json.bz2` are under a `wikidata` sub-directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` and `wikidata-properties.json` are installed in each language-specific sub-directory,
 
 - in entity-fishing the loading of these files is automatic when building the project or starting the service (if not present), be sure to indicate the path to these above files in the entity-fishing config files.
 
-## Just for History: Creating additional infobox csv files with DBPedia
 
-This part is deprecated as we are not using at all DBPedia due to too low quality. 
-
-For generating the complementary csv files capturing the infobox information, the DBpedia infobox tql file can be used. The DBPedia project has already parsed the Wikipedia XML dumps to get the infobox information, so we simply reuse this work for importing in GRISP. 
-
-Note that given the very low quality of DBPedia, its usage is actually more harmful than useful and, after practical experiments, this resource is better be ignored. Wikidata is the right replacement both for data quality and soundness of the approach. 
-
-Basically the generated csv file contains a list of properties and relations as available in the infoboxes. Use the following command:
-
-```
-> mvn compile exec:exec -Dexec.classpathScope=compile -PbuildInfoboxEn
-```
-
-For other languages, replace the ending ```En```, but the appropriate lang code, e.g. for French:
-
-```
-> mvn compile exec:exec -Dexec.classpathScope=compile -PbuildInfoboxFr
-```
 
 ### More to come
 
@@ -256,3 +172,4 @@ Many thanks to David Milne for the Wikipedia XML dump processing. The present pr
 GRISP is distributed under [GPL 3.0 license](https://www.gnu.org/licenses/gpl-3.0.html). 
 
 Contact: Patrice Lopez (<patrice.lopez@science-miner.com>)
+

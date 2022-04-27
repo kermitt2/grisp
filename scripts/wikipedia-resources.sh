@@ -20,13 +20,12 @@ echo "Downloading latest Wikidata JSON dump"
 cd $data_path
 mkdir wikidata
 cd wikidata
-#wget -c https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2
+wget -c https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2
 
-## Donwload all the Wikipedia resources by language (around 44GB, in Feb. 2022 for the 9 indicated languages)
+## Download all the Wikipedia resources by language (a bit less than 50GB, in Feb. 2022 for the 9 indicated languages)
 
 ## declare an array variable
-#declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru")
-declare -a languages=("ru")
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru")
 
 ## now loop through the language array to download resources
 cd $data_path
@@ -35,9 +34,9 @@ do
     echo "Downloading latest resources for language ${i}..."
     mkdir ${i}
     cd ${i}
-    #wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-pages-articles-multistream.xml.bz2
-    #wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-langlinks.sql.gz
-    #wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-page_props.sql.gz
+    wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-pages-articles-multistream.xml.bz2
+    wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-langlinks.sql.gz
+    wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-page_props.sql.gz
 done
 
 ## loop through the language array to create Wikidata property files for each language

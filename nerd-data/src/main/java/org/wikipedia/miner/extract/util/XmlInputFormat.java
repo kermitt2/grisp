@@ -70,6 +70,7 @@ public class XmlInputFormat extends TextInputFormat {
       end = start + split.getLength();
       Path file = split.getPath();
       FileSystem fs = file.getFileSystem(jobConf);
+      fs.setVerifyChecksum(false);
       fsin = fs.open(split.getPath());
       fsin.seek(start);
     }
@@ -121,19 +122,32 @@ public class XmlInputFormat extends TextInputFormat {
     private boolean readUntilMatch(byte[] match, boolean withinBlock) throws IOException {
       int i = 0;
       while (true) {
-        int b = fsin.read();
+        int b = -1;
+        try {
+          b = fsin.read();
+        } catch(Exception e) {
+          // in case of checksum error, leave the file
+          b = -1;
+        }
+
         // end of file:
-        if (b == -1) return false;
+        if (b == -1) 
+          return false;
+        
         // save to buffer:
-        if (withinBlock) buffer.write(b);
+        if (withinBlock) 
+          buffer.write(b);
         
         // check if we're matching:
         if (b == match[i]) {
           i++;
           if (i >= match.length) return true;
-        } else i = 0;
+        } else 
+          i = 0;
+        
         // see if we've passed the stop point:
-        if (!withinBlock && i == 0 && fsin.getPos() >= end) return false;
+        if (!withinBlock && i == 0 && fsin.getPos() >= end) 
+          return false;
       }
     }
   }

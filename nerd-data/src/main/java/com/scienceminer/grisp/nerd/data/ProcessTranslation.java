@@ -30,13 +30,13 @@ public class ProcessTranslation {
   	// languages
   	private static List<String> targetLanguages = Arrays.asList("en", "fr", "de", "it", "es", "ar", "zh", "jp", "ru");
 
-  	public ProcessTranslation() {
+  	public ProcessTranslation(String lang) {
   		// init LMDB - the default usage of LMDB will ensure that the entries in the resulting 
   		// translations.csv file will be sorted by the page id
-		File path = new File("/tmp/lmdb-temp-translations");
+		File path = new File("/tmp/lmdb-temp-translations"+lang);
 		if (!path.exists()) {
 			path.mkdir();
-			System.out.println("new temp translation DB: " + path.toString());
+			System.out.println("new temp translation DB for language " + lang + " : " + path.toString());
 		} else {
 			//System.out.println("Existing temp translation DB found: DB will not overwritten");
 			try {
@@ -299,15 +299,21 @@ public class ProcessTranslation {
 	}
 
 	public static void main(String[] args) throws Exception {
-		if (args.length != 2) {
-			System.err.println("Invalid arguments: [input_path_to_sql_translation_file] [output_path_to_csv_translation_file]");
+		if (args.length != 3) {
+			System.err.println("Invalid arguments: [lang] [input_path_to_sql_translation_file] [output_path_to_csv_translation_file]");
 		}
 
-		ProcessTranslation translate = new ProcessTranslation() ;
+		String lang = args[0];
+		String sqlTranslationFilePath = args[1];
+		String outputPath = args[2];
+
+		// TBD: sanity check on arguments
+
+		ProcessTranslation translate = new ProcessTranslation(lang);
 				
 		long start = System.currentTimeMillis();
-		int nbResult = translate.process(args[0]);
-		translate.writeTranslationsCsv(args[1]);
+		int nbResult = translate.process(sqlTranslationFilePath);
+		translate.writeTranslationsCsv(outputPath+"/translations.csv");
 		long end = System.currentTimeMillis();
 
 		translate.close();

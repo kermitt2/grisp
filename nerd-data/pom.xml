@@ -17,6 +17,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<avro.version>1.7.5</avro.version>
 		<lmdbjni.version>0.4.6</lmdbjni.version>
+
+		<!-- placeholder for exec arguments -->
+    	<lang></lang>
+    	<input></input>
+		<output></output>
 	</properties>
 	
 	<licenses>
@@ -204,12 +209,12 @@
 
 		</plugins>	
 	</build>
-	
+
 	<profiles>
 		<profile>
-		  <!-- mvn compile exec:exec -PbuildTranslationEn -->	
-		  <id>buildTranslationEn</id>
-		  <activation><property><name>buildTranslationEn</name></property></activation>
+		  <!-- mvn compile exec:exec -PbuildTranslation -Dlang="en" -Dinput="./en/enwiki-latest-langlinks.sql.gz" -Doutput"./en/" -->	
+		  <id>buildTranslation</id>
+		  <activation><property><name>buildTranslation</name></property></activation>
 		  <build>
 			<plugins>
 				<plugin>
@@ -222,136 +227,18 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/en/enwiki-latest-langlinks.sql.gz</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/en/translations.csv</argument>
+            			<argument>${lang}</argument>
+            			<argument>${input}</argument>
+            			<argument>${output}</argument>
 				      </arguments>
 				    </configuration>
 		    	</plugin>
 		    </plugins>
 		  </build>
 		</profile>
+
 		<profile>
-		  <!-- mvn compile exec:exec -PbuildTranslationFr -->	
-		  <id>buildTranslationFr</id>
-		  <activation><property><name>buildTranslationFr</name></property></activation>
-		  <build>
-			<plugins>
-				<plugin>
-				    <groupId>org.codehaus.mojo</groupId>
-				    <artifactId>exec-maven-plugin</artifactId>
-				    <configuration>
-				      <executable>java</executable>
-				      <arguments>
-						<argument>-Xms2g</argument>
-		            	<argument>-Xmx4g</argument>
-				        <argument>-classpath</argument><classpath />
-				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/fr/frwiki-latest-langlinks.sql.gz</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/fr/translations.csv</argument>
-				      </arguments>
-				    </configuration>
-		    	</plugin>
-		    </plugins>
-		  </build>
-		</profile>
-		<profile>
-		  <!-- mvn compile exec:exec -PbuildTranslationDe -->	
-		  <id>buildTranslationDe</id>
-		  <activation><property><name>buildTranslationDe</name></property></activation>
-		  <build>
-			<plugins>
-				<plugin>
-				    <groupId>org.codehaus.mojo</groupId>
-				    <artifactId>exec-maven-plugin</artifactId>
-				    <configuration>
-				      <executable>java</executable>
-				      <arguments>
-						<argument>-Xms2g</argument>
-		            	<argument>-Xmx4g</argument>
-				        <argument>-classpath</argument><classpath />
-				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/de/dewiki-latest-langlinks.sql.gz</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/de/translations.csv</argument>
-				      </arguments>
-				    </configuration>
-		    	</plugin>
-		    </plugins>
-		  </build>
-		</profile>
-		<profile>
-		  <!-- mvn compile exec:exec -PbuildTranslationEs -->	
-		  <id>buildTranslationEs</id>
-		  <activation><property><name>buildTranslationEs</name></property></activation>
-		  <build>
-			<plugins>
-				<plugin>
-				    <groupId>org.codehaus.mojo</groupId>
-				    <artifactId>exec-maven-plugin</artifactId>
-				    <configuration>
-				      <executable>java</executable>
-				      <arguments>
-						<argument>-Xms2g</argument>
-		            	<argument>-Xmx4g</argument>
-				        <argument>-classpath</argument><classpath />
-				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/es/eswiki-latest-langlinks.sql.gz</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/es/translations.csv</argument>
-				      </arguments>
-				    </configuration>
-		    	</plugin>
-		    </plugins>
-		  </build>
-		</profile>
-		<profile>
-		  <!-- mvn compile exec:exec -PbuildTranslationIt -->	
-		  <id>buildTranslationIt</id>
-		  <activation><property><name>buildTranslationIt</name></property></activation>
-		  <build>
-			<plugins>
-				<plugin>
-				    <groupId>org.codehaus.mojo</groupId>
-				    <artifactId>exec-maven-plugin</artifactId>
-				    <configuration>
-				      <executable>java</executable>
-				      <arguments>
-						<argument>-Xms2g</argument>
-		            	<argument>-Xmx4g</argument>
-				        <argument>-classpath</argument><classpath />
-				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/it/itwiki-latest-langlinks.sql.gz</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/it/translations.csv</argument>
-				      </arguments>
-				    </configuration>
-		    	</plugin>
-		    </plugins>
-		  </build>
-		</profile>
-		<profile>
-		  <!-- mvn compile exec:exec -PbuildTranslationAr -->	
-		  <id>buildTranslationAr</id>
-		  <activation><property><name>buildTranslationAr</name></property></activation>
-		  <build>
-			<plugins>
-				<plugin>
-				    <groupId>org.codehaus.mojo</groupId>
-				    <artifactId>exec-maven-plugin</artifactId>
-				    <configuration>
-				      <executable>java</executable>
-				      <arguments>
-						<argument>-Xms2g</argument>
-		            	<argument>-Xmx4g</argument>
-				        <argument>-classpath</argument><classpath />
-				        <argument>com.scienceminer.grisp.nerd.data.ProcessTranslation</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/ar/arwiki-latest-langlinks.sql.gz</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/ar/translations.csv</argument>
-				      </arguments>
-				    </configuration>
-		    	</plugin>
-		    </plugins>
-		  </build>
-		</profile>
-		<profile>
-		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PbuildWikidata -->	
+		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PbuildWikidata -Dinput="./wikidata/latest-all.json.bz2" -Doutput="./wikidata/" -->	
 		  <id>buildWikidata</id>
 		  <activation><property><name>buildWikidata</name></property></activation>
 		  <build>
@@ -366,18 +253,19 @@
 		            	<argument>-Xmx4g</argument>
 				        <argument>-classpath</argument><classpath />
 				        <argument>com.scienceminer.grisp.nerd.data.ProcessWikiData</argument>
-				        <argument>/media/lopez/data/wikidata/latest-all.json.bz2</argument>
+				        <argument>${input}</argument>
+            			<argument>${output}</argument>
+
+				        <!--argument>/media/lopez/data/wikidata/latest-all.json.bz2</argument>
 				        <argument>/media/lopez/data/wikipedia/latest/</argument>
-				        <argument>/media/lopez/data/wikipedia/latest/</argument>
-				        <!--argument>/home/lopez/resources/wikidata/latest-all.json.bz2</argument>
-				        <argument>/home/lopez/resources/wikidata/</argument>
-				        <argument>/home/lopez/resources/wikipedia/</argument-->
+				        <argument>/media/lopez/data/wikipedia/latest/</argument-->
 				      </arguments>
 				    </configuration>
 		    	</plugin>
 		    </plugins>
 		  </build>
 		</profile>
+
 		<profile>
 		  <!-- mvn compile exec:exec -Dexec.classpathScope=compile -PmapUAT -->	
 		  <id>mapUAT</id>
@@ -402,9 +290,8 @@
 		    </plugins>
 		  </build>
 		</profile>
-	</profiles>
 
-	
+	</profiles>
 	
 	<dependencies>	
 		<!-- Wikimedia markup parser -->
@@ -653,28 +540,12 @@
 			</exclusions>	
 		</dependency>
 
-	    <!-- for some mysterious reason, hadoop 2.7.4 requires this instead of the default xalan (?) -->
+	    <!-- for some mysterious reason, hadoop requires this instead of the default xalan (?) -->
 	    <dependency>
 		  	<groupId>net.sf.saxon</groupId>
 		  	<artifactId>Saxon-HE</artifactId>
 		  	<version>9.8.0-4</version>
 		</dependency>
-
-		<!--dependency>
-			  <groupId>xmlrpc-helma</groupId>
-			  <artifactId>xmlrpc-helma</artifactId>
-			  <version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.trove4j</groupId>
-			<artifactId>trove4j</artifactId>
-			<version>3.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>info.bliki.wiki</groupId>
-			<artifactId>bliki-core</artifactId>
-			<version>3.0.19</version>
-		</dependency-->
 
 	</dependencies>
 		

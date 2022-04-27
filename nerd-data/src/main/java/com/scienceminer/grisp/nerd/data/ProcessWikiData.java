@@ -128,19 +128,19 @@ public class ProcessWikiData {
 	/**
 	 * Map all language specific PageID to Wikidata entity identifier
 	 */
-	public int processAllProps(String inputPath, String resultPath) {
+	public int processAllProps(String inputPath) {
 		// seed entites
 		int nbEntities = processWikidataDump();
 		System.out.println("total of " + nbEntities + " entities.");
 		int nbAll = 0;
 		for(String lang : targetLanguages) {
-			String localResultPath = resultPath + "/" + lang + "/wikidata.txt" ;
-			int nb = processProps(inputPath+"/"+lang+"wiki-latest-page_props.sql.gz", localResultPath, lang);
+			String localResultPath = inputPath + "/" + lang + "/wikidata.txt" ;
+			int nb = processProps(inputPath + "/" + lang + "/" +lang+"wiki-latest-page_props.sql.gz", localResultPath, lang);
 			System.out.println(lang + ": " + nb + " page id mapping to Wikidata entities");
 			nbAll += nb;
 		}
 		System.out.println("total of " + nbAll + " mappings with " + targetLanguages.size() + " languages.");
-		String localResultPath = resultPath + "/" +"wikidataIds.csv" ;
+		String localResultPath = inputPath + "/wikidata/wikidataIds.csv" ;
 		writeProp(localResultPath);
 		return nbAll;
 	}
@@ -568,14 +568,15 @@ public class ProcessWikiData {
 	}*/
 
 	public static void main(String[] args) throws Exception {
-System.out.println(args.length + " arguments");
-		if (args.length != 3) {
-			System.err.println("Invalid arguments: [input_path_to_wikidata_json_file] [path_to_language_page_props.sql_directory] [result_directory]");
+		if (args.length != 2) {
+			System.err.println("Invalid arguments: [input_path_to_wikidata_json_file] [path_to_resource_directory]");
 		} else {
+			// TBD: sanity check on the arguments
+
 			ProcessWikiData wikidata = new ProcessWikiData(args[0], args[1]) ;
 
 			long start = System.currentTimeMillis();
-			int nbResult = wikidata.processAllProps(args[1], args[2]);
+			int nbResult = wikidata.processAllProps(args[1]);
 			long end = System.currentTimeMillis();
 
 			System.out.println(nbResult + " props language mapping produced in " + (end - start) + " ms");

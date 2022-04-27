@@ -68,33 +68,63 @@ We think that it is possible to still improve significantly the processing time,
 
 Translation information are not available anymore in the Wikipedia XML dump, so downloading the SQL langlink file is necessary (e.g. `enwiki-latest-langlinks.sql.gz`). This file must be put together with the XML dump file. Then for each language, the translation cvs file can be generated with the command - here for English: 
 
-```
-> mvn compile exec:exec -PbuildTranslationEn
-```
-
-For other languages, replace the ending ```En```, with the appropriate lang codes (among `De`, `Fr`, `Es`, `It`, `Jp`), e.g. for French language:
-
-```
-> mvn compile exec:exec -PbuildTranslationFr
+```console
+cd nerd-data
+mvn compile exec:exec -PbuildTranslation -Dlang="en" -Dinput="/somewhere/en/enwiki-latest-langlinks.sql.gz" -Doutput"somewhere/en/" 
 ```
 
-Check the correct paths given in argument in the `nerd-data/pom.xml` for the tasks `buildTranslation**`. 
+The command line takes 3 arguments: 
+
+* `-Dlang` is the language code of the target language for which the translation are generated
+* `-Dinput` is the path to the downloaded SQL langlink file gzipped (e.g. `enwiki-latest-langlinks.sql.gz` for english)
+* `-Doutput` is the path to the directory where to write the result csv translation file 
+
+For example:
+
+```console
+mvn compile exec:exec -PbuildTranslation -Dlang=en -Dinput=/media/lopez/data/wikipedia/latest/ja.old/jawiki-latest-langlinks.sql.gz -Doutput=/media/lopez/data/wikipedia/latest/ja
+```
+
+For other languages, replace the ```en```, with the appropriate lang codes (among supported ones `de`, `fr`, `es`, `it`, `jp`, etc.), e.g. for Japanese language:
+
+```
+mvn compile exec:exec -PbuildTranslation -Dlang=ja -Dinput=/media/lopez/data/wikipedia/latest/ja.old/jawiki-latest-langlinks.sql.gz -Doutput=/media/lopez/data/wikipedia/latest/ja
+```
 
 ### Creating Wikidata knowledge base backbone and language-specific mapping
 
 Wikidata is a multilingual knowledge base that can be used on top the existing language-specific wikipedia. It provides conceptual information such as properties and semantic relations built in a controled way. 
 
-The following language specific files must be first downloaded: ``**wiki-latest-page_props.sql.gz`` for each target languages (`en`, `fr`, `de`, `it`, `es`), with `en` at least being mandatory and put in the same subdirectory.
+The following language specific files must be first downloaded: ``**wiki-latest-page_props.sql.gz`` for each target languages (`en`, `fr`, `de`, `it`, `es`, etc.), with `en` at least being mandatory and put in the same subdirectory.
 
 The JSON Wikidata dump file ``latest-all.json.bz2`` must be downloaded. 
 
-For  importing Wikidata resources in GRISP, then use the following command:
+For  importing Wikidata resources in GRISP, then adapt the following command:
 
 ```
-> mvn compile exec:exec -PbuildWikidata
+> cd nerd-data
+> mvn compile exec:exec -PbuildWikidata -Dinput=/somewhere/wikidata/latest-all.json.bz2 -Doutput=/somewhere/ 
 ```
 
-The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for each language the compressed ``**wiki-latest-page_props.sql.gz`` mapping information (where `**` is the language code, e.g. `en`, `fr`, `de`, ...), the correct paths to these files must currently be indicated manually in the `nerd-data/pom.xml` for the task `buildWikidata`. 
+The command line takes 2 arguments: 
+
+* `-Dinput` is the path to the downloaded full Wikidata JSON dump bzip2 file (e.g. `latest-all.json.bz2`)
+* `-Doutput` is the path to the directory where to write the language-specific entity mapping file, it is expecting one subdirectory per language (`en/`, `fr/`, etc.) each one containing its specific ``**wiki-latest-page_props.sql.gz``
+
+For example: 
+
+```console
+mvn compile exec:exec -PbuildWikidata -Dinput=/media/lopez/data/wikipedia/latest/wikidata/latest-all.json.bz2 -Doutput=/media/lopez/data/wikipedia/latest
+```
+
+with: 
+
+```
+ls /media/lopez/data/wikipedia/latest
+ar  de  en  es  fr  it  ja  ru  wikidata  zh
+```
+
+The process uses the compressed JSON Wikidata ``latest-all.json.bz2`` and for each language the compressed ``**wiki-latest-page_props.sql.gz`` mapping information (where `**` is the language code, e.g. `en`, `fr`, `de`, ...). 
 
 ### Generating Wikidata property labels for each language
 

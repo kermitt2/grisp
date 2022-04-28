@@ -332,8 +332,8 @@ Finally you can clean and stop HDFS and stop YARN:
 
 ```console
 hadoop-3.3.1/bin/hdfs dfs -rm /user/lopez/*wiki-latest-pages-articles-multistream.xml
-hadoop-3.3.1/bin/hdfs dfs -rmr /user/lopez/output/*
-hadoop-3.3.1/bin/hdfs dfs -rmr /user/lopez/working/*
+hadoop-3.3.1/bin/hdfs dfs -rm -r /user/lopez/output/*
+hadoop-3.3.1/bin/hdfs dfs -rm -r /user/lopez/working/*
 hadoop-3.3.1/sbin/stop-dfs.sh
 hadoop-3.3.1/sbin/stop-yarn.sh
 ```

@@ -52,13 +52,6 @@ public class ProcessWikiData {
   	public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
   		try {
   			this.pathWikidataJSONPath = pathWikidataJSONPath;
-	  		// init page cache to get page id from page title
-	  		/*pageCache = new PagesByTitleCache(null, lang);
-
-	  		// load cache content from existing csv file
-	  		List<Path> pageFiles = new ArrayList<Path>();
-	  		pageFiles.add(new Path(pathPageCsvPath));
-	  		pageCache.loadAll(pageFiles, null); */
 
 	  		// init LMDB
 	  		// first temporary DB for storing the page ids in different languages
@@ -80,24 +73,6 @@ public class ProcessWikiData {
 	    	env_id.open(envFilePath_id);
 			db_id = env_id.openDatabase();
 
-			// second temporary DB for storing the properties and relations present in wikidata
-			/*path = new File("/tmp/lmdb-temp-wikidata-data");
-			if (!path.exists()) {
-				path.mkdir();
-				System.out.println("new temp wikidata DB: " + path.toString());
-			} else {
-				try {
-					FileUtils.deleteDirectory(path);
-					path.mkdir();
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-			}*/
-	    	/*envFilePath_data = path.toString();
-	    	env_data = new Env();
-	    	env_data.setMapSize(200 * 1024 * 1024, ByteUnit.KIBIBYTES); // space for > 40 millions
-	    	env_data.open(envFilePath_data);
-			db_data = env_data.openDatabase();*/
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -113,16 +88,6 @@ public class ProcessWikiData {
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
-
-		//db_data.close();
-    	//env_data.close();
-    	/*try {
-    		File tmpFile = new File(envFilePath_data);
-    		if (tmpFile.exists())
-	    		FileUtils.deleteDirectory(tmpFile);
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}*/
 	}
 
 	/**
@@ -502,71 +467,6 @@ public class ProcessWikiData {
 		return builder.toString();
 	}
 
-	/*public int process(String inputPath, String resultPath) {
-		int nb = 0;
-		int ignored = 0;
-		BufferedReader reader = null;
-		try {
-			// open file
-			BufferedInputStream bis = new BufferedInputStream(new InputStreamReader(new FileInputStream(inputPath)));
-		    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
-		    reader = new BufferedReader(new InputStreamReader(input));
-
-			String line = null;
-			int nbToAdd = 0;
-			Transaction tx = env_data.createWriteTransaction();
-			Map<Integer,String> tempToBeAddedMap = new TreeMap<Integer,String>();
-			while ((line = reader.readLine()) != null) {
-				//if (nb > 100000)
-				//	break;
-				if (line.length() == 0) continue;
-				if (line.startsWith("[")) continue;
-//System.out.println(line);
-				if (nbToAdd == 1000) {
-					tx.commit();
-					nbToAdd = 0;
-					tx = env_data.createWriteTransaction();
-					tempToBeAddedMap = new TreeMap<Integer,String>();
-					System.out.print(".");
-					System.out.flush();
-				}
-                
-				JsonNode rootNode = mapper.readTree(line);
-				JsonNode idNode = rootNode.findPath("id");
-				String itemId = null;
-				if ((idNode != null) && (!idNode.isMissingNode())) {
-					itemId = idNode.textValue();
-				}
-                
-                if (itemId == null)
-                	continue;
-
-				JsonNode claimsNode = rootNode.findPath("claims");
-				if ((claimsNode != null) && (!claimsNode.isMissingNode())) {
-
-				}
-
-					db.put(tx, BigInteger.valueOf(itemId).toByteArray(), bytes(propString));
-					tempToBeAddedMap.put(new Integer(pageId), propString);
-					nbToAdd++;
-					nb++;
-				}
-			}
-			tx.commit();
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (reader != null)
-					reader.close();
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		System.out.println("\nproperties ignored: " + ignored);
-		return nb;
-	}*/
-
 	public static void main(String[] args) throws Exception {
 		if (args.length != 2) {
 			System.err.println("Invalid arguments: [input_path_to_wikidata_json_file] [path_to_resource_directory]");
@@ -580,12 +480,6 @@ public class ProcessWikiData {
 			long end = System.currentTimeMillis();
 
 			System.out.println(nbResult + " props language mapping produced in " + (end - start) + " ms");
-
-			/*start = System.currentTimeMillis();
-			nbResult = wikidata.process(args[1], args[2]);
-			end = System.currentTimeMillis();
-
-			System.out.println(nbResult + " Wikidata statements produced in " + (end - start) + " ms");*/
 
 			wikidata.close();
 		}

@@ -387,9 +387,6 @@ public class LabelSensesStep extends Configured implements Tool {
 
 		private void gatherCategoryLinksAndTranslations(DumpPage page, String markup, Reporter reporter) throws Exception {
 			List<int[]> linkRegions = Util.gatherComplexRegions(markup, null, "\\[\\[", "\\]\\]");
-
-			//System.out.println("gatherCategoryLinksAndTranslations, nb link region:" + linkRegions.size());
-
 			for(int[] linkRegion: linkRegions) {
 				String linkMarkup = markup.substring(linkRegion[0]+2, linkRegion[1]-2);
 
@@ -406,7 +403,7 @@ public class LabelSensesStep extends Configured implements Tool {
 				if (link.getTargetNamespace() == SiteInfo.CATEGORY_KEY)  {
 					int parentId = pagesByTitle.getCategoryId(link.getTargetTitle());
 					if (parentId != -1) {
-						if (page.getNamespace() == SiteInfo.CATEGORY_KEY)
+						if (page.getNamespace() == SiteInfo.CATEGORY_KEY) 
 							mos.getCollector(Output.tempCategoryParent.name(), reporter).collect(new IntWritable(page.getId()), new IntWritable(parentId));
 						else
 							mos.getCollector(Output.tempArticleParent.name(), reporter).collect(new IntWritable(page.getId()), new IntWritable(parentId));

@@ -40,7 +40,7 @@ public class DumpPageParser {
 		this.languageConfiguration = lc;
 		this.siteInfo = si;
 
-		if (lc.getLangCode().equals("ar"))
+		if (lc.getLangCode().equals("ar") || lc.getLangCode().equals("fa"))
 			this.right2left = true;
 	}
 

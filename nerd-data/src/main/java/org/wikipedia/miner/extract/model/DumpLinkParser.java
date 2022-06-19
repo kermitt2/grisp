@@ -20,17 +20,26 @@ public class DumpLinkParser {
 		
 		StringBuffer tmp = new StringBuffer();
 		for (String namespace : siteInfo.getNamespaceKeysByNamespace().keySet()) {
-			tmp.append(namespace);
-			tmp.append("|");
+			if (namespace != null && namespace.length()>0) {
+				String localNamespace = namespace;
+				// to cover categories with parenthesis (e.g. "Usuário(a)"" or "Usuário(a) Discussão")
+				if (localNamespace.indexOf("(") != -1)
+					localNamespace = localNamespace.replace("(", "\\(");
+				if (localNamespace.indexOf(")") != -1)
+					localNamespace = localNamespace.replace(")", "\\)");
+				tmp.append(localNamespace);
+				tmp.append("|");
+			}
 		}
 		tmp.deleteCharAt(tmp.length()-1);
+
 		namespacePattern = Pattern.compile("(" + tmp + ")\\:(.*)");
 		
 		mainPattern = Pattern.compile("([^#|]+)(\\#([^|]+))?(\\|(.+))?");
 	}
 	
 	public DumpLink parseLink(String markup) throws Exception {
-		
+
 		String lang = null;
 		String namespace = null;
 		int namespaceKey = SiteInfo.MAIN_KEY;

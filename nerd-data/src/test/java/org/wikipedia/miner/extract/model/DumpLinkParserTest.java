@@ -27,6 +27,7 @@ public class DumpLinkParserTest {
 	public void setUp() {
 		try {
 			//LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
+			// default
 			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
 			dumpLinkParser = new DumpLinkParser(si);
 			stripper = MediaWikiParser.getInstance();
@@ -39,6 +40,9 @@ public class DumpLinkParserTest {
 	@Test
 	public void testLinkParser() {
 		try {
+			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
+			dumpLinkParser = new DumpLinkParser(si);
+
 			List<String> links = Arrays.asList("Alexander II of Russia", 
 				"Marie François Sadi Carnot|Sadi Carnot", 
 				"Synthesist anarchism|synthesist", 
@@ -62,6 +66,9 @@ public class DumpLinkParserTest {
 	@Test
 	public void testLinkParserInSentence() {
 		try {
+			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
+			dumpLinkParser = new DumpLinkParser(si);
+
 			List<String> sentences = Arrays.asList("'''Anarchism''' is a [[political philosophy]] that advocates [[self-governance|self-governed]] societies based on voluntary institutions.",
 				"These are often described as [[stateless society|stateless societies]].", 
 				"Following his time in Judea, Albinus was chosen by Nero to be governor of [[Mauretania Caesariensis]]. The province of [[Mauretania Tingitana]] was added to Albinus's governor duties by the Emperor [[Galba]]. Following Galba's death, Albinus supported [[Otho]] in the [[Year of the Four Emperors|year of political anarchy]] (69), which followed Nero's death.&lt;ref name=&quot;Hist 2.58&quot;&gt;Tacitus, ''[[Histories (Tacitus)|The Histories]]'', Volume II, Section 58&lt;/ref&gt; Following Otho's death, Albinus was rumored to have styled himself as a king using the title &quot;Juba&quot;. Albinus and his wife were assassinated shortly afterwards.&lt;ref name=&quot;Hist 2.59&quot;&gt;[[Tacitus]], ''The Histories'', Volume II, Section 59&lt;/ref&gt;",
@@ -96,6 +103,9 @@ public class DumpLinkParserTest {
 	@Test
 	public void testLinkParserInDisambiguationText() {
 		try {
+			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfo.xml"));
+			dumpLinkParser = new DumpLinkParser(si);
+
 			String sentence = "'''Nardelli''' is an [[Italian language|Italian]] surname, which means a descendant of \"Nardo\",\n" +
 				"a pet form of the name [[Leonardo]] (\"lion-like\").<ref>''Dictionary of American Family Names''.\n" +
 				"Oxford University Press, 2013. Retrieved on 10 January 2016.</ref> The name may refer to:\n" +
@@ -126,6 +136,27 @@ public class DumpLinkParserTest {
 					System.out.println(dumpLink.toString());
 				} catch (Exception e) {
 					System.out.println("Could not parse link markup '" + linkMarkup + "'");
+					e.printStackTrace();
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testLinkParserCategoryPt() {
+		try {
+			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfoPt.xml"));
+			dumpLinkParser = new DumpLinkParser(si);
+
+			List<String> links = Arrays.asList("Categoria:Elementos arquitetónicos", "Categoria:Árbitros de futebol", "Categoria:Funções matemáticas");
+			for(String link : links) {
+				try {
+					DumpLink dumpLink = dumpLinkParser.parseLink(link);
+					System.out.println(dumpLink.toString());
+				} catch (Exception e) {
+					System.out.println("Could not parse link markup '" + link + "'");
 					e.printStackTrace();
 				}
 			}

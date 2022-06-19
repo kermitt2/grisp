@@ -115,7 +115,6 @@
 		<DisambiguationCategory>كلمة_(توضيح)</DisambiguationCategory>
 
 		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
-		<DisambiguationTemplate>توضيح</DisambiguationTemplate>
 
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>redirect</RedirectIdentifier>
@@ -127,8 +126,9 @@
 	<Language code="zh" name="Mandarin" localName="中文">
 		<RootCategory>总览</RootCategory>
 
+		<DisambiguationCategory>disambig</DisambiguationCategory>
 		<DisambiguationCategory>消歧义</DisambiguationCategory>
-		<DisambiguationCategory>消歧義模板</DisambiguationCategory>
+		<DisambiguationCategory>字消歧義</DisambiguationCategory>
 
 		<DisambiguationTemplate>消歧義模板</DisambiguationTemplate>
 
@@ -152,14 +152,20 @@
 		<DisambiguationTemplate>disambig</DisambiguationTemplate>
 		<DisambiguationTemplate>dab</DisambiguationTemplate>
 
+		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
+		<RedirectIdentifier>Wikipedia:リダイレクト</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
-		<RedirectIdentifier>転送</RedirectIdentifier>
-		<RedirectIdentifier>リダイレクト</RedirectIdentifier>
+		<RedirectIdentifier>redirect</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
+		<RedirectIdentifier>R</RedirectIdentifier>
+		<RedirectIdentifier>RDR</RedirectIdentifier>
+		<RedirectIdentifier>ショートカット</RedirectIdentifier>
 	</Language>
 
 	<Language code="ru" name="Russian" localName="Русский">
-		<RootCategory>Содержание</RootCategory>
+		<RootCategory>Всё</RootCategory>
+		<!-->Содержание</RootCategory-->
 
 		<DisambiguationCategory>Неоднозначность</DisambiguationCategory>
 		<DisambiguationCategory>Disambiguation</DisambiguationCategory>
@@ -169,12 +175,38 @@
 		<DisambiguationTemplate>Многозначность</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambiguation</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambig</DisambiguationTemplate>
-		<DisambiguationTemplate></DisambiguationTemplate>
 
 		<RedirectIdentifier>Перенаправления</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
+	</Language>
+
+	<Language code="pt" name="Portuguese" localName="Português">
+		<RootCategory>Conteúdo</RootCategory>
+
+		<DisambiguationCategory>Desambiguação</DisambiguationCategory>
+		<DisambiguationCategory>Categorias de desambiguação</DisambiguationCategory>
+
+		<DisambiguationTemplate>Desambiguação</DisambiguationTemplate>
+		<DisambiguationTemplate>Desambiguação de categoria</DisambiguationTemplate>
+
+		<RedirectIdentifier>fusão com</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="fa" name="Farsi" localName="فارسی">
+		<RootCategory>درونمایه</RootCategory>
+
+		<DisambiguationCategory>صفحه&#x200c;های_ابهام&#x200c;زدایی</DisambiguationCategory>
+		<DisambiguationCategory>رده&#x200c;های_ابهام&#x200c;زدایی</DisambiguationCategory>
+		<DisambiguationCategory>همه صفحه&#x200c;های ابهام&#x200c;زدایی</DisambiguationCategory>
+
+		<DisambiguationTemplate>ابهام&#x200c;زدایی</DisambiguationTemplate>
+		<DisambiguationTemplate>رده ابهام&#x200c;زدایی</DisambiguationTemplate>
+
+		<RedirectIdentifier>تغییرمسیر</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 	</Language>
 
 </WikipediaLanguageList>

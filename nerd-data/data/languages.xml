@@ -182,4 +182,33 @@
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 	</Language>
 
+	<Language code="pt" name="Portuguese" localName="Português">
+		<RootCategory>Conteúdo</RootCategory>
+		<!--RootCategory>Artigos</RootCategory-->
+
+		<DisambiguationCategory>Desambiguação</DisambiguationCategory>
+		<DisambiguationCategory>Categorias_de_desambiguação</DisambiguationCategory>
+
+		<DisambiguationTemplate>Desambiguação</DisambiguationTemplate>
+		<DisambiguationTemplate>Desambiguação_de_categoria</DisambiguationTemplate>
+		<DisambiguationTemplate>Disambiguate</DisambiguationTemplate>
+
+		<RedirectIdentifier>fusão com</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="fa" name="Farsi" localName="فارسی">
+		<RootCategory>درونمایه</RootCategory>
+
+		<DisambiguationCategory>صفحه&#x200c;های_ابهام&#x200c;زدایی</DisambiguationCategory>
+		<DisambiguationCategory>رده&#x200c;های_ابهام&#x200c;زدایی</DisambiguationCategory>
+		<DisambiguationCategory>همه صفحه&#x200c;های ابهام&#x200c;زدایی</DisambiguationCategory>
+
+		<DisambiguationTemplate>ابهام&#x200c;زدایی</DisambiguationTemplate>
+		<DisambiguationTemplate>رده ابهام&#x200c;زدایی</DisambiguationTemplate>
+
+		<RedirectIdentifier>تغییرمسیر</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
 </WikipediaLanguageList>

@@ -28,7 +28,7 @@ public class ProcessTranslation {
 
   	// this is the list of languages we consider for target translations, we will ignore the other
   	// languages
-  	private static List<String> targetLanguages = Arrays.asList("en", "fr", "de", "it", "es", "ar", "zh", "jp", "ru");
+  	private static List<String> targetLanguages = Arrays.asList("en", "fr", "de", "it", "es", "ar", "zh", "jp", "ru", "pt", "fa");
 
   	public ProcessTranslation(String lang) {
   		// init LMDB - the default usage of LMDB will ensure that the entries in the resulting 

@@ -198,7 +198,8 @@
 	</Language>
 
 	<Language code="fa" name="Farsi" localName="فارسی">
-		<RootCategory>درونمایه</RootCategory>
+		<!--RootCategory>درونمایه</RootCategory-->
+		<RootCategory>درون&#x200c;مایه</RootCategory>
 
 		<DisambiguationCategory>صفحه&#x200c;های_ابهام&#x200c;زدایی</DisambiguationCategory>
 		<DisambiguationCategory>رده&#x200c;های_ابهام&#x200c;زدایی</DisambiguationCategory>

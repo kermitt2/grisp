@@ -6,7 +6,7 @@ Translation information are not available anymore in the Wikipedia XML dump, so 
 
 ```console
 cd nerd-data
-mvn compile exec:exec -PbuildTranslation -Dlang="en" -Dinput="/somewhere/en/enwiki-latest-langlinks.sql.gz" -Doutput"somewhere/en/" 
+mvn compile exec:exec -PbuildTranslation -Dlang="en" -Dinput="/somewhere/en/enwiki-latest-langlinks.sql.gz" -Doutput="somewhere/en/" 
 ```
 
 The command line takes 3 arguments: 

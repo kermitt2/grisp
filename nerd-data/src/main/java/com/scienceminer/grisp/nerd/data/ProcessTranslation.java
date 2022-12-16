@@ -134,7 +134,9 @@ public class ProcessTranslation {
 		    							// check if this identifier is already indexed or not
 		    							try (Transaction txr = env.createReadTransaction()) {
 		    								val = string(db.get(txr, bytes(keyId)));
-		    							}
+		    							} /*catch(Excepion e) {
+		    								e.printStackTrace();
+		    							}*/
 		    							if (val == null) {
 		    								// also look at the temp stuff not yet aded
 		    								val = tempToBeAddedMap.get(keyId);
@@ -179,10 +181,15 @@ public class ProcessTranslation {
 	public static String convertSqlEntry(String translationElement) {
 		StringBuilder builder = new StringBuilder();
 		// input: (746,'ab','Азербаиџьан')
+		int startPos = 1;
+		if (!translationElement.startsWith("(")) {
+			// re-adjust start in case of shift in start pos
+			startPos = 0;
+		}
 		int nextPos1 = translationElement.indexOf(",");
 		if (nextPos1 == -1)
 			return null;
-		String pageId = translationElement.substring(1, nextPos1);
+		String pageId = translationElement.substring(startPos, nextPos1);
 		int nextPos2 = translationElement.indexOf(",'", nextPos1+1);
 		if (nextPos2 == -1)
 			return null;
@@ -193,8 +200,6 @@ public class ProcessTranslation {
 		if (!targetLanguages.contains(langId))
 			return null;
 		String translatedTitle = translationElement.substring(nextPos2+2, nextPos3);
-		// format: 5886651,m{'en,'Category:Dames Grand Cross of the Order of St John}
-		// 5886606,m{'pt,'Museu da Terra de Miranda}
 		if (translatedTitle.trim().length() == 0)
 			return null;
 		builder
@@ -211,6 +216,9 @@ public class ProcessTranslation {
 		Writer writer =  null;
 		try {
 			writer = new OutputStreamWriter(new FileOutputStream(outputCsvPath), "UTF8");
+
+			// format: 5886651,m{'en,'Category:Dames Grand Cross of the Order of St John}
+			// 5886606,m{'pt,'Museu da Terra de Miranda}
 
 			// iterate through the DB
 			try (Transaction tx = env.createReadTransaction()) {

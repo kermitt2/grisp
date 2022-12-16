@@ -27,7 +27,7 @@ Then install and build GRISP:
 ```console
 git clone https://github.com/kermitt2/grisp
 cd grisp
-./gradlew clean install 
+mvn clean install 
 ```
 
 ### Script for preparing the Wikidata and Wikipedia resources 

@@ -8,7 +8,7 @@ The sub-module `nerd-data` pre-processes the Wikipedia XML dumps and creates com
 
 The pre-processing is an adaptation of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing, which relies on Hadoop. The main Modifications include the usage of the [Sweble MediaWiki document parser](https://en.wikipedia.org/wiki/Sweble) for Wikipedia pages (the most comprehensive, reliable and fast MediaWiki parser following our tests, apart MediaWiki itself), a complete review of the compiled statistics, the usage of LMDB to avoid distributed data, additional extraction related to multilinguality and various speed optimization.
 
-The Wikipedia pre-processing supports current the Wikipedia dumps (May 2020) and was successfully tested with English, German, French, Spanish and Italian XML dumps. Japanese dump should also be well supported, see the branch `Japanese`. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
+The Wikipedia pre-processing supports current the Wikipedia dumps (2022) and was successfully tested with English, French, German, Italian, Spanish, Arabic, Mandarin, Russian, Japanese, Portuguese and Farsi XML dumps. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
 
 ### Preliminary install of entity-fishing and GRISP
 
@@ -54,10 +54,10 @@ For example:
 The above mentioned steps are realized successively by the scripts. By default all the languages will be covered, but you can change to a subset of languages by modifying the script at the following line:
 
 ```bash
-declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru")
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa")
 ```
 
-Note that English `"en"` at least is mandatory to further running entity-fishing. 
+Note that English `"en"` at least is mandatory to further running [entity-fishing](https://github.com/kermitt2/entity-fishing). 
 
 Be aware that the data path must have enough storage: as of April 2022, 70GB are needed for Wikidata dump and 50GB for all the language resources. To accomodate all resources, including the next Hadoop processing step, consider 150GB for the 9 languages. 
 
@@ -158,10 +158,9 @@ Note:
 - in entity-fishing the loading of these files is automatic when building the project or starting the service (if not present), be sure to indicate the path to these above files in the entity-fishing config files.
 
 
-
 ### More to come
 
-We considering generating more KB data to be mapped: geonames, geospecies, etc.
+We considering generating more KB data to be mapped: geonames, geospecies, etc. and better exploiting Wikidata labels and statements.
 
 ## Credits
 

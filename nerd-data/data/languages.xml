@@ -9,6 +9,8 @@
 
         <DisambiguationCategory>Disambiguation</DisambiguationCategory>
         <DisambiguationCategory>disambiguation</DisambiguationCategory>
+        <DisambiguationCategory>Disambiguation_categories</DisambiguationCategory>
+        <DisambiguationCategory>Disambiguation_pages</DisambiguationCategory>
         
         <DisambiguationTemplate>disambiguation</DisambiguationTemplate>
         <DisambiguationTemplate>disambig</DisambiguationTemplate>
@@ -30,6 +32,7 @@
 
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>Wikipedia_redirects</RedirectIdentifier>
     </Language>
 
 	<Language code="de" name="German" localName="Deutsch">
@@ -95,6 +98,7 @@
 
 		<DisambiguationCategory>Disambiguazione</DisambiguationCategory>
 		<DisambiguationCategory>Disambigua</DisambiguationCategory>
+		<DisambiguationCategory>Pagine_di_disambiguazione</DisambiguationCategory>
 		
 		<DisambiguationTemplate>disambigua</DisambiguationTemplate>
 		<DisambiguationTemplate>Disambigua</DisambiguationTemplate>
@@ -103,6 +107,7 @@
 
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>RINVIA</RedirectIdentifier>
 	</Language>
 
 	<Language code="ar" name="Arabic" localName="عربى">
@@ -177,6 +182,7 @@
 		<DisambiguationTemplate>Disambig</DisambiguationTemplate>
 
 		<RedirectIdentifier>Перенаправления</RedirectIdentifier>
+		<RedirectIdentifier>перенаправление</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECTION</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>
@@ -209,6 +215,60 @@
 		<DisambiguationTemplate>رده ابهام&#x200c;زدایی</DisambiguationTemplate>
 
 		<RedirectIdentifier>تغییرمسیر</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="uk" name="Ukrainian" localName="Українська">
+		<RootCategory>Головна</RootCategory>
+
+		<DisambiguationCategory>Багатозначні_терміни</DisambiguationCategory>
+		<DisambiguationCategory>Категорії_неоднозначності</DisambiguationCategory>
+
+		<DisambiguationTemplate>Disambig</DisambiguationTemplate>
+		<DisambiguationTemplate>disambig</DisambiguationTemplate>
+		<DisambiguationTemplate>Неоднозначність</DisambiguationTemplate>
+		<DisambiguationTemplate>DisambigG</DisambiguationTemplate>
+
+		<RedirectIdentifier>ПЕРЕНАПРАВЛЕННЯ</RedirectIdentifier>
+		<RedirectIdentifier>Коротка назва</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="sv" name="Swedish" localName="Svenska">
+		<RootCategory>Topp</RootCategory>
+
+		<DisambiguationCategory>Förgreningssidor</DisambiguationCategory>
+
+		<DisambiguationTemplate>förgrening</DisambiguationTemplate>
+		<DisambiguationTemplate>Förgrening</DisambiguationTemplate>
+
+		<RedirectIdentifier>OMDIRIGERING</RedirectIdentifier>
+		<RedirectIdentifier>Kategoriomdirigering</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="hi" name="Hindi" localName="हिन्दी">
+		<RootCategory>समग्र_विषय</RootCategory>
+
+		<DisambiguationCategory>बहुविकल्पी_शब्द</DisambiguationCategory>
+
+		<DisambiguationTemplate>बहुवि</DisambiguationTemplate>
+		<DisambiguationTemplate>बहुविकल्पी</DisambiguationTemplate>
+
+		<RedirectIdentifier>अनुप्रेषित</RedirectIdentifier>
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="bn" name="Bengali" localName="বাংলা">
+		<RootCategory>সূচীপত্র</RootCategory>
+
+		<DisambiguationCategory>দ্ব্যর্থতা_নিরসন_পাতা</DisambiguationCategory>
+
+		<DisambiguationTemplate>disambiguation</DisambiguationTemplate>
+		<DisambiguationTemplate>DISAMBIG</DisambiguationTemplate>
+		<DisambiguationTemplate>দ্ব্যর্থতা নিরসন</DisambiguationTemplate>
+
+		<RedirectIdentifier>পুননির্দেশ</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 	</Language>
 

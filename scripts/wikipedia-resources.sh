@@ -15,7 +15,7 @@ mvn=/opt/maven/bin/mvn
 
 ## Download all necessary resources from Wikidata/Wikipedia
 
-## Download wikidata (around 70GB in Feb. 2022)
+## Download wikidata (around 74GB in Dec. 2022)
 echo "Downloading latest Wikidata JSON dump"
 cd $data_path
 mkdir wikidata
@@ -25,7 +25,7 @@ wget -c https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2
 ## Download all the Wikipedia resources by language (a bit less than 50GB, in Feb. 2022 for the 9 indicated languages)
 
 ## declare an array variable
-declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa")
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa" "uk" "sv" "hi" "bn")
 
 ## now loop through the language array to download resources
 cd $data_path
@@ -37,6 +37,7 @@ do
     wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-pages-articles-multistream.xml.bz2
     wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-langlinks.sql.gz
     wget -c https://dumps.wikimedia.org/${i}wiki/latest/${i}wiki-latest-page_props.sql.gz
+    cd ..
 done
 
 ## loop through the language array to create Wikidata property files for each language
@@ -47,6 +48,7 @@ do
     echo "Generate Wikidata property file for language $i"
     cd ${i}
     wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%20%3FpropertyLabel%20WHERE%20%7B%0A%20%20%20%20%3Fproperty%20a%20wikibase%3AProperty%20.%0A%20%20%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22${i}%22%20.%0A%20%20%20%7D%0A%20%7D%0A%0A" -O wikidata-properties.json
+    cd ..
 done
 
 ## loop through the language array to create translation files for each target language

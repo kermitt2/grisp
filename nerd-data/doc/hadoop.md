@@ -187,6 +187,8 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-3.3.1
 
 ## Preparing the hdfs space:
 
+Note: you will probably encounter some issues for starting Hadoop, see [bellow](hadoop.md#common-issues-with-hadoop) for help.
+
 * Prepare the namenode:
 
 ```console
@@ -221,7 +223,7 @@ Note that the `**wiki-latest-pages-articles.xml` file must be passed **uncompres
 
 ## Common issues with Hadoop
 
-Starting hadoop might fail for various reasons, we try to cover here the most common ones:
+Starting hadoop commonly fails for various reasons, we try to cover here the most common ones:
 
 - password-less authentication is not configured on localhost:
 
@@ -248,6 +250,20 @@ Even if the `JAVA_HOME` is correctly set for the user, in the .bashrc or profile
 ```bash
 export JAVA_HOME=/usr/lib/jvm/<jdk folder>
 ```
+
+- Connection refused:
+
+```
+Call From **hostname**/127.0.1.1 to localhost:9000 failed on connection exception: java.net.ConnectException: Connection refused; For more details see:  http://wiki.apache.org/hadoop/ConnectionRefused
+```
+
+Check if you have already a process listening to port `:9000`:
+
+```
+sudo netstat -tnlp | grep :9000
+```
+
+If yes, you need to stop this indicated process - this is usually a YARN process that failed to stopped. 
 
 ## Building the hadoop job jar 
 

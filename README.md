@@ -54,12 +54,12 @@ For example:
 The above mentioned steps are realized successively by the scripts. By default all the languages will be covered, but you can change to a subset of languages by modifying the script at the following line:
 
 ```bash
-declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa")
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa" "uk" "sv" "hi" "bn")
 ```
 
 Note that English `"en"` at least is mandatory to further running [entity-fishing](https://github.com/kermitt2/entity-fishing). 
 
-Be aware that the data path must have enough storage: as of April 2022, 70GB are needed for Wikidata dump and 50GB for all the language resources. To accomodate all resources, including the next Hadoop processing step, consider 150GB for the 9 languages. 
+Be aware that the data path must have enough storage: as of April 2022, 74GB are needed for Wikidata dump and 70GB for all the language resources. To accomodate all resources, including the next Hadoop processing step, consider 200GB for all the languages. 
 
 ### Haddop processing of Wikipedia XML article dump files
 

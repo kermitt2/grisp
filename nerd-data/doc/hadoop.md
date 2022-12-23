@@ -6,6 +6,8 @@
 
 The processing of Wikpedia dump files uses Hadoop `3.*` (latest tested version is `3.3.1` from `2022-02-10`), which must be downloaded and installed according to your environment. The processing should still work with Hadoop `2`. In your Hadoop installation, some config files under `etc/hadoop/` might need to be adjusted for the task, we provide below our configuration files, but the spotted number can of course be adapted to take advantage of more CPU and memory for a more modern machine. 
 
+Please note that running Hadoop is not straightfoward and involves often fixing various setup and connection problems (even on very standard and basic Linux installation). The problems depends on the environment (e.g. Linux distribution) and OS version. See [bellow](hadoop.md#common-issues-with-hadoop) for common failures and help.
+
 ### Expected produced files
 
 For each language, there will be 12 generated csv files by this processing step. 
@@ -225,7 +227,7 @@ Note that the `**wiki-latest-pages-articles.xml` file must be passed **uncompres
 
 Starting hadoop commonly fails for various reasons, we try to cover here the most common ones:
 
-- password-less authentication is not configured on localhost:
+- **password-less authentication is not configured on localhost**:
 
 ```
 Starting namenodes on [localhost]
@@ -238,7 +240,7 @@ This can be solved by adding the ssh key of the machine to itself:
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 ```
 
-- JAVA_HOME not found
+- **JAVA_HOME not found**:
 
 ```
 Starting namenodes on [localhost]
@@ -251,7 +253,7 @@ Even if the `JAVA_HOME` is correctly set for the user, in the .bashrc or profile
 export JAVA_HOME=/usr/lib/jvm/<jdk folder>
 ```
 
-- Connection refused:
+- **Connection refused**:
 
 ```
 Call From **hostname**/127.0.1.1 to localhost:9000 failed on connection exception: java.net.ConnectException: Connection refused; For more details see:  http://wiki.apache.org/hadoop/ConnectionRefused
@@ -263,7 +265,40 @@ Check if you have already a process listening to port `:9000`:
 sudo netstat -tnlp | grep :9000
 ```
 
-If yes, you need to stop this indicated process - this is usually a YARN process that failed to stopped. 
+If yes, you need to stop this indicated process - this is usually a YARN zombi process that failed to stopped. 
+
+- **Connextion to ResourceManager fails**:
+
+When starting some Hadoop job, you might see:
+
+```
+2022-12-21 16:10:03,762 INFO client.DefaultNoHARMFailoverProxyProvider: Connecting to ResourceManager at /0.0.0.0:8032
+2022-12-21 16:10:04,810 INFO ipc.Client: Retrying connect to server: 0.0.0.0/0.0.0.0:8032. Already tried 0 time(s); retry policy is RetryUpToMaximumCountWithFixedSleep(maxRetries=10, sleepTime=1000 MILLISECONDS)
+```
+
+First, just to be sure, check that you have started YARN:
+
+```
+sbin/start-yarn.sh
+```
+
+To solve this problem, you usually need to indicate in the `etc/hadoop/yarn-site.xml` configuration file:
+
+```xml
+<property>
+  <name>yarn.resourcemanager.address</name>
+  <value>127.0.0.1:8032</value>
+</property>
+<property>
+  <name>yarn.resourcemanager.scheduler.address</name>
+  <value>127.0.0.1:8030</value>
+</property>
+<property>
+  <name>yarn.resourcemanager.resource-tracker.address</name>
+  <value>127.0.0.1:8031</value>
+</property>
+```
+
 
 ## Building the hadoop job jar 
 
@@ -286,7 +321,7 @@ hadoop-3.3.1/sbin/start-yarn.sh
 * English (path in HDFS, except the jar):
 
 ```console
-hadoop-3.3.1/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/enwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/enwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
 ```
 
 After a few hours, when done, getting the csv files for the English language:
@@ -298,7 +333,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/e
 * French:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/frwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/frwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
 ```
 
 Getting the csv files for French:
@@ -310,7 +345,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/f
 * German:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/dewiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/dewiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
 ```
 
 Getting the csv files for German: 
@@ -322,7 +357,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/d
 * Italian:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/itwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml it /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/itwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml it /user/lopez/working /user/lopez/output
 ```
 
 Getting the csv files for Italian:
@@ -334,7 +369,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/i
 * Spanish:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/eswiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml es /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/eswiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml es /user/lopez/working /user/lopez/output
 ```
 Getting the csv files for Spanish:
 

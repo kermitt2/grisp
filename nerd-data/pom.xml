@@ -409,6 +409,10 @@
 			      <groupId>tomcat</groupId>
 			      <artifactId>jasper-compiler</artifactId>
 			    </exclusion>
+                <exclusion> 
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
 			  </exclusions>
 		</dependency>
 		<!-- hadoop-0.20.2-core.jar -->

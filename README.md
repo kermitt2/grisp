@@ -4,9 +4,9 @@ Pre-process the Language and Knowledge Base data for loading into [entity-fishin
 
 ## Create entity-fishing Wikipedia and Wikidata preprocessed data
 
-The sub-module `nerd-data` pre-processes the Wikipedia XML dumps and creates compiled data to be used by [entity-fishing](https://github.com/kermitt2/entity-fishing), a machine learning tool for extracting and disambiguating Wikidata entities in text and PDF at scale. 
+The sub-module `nerd-data` pre-processes the Wikidata JSON and Wikipedia XML dumps to create compiled data to be used by [entity-fishing](https://github.com/kermitt2/entity-fishing), a machine learning tool for extracting and disambiguating Wikidata entities in text and PDF at scale. 
 
-The pre-processing is an adaptation of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) XML dump processing, which relies on Hadoop. The main Modifications include the usage of the [Sweble MediaWiki document parser](https://en.wikipedia.org/wiki/Sweble) for Wikipedia pages (the most comprehensive, reliable and fast MediaWiki parser following our tests, apart MediaWiki itself), a complete review of the compiled statistics, the usage of LMDB to avoid distributed data, additional extraction related to multilinguality and various speed optimization.
+The pre-processing is an adaptation of the [WikipediaMiner 2.0](https://github.com/dnmilne/wikipediaminer) for the XML dump processing, which relies on Hadoop. The main Modifications include the usage of the [Sweble MediaWiki document parser](https://en.wikipedia.org/wiki/Sweble) for Wikipedia pages (the most comprehensive, reliable and fast MediaWiki parser following our tests, apart MediaWiki itself), a complete review of the compiled statistics, processing of Wikidata dump, the usage of LMDB to avoid distributed data, additional extraction related to multilinguality and various speed optimization.
 
 The Wikipedia pre-processing supports current the Wikipedia dumps (2022) and was successfully tested with English, French, German, Italian, Spanish, Arabic, Mandarin, Russian, Japanese, Portuguese and Farsi XML dumps. The Wikipedia XML dumps and additional required files are available at the Wikimedia Downloads [page](https://dumps.wikimedia.org/), as well as the Wikidata JSON dump.
 
@@ -63,7 +63,9 @@ Be aware that the data path must have enough storage: as of April 2022, 74GB are
 
 ### Haddop processing of Wikipedia XML article dump files
 
-The parsing and processing of the Wikipedia XML article dump files is computationally expensive and we are using an Hadoop process for this purpose. A pseudo distributed mode (just running the process on one machine with several CPU) is enough for reasonnable processing time. A "real" distributed mode has not been tested for the moment and is thus currently not supported. 
+Once all the required resources have been downloaded via the provided script, see above, we can run the pre-processing of the Wikipedia dumps.
+
+The parsing and processing of the Wikipedia XML article dump files is computationally expensive, it has to be parallelized and we are using an Hadoop process for this purpose. A pseudo distributed mode (just running the process on one machine with several CPU) is enough for reasonnable processing time. A "real" distributed mode has not been tested for the moment and is thus currently not supported. 
 
 Create the hadoop job jar:
 
@@ -155,7 +157,7 @@ Note:
 
 - the wikidata identifiers csv file `wikidataIds.csv` and the full wikidata JSON dump file `latest-all.json.bz2` are under a `wikidata` sub-directory while the wikidata language-specific Wikidata mapping files `wikidata.txt` and `wikidata-properties.json` are installed in each language-specific sub-directory,
 
-- in entity-fishing the loading of these files is automatic when building the project or starting the service (if not present), be sure to indicate the path to these above files in the entity-fishing config files.
+- in entity-fishing the loading of these files is automatic when building the project or starting the service (if not present), be sure to indicate the path to these above generated files in the entity-fishing config files.
 
 
 ### More to come
@@ -171,4 +173,3 @@ Many thanks to David Milne for the Wikipedia XML dump processing. The present pr
 GRISP is distributed under [GPL 3.0 license](https://www.gnu.org/licenses/gpl-3.0.html). 
 
 Contact: Patrice Lopez (<patrice.lopez@science-miner.com>)
-

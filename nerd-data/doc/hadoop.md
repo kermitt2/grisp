@@ -208,11 +208,11 @@ hadoop-3.3.1/bin/hdfs dfs -mkdir /user/lopez
 
 hadoop-3.3.1/bin/hdfs dfs -put ~/grisp/nerd-data/data/languages.xml /user/lopez/
 
-hadoop-3.3.1/bin/hdfs dfs -put /mnt/data/wikipedia/latest/enwiki-latest-pages-articles-multistream.xml /user/lopez/
+hadoop-3.3.1/bin/hdfs dfs -put /mnt/data/wikipedia/latest/en/enwiki-latest-pages-articles-multistream.xml /user/lopez/
 
-hadoop-3.3.1/bin/hdfs dfs -put /mnt/data/wikipedia/latest/frwiki-latest-pages-articles-multistream.xml /user/lopez/
+hadoop-3.3.1/bin/hdfs dfs -put /mnt/data/wikipedia/latest/fr/frwiki-latest-pages-articles-multistream.xml /user/lopez/
 
-hadoop-3.3.1/bin/hdfs dfs -put /mnt/data/wikipedia/latest/dewiki-latest-pages-articles-multistream.xml /user/lopez/
+hadoop-3.3.1/bin/hdfs dfs -put /mnt/data/wikipedia/latest/de/dewiki-latest-pages-articles-multistream.xml /user/lopez/
 
 ...
 

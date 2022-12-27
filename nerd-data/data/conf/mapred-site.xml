@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+  <!--property>
+    <name>mapred.child.java.opts</name>
+    <value>-Xmx1024m</value>
+  </property--> <!-- in case we need more memory in the main hadoop job, it should not be the case -->
+  <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+  </property>
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>3072</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>8192</value> <!-- single reduce job ! -->
+  </property>
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx1024m</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.java.opts</name>
+    <value>-Xmx8192m</value>
+  </property>
+  
+  <property>
+    <name>mapreduce.job.ubertask.enable</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>mapreduce.tasktracker.map.tasks.maximum</name>
+    <value>4</value>
+  </property>
+  <property>
+    <name>mapreduce.tasktracker.reduce.tasks.maximum</name>
+    <value>1</value>
+  </property> <!-- single reduce job ! -->
+  <property>
+    <name>mapred.reduce.slowstart.completed.maps</name>
+    <value>1</value>
+  </property>
+
+  <property>
+    <name>mapred.task.timeout</name>
+    <value>1800000</value>
+  </property> <!-- timout 30 minutes, safer for building the largest LMDB caches -->
+
+  <property>
+    <name>yarn.app.mapreduce.am.env</name>
+    <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
+  </property>
+  <property>
+    <name>mapreduce.map.env</name>
+    <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.env</name>
+    <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
+  </property>
+
+</configuration>

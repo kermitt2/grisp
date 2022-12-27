@@ -165,4 +165,25 @@ public class DumpLinkParserTest {
 		}
 	}
 
+	@Test
+	public void testLinkParserCategorySv() {
+		try {
+			SiteInfo si = new SiteInfo(new Path("src/test/resources/siteInfoSv.xml"));
+			dumpLinkParser = new DumpLinkParser(si);
+
+			List<String> links = Arrays.asList("Kategori:Topp", "Kategori:Amager", "Kategori:Öar i Region Hovedstaden");
+			for(String link : links) {
+				try {
+					DumpLink dumpLink = dumpLinkParser.parseLink(link);
+					System.out.println(dumpLink.toString());
+				} catch (Exception e) {
+					System.out.println("Could not parse link markup '" + link + "'");
+					e.printStackTrace();
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

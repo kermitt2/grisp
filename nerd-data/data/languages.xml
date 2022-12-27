@@ -236,6 +236,7 @@
 
 	<Language code="sv" name="Swedish" localName="Svenska">
 		<RootCategory>Topp</RootCategory>
+		<!--RootCategory>Artiklar</RootCategory-->
 
 		<DisambiguationCategory>Förgreningssidor</DisambiguationCategory>
 

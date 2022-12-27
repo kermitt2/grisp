@@ -55,13 +55,12 @@ public class CategoryLinkSummaryStep extends Configured implements Tool {
 
 		conf.setInputFormat(TextInputFormat.class);
 		switch (linksToSummarize) {
-		
-		case categoryParent: 
-			FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense) + "/" + LabelSensesStep.Output.tempCategoryParent.name() + "*"));
-			break ;
-		case articleParent: 
-			FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense) + "/" + LabelSensesStep.Output.tempArticleParent.name() + "*"));
-			break ;	
+			case categoryParent: 
+				FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense) + "/" + LabelSensesStep.Output.tempCategoryParent.name() + "*"));
+				break ;
+			case articleParent: 
+				FileInputFormat.setInputPaths(conf, new Path(conf.get(DumpExtractor.KEY_OUTPUT_DIR) + "/" + DumpExtractor.getDirectoryName(ExtractionStep.labelSense) + "/" + LabelSensesStep.Output.tempArticleParent.name() + "*"));
+				break ;	
 		}
 		
 		//set up output

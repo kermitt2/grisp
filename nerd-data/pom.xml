@@ -543,6 +543,11 @@
 				</exclusion>
 			</exclusions>	
 		</dependency>
+		<dependency>
+		  	<groupId>org.grobid</groupId>
+		  	<artifactId>grobid-core</artifactId>
+		  	<version>0.7.2</version>
+		</dependency>
 
 	    <!-- for some mysterious reason, hadoop requires this instead of the default xalan (?) -->
 	    <dependency>

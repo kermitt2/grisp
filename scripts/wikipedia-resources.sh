@@ -51,6 +51,10 @@ do
     cd ..
 done
 
+## get word and entity embeddings - for the moment only for French
+cd $data_path
+wget -c -O fr/embeddings.quantized.bz2 https://wikipedia2vec.s3.amazonaws.com/models/fr/2018-04-20/frwiki_20180420_300d.txt.bz2
+
 ## loop through the language array to create translation files for each target language
 echo "Creating translation files for each language..."
 cd $grisp_install

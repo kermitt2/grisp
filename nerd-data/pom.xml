@@ -8,7 +8,7 @@
 	<groupId>com.scienceminer.grisp.nerd-data</groupId>
 	<artifactId>com.scienceminer.grisp.nerd-data</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	
 	<name>NERD-data</name>
 	<description>Data creation for entity-fishing</description>
@@ -310,7 +310,7 @@
 		<dependency>
 			<groupId>com.scienceminer.nerd</groupId>
 			<artifactId>entity-fishing</artifactId>
-			<version>0.0.5</version>
+			<version>0.0.6</version>
             <exclusions>
                 <exclusion> 
                     <groupId>org.slf4j</groupId>

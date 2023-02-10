@@ -4,7 +4,7 @@
 	<groupId>com.scienceminer.grisp</groupId>
 	<artifactId>grisp-parent</artifactId>
 	<name>${project.artifactId}</name>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<packaging>pom</packaging>
 
     <!--scm>

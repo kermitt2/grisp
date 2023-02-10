@@ -30,6 +30,8 @@ cd grisp
 mvn clean install 
 ```
 
+**Note:** current latest versions of GRISP and [entity-fishing](https://github.com/kermitt2/entity-fishing) are `0.0.6`.
+
 ### Script for preparing the Wikidata and Wikipedia resources 
 
 A script is available to:

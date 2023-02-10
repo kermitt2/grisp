@@ -308,7 +308,7 @@ Under `~/grisp/nerd-data`:
 mvn clean package
 ```
 
-will create job jar under `./target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar` to be used below.
+will create job jar under `./target/com.scienceminer.grisp.nerd-data-0.0.6-job.jar` to be used below.
 
 ## Launching hadoop process: 
 
@@ -321,7 +321,7 @@ hadoop-3.3.1/sbin/start-yarn.sh
 * English (path in HDFS, except the jar):
 
 ```console
-hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/enwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.6-job.jar /user/lopez/enwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml en /user/lopez/working /user/lopez/output
 ```
 
 After a few hours, when done, getting the csv files for the English language:
@@ -333,7 +333,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/e
 * French:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/frwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.6-job.jar /user/lopez/frwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml fr /user/lopez/working /user/lopez/output
 ```
 
 Getting the csv files for French:
@@ -345,7 +345,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/f
 * German:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/dewiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.6-job.jar /user/lopez/dewiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml de /user/lopez/working /user/lopez/output
 ```
 
 Getting the csv files for German: 
@@ -357,7 +357,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/d
 * Italian:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/itwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml it /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.6-job.jar /user/lopez/itwiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml it /user/lopez/working /user/lopez/output
 ```
 
 Getting the csv files for Italian:
@@ -369,7 +369,7 @@ hadoop-3.3.1/bin/hdfs dfs -get /user/lopez/output/* /mnt/data/wikipedia/latest/i
 * Spanish:
 
 ```console
-hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.5-job.jar /user/lopez/eswiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml es /user/lopez/working /user/lopez/output
+hadoop-3.3.1/bin/hadoop jar ~/grisp/nerd-data/target/com.scienceminer.grisp.nerd-data-0.0.6-job.jar /user/lopez/eswiki-latest-pages-articles-multistream.xml /user/lopez/languages.xml es /user/lopez/working /user/lopez/output
 ```
 Getting the csv files for Spanish:
 

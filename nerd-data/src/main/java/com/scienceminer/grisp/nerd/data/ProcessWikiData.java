@@ -1,5 +1,7 @@
 package com.scienceminer.grisp.nerd.data;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.io.*;
@@ -50,7 +52,7 @@ public class ProcessWikiData {
   	private static List<String> targetLanguages = 
   		Arrays.asList("en","fr", "de", "es", "it", "ar", "zh", "ja", "ru", "pt", "fa", "bn", "hi", "sv", "uk");
 
-  	public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
+	  public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
   		try {
   			this.pathWikidataJSONPath = pathWikidataJSONPath;
 

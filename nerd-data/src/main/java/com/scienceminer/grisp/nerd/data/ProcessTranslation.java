@@ -1,16 +1,21 @@
 package com.scienceminer.grisp.nerd.data;
 
-import java.util.*;    
-import java.io.*;    
-import java.util.zip.GZIPInputStream;
-
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.StringBuilderWriter;
-//import org.apache.commons.io.input.BoundedInputStream;
-import org.apache.commons.io.IOUtils;
-
 import org.fusesource.lmdbjni.*;
-import static org.fusesource.lmdbjni.Constants.*;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static org.fusesource.lmdbjni.Constants.bytes;
+import static org.fusesource.lmdbjni.Constants.string;
 
 /**
  * This class processes the latest Wikipedia cross-language files (.sql) into
@@ -213,10 +218,10 @@ public class ProcessTranslation {
 	}
 
 	private void writeTranslationsCsv(String outputCsvPath) {
-		System.out.println("Outputing translations under " + outputCsvPath);
+		System.out.println("Outputting translations under " + outputCsvPath);
 		Writer writer =  null;
 		try {
-			writer = new OutputStreamWriter(new FileOutputStream(outputCsvPath), "UTF8");
+			writer = new OutputStreamWriter(Files.newOutputStream(Paths.get(outputCsvPath)), StandardCharsets.UTF_8);
 
 			// format: 5886651,m{'en,'Category:Dames Grand Cross of the Order of St John}
 			// 5886606,m{'pt,'Museu da Terra de Miranda}

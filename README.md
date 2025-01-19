@@ -35,7 +35,7 @@ mvn clean install
 ### Script for preparing the Wikidata and Wikipedia resources 
 
 A script is available to:
-* download the different resources needed fromn Wikidata and Wikipedia for a set of specified languages
+* download the different resources needed from Wikidata and Wikipedia for a set of specified languages
 * create cvs translation files between languages
 * generate Wikidata property labels for each language
 * creating Wikidata knowledge base backbone and language-specific mapping with Wikidata entities
@@ -53,7 +53,8 @@ For example:
 ./wikipedia-resources.sh /home/lopez/grisp/ /media/lopez/data/wikipedia/latest/
 ```
 
-The above mentioned steps are realized successively by the scripts. By default all the languages will be covered, but you can change to a subset of languages by modifying the script at the following line:
+The steps mentioned above are realized successively by the scripts. 
+By default, all the languages will be covered, but you can change to a subset of languages by modifying the script at the following line:
 
 ```bash
 declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa" "uk" "sv" "hi" "bn")
@@ -63,7 +64,7 @@ Note that English `"en"` at least is mandatory to further running [entity-fishin
 
 Be aware that the data path must have enough storage: as of April 2022, 74GB are needed for Wikidata dump and 70GB for all the language resources. To accomodate all resources, including the next Hadoop processing step, consider 200GB for all the languages. 
 
-### Haddop processing of Wikipedia XML article dump files
+### Hadoop processing of Wikipedia XML article dump files
 
 Once all the required resources have been downloaded via the provided script, see above, we can run the pre-processing of the Wikipedia dumps.
 

@@ -37,6 +37,7 @@
 
 	<Language code="de" name="German" localName="Deutsch">
 		<RootCategory>!Hauptkategorie</RootCategory>
+		<RootCategory>Übersicht</RootCategory>
 		<!--RootCategory>Sachsystematik</RootCategory-->
 
 		<DisambiguationCategory>Begriffsklärung</DisambiguationCategory>
@@ -271,6 +272,19 @@
 
 		<RedirectIdentifier>পুননির্দেশ</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="nl" name="Dutch" localName="Nederlands">
+		<RootCategory>Alles</RootCategory>
+
+		<DisambiguationCategory>Doorverwijspagina</DisambiguationCategory>
+		<DisambiguationTemplate>dp</DisambiguationTemplate>
+
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>R</RedirectIdentifier>
+		<RedirectIdentifier>REFERRAL</RedirectIdentifier>
+		<RedirectIdentifier>DOORVERWIJZING</RedirectIdentifier>
 	</Language>
 
 </WikipediaLanguageList>

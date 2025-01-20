@@ -99,6 +99,7 @@
 
 		<DisambiguationCategory>Disambiguazione</DisambiguationCategory>
 		<DisambiguationCategory>Disambigua</DisambiguationCategory>
+		<DisambiguationCategory>Nota disambigua</DisambiguationCategory>
 		<DisambiguationCategory>Pagine_di_disambiguazione</DisambiguationCategory>
 		
 		<DisambiguationTemplate>disambigua</DisambiguationTemplate>
@@ -279,6 +280,9 @@
 
 		<DisambiguationCategory>Doorverwijspagina</DisambiguationCategory>
 		<DisambiguationTemplate>dp</DisambiguationTemplate>
+		<DisambiguationTemplate>Dp</DisambiguationTemplate>
+		<DisambiguationTemplate>dpintro</DisambiguationTemplate>
+		<DisambiguationTemplate>Dpintro</DisambiguationTemplate>
 
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
 		<RedirectIdentifier>Redirect</RedirectIdentifier>

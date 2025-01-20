@@ -77,11 +77,15 @@ public class ProcessTranslation {
 		InputStream inputStream = null;
 		try {
 			// open file
-			inputStream = new FileInputStream(inputSqlPath);
+			inputStream = Files.newInputStream(Paths.get(inputSqlPath));
+			BufferedReader reader = null;
 			if (inputSqlPath.endsWith(".gz")) {
-				inputStream = new GZIPInputStream(inputStream);
-			}			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream), 8192);
+				CompressorInputStream compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(inputStream);
+				reader = new BufferedReader(new InputStreamReader(compressorInputStream), 8192);
+			} else {
+				reader = new BufferedReader(new InputStreamReader(inputStream), 8192);
+			}
+
 
 			final String insertString = "INSERT INTO `langlinks` VALUES ("; 
 			String line = null;

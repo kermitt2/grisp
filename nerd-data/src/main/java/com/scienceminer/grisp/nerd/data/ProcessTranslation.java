@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.zip.GZIPInputStream;
 
 import static org.fusesource.lmdbjni.Constants.bytes;
 import static org.fusesource.lmdbjni.Constants.string;
@@ -77,7 +78,7 @@ public class ProcessTranslation {
 		InputStream inputStream = null;
 		try {
 			// open file
-			inputStream = new FileInputStream(inputSqlPath);
+			inputStream = Files.newInputStream(Paths.get(inputSqlPath));
 			if (inputSqlPath.endsWith(".gz")) {
 				inputStream = new GZIPInputStream(inputStream);
 			}			

@@ -85,3 +85,24 @@ wget "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fproperty%2
 ```
 
 Just modify the language code in the url for other languages. Put all these language-specific Wikidata property naming into their corresponding language-specific data directory.
+
+
+### Add new languages
+
+To add new languages requires a few changes in the configuration and the code. 
+
+1. Update the file `languages.xml`. The file needs to have the following information:
+   - RootCategory: Open a random category (at the end of a Wikipedia page) and navigate up to the top category 
+   - DisambiguationCategory: take `Wikipedia:Content` from the english wikipedia and check the `translation` in the target language
+   - DisambiguationTemplate, RedirectIdentifier: Usually in the page `Help:Disambiguate` corresponding translation there are information about the templates. Editing a disambiguation page usually contains such information. 
+
+2. The new language code needs to be added in the following files/classes:
+   - `wikipedia-resources.sh`
+   - `ProcessTranslation.java`
+   - `ProcessWikidata.java`
+
+3. Configure the Mediawiki parser for the new language pages:
+   - **NOTE**: The parser is located in the `entity-fishing` project (it's a dependency for GRISP), under https://github.com/kermitt2/entity-fishing/tree/master/src/main/java/com/scienceminer/nerd/utilities/mediaWiki
+   - This classes describe the namespaces used for this language. Information from the siteinfo element are at the beginning of the Wikipedia XML dump files for this language. E.g. https://github.com/kermitt2/entity-fishing/blob/master/src/main/java/com/scienceminer/nerd/utilities/mediaWiki/DefaultConfigEnWp.java#L18
+   - Then test the parser with a couple of articles for this language (as done in entity-fishing). 
+   - When it works, build entity-fishing and place the jar file under `lib/com/scienceminer/entity-fishing/0.0.6/` in GRISP.

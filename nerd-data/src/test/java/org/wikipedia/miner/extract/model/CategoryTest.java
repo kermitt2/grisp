@@ -1,30 +1,18 @@
 package org.wikipedia.miner.extract.model;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
-import java.io.*;
-import java.util.*;
-
-import org.apache.commons.lang.StringUtils;
+import com.scienceminer.nerd.kb.model.Page.PageType;
+import com.scienceminer.nerd.kb.model.hadoop.*;
+import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.record.CsvRecordInput;
 import org.junit.Before;
 import org.junit.Test;
-import org.wikipedia.miner.extract.util.*;
+import org.wikipedia.miner.extract.util.PagesByTitleCache;
+import org.wikipedia.miner.extract.util.SiteInfo;
 
-import org.apache.hadoop.fs.Path;
-import java.io.*;
-import java.util.*;
-
-import org.apache.hadoop.fs.*;
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.conf.*;
-import org.apache.hadoop.record.CsvRecordInput;
-
-import com.scienceminer.nerd.kb.model.hadoop.*;
-import com.scienceminer.nerd.kb.model.Page.PageType;
-import com.scienceminer.nerd.utilities.mediaWiki.MediaWikiParser;
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.List;
 
 public class CategoryTest {
 
@@ -32,7 +20,18 @@ public class CategoryTest {
 	private MediaWikiParser stripper = null;
 	private PagesByTitleCache pagesByTitle = null;
 
-	//@Before
+	/**
+	 * This test can be updated with the new language that has been added, to verify that everything will work in hadoop
+	 *
+	 */
+	@Test
+	public void testSetup() {
+		MediaWikiParser parser = MediaWikiParser.getInstance();
+
+		parser.toTextWithInternalLinksAndCategoriesOnly("page", "nl");
+	}
+
+//	@Before
 	public void setUp() {
 		try {
 			//LanguageConfiguration lc = new LanguageConfiguration("en", new Path("src/test/resources/languages.xml"));
@@ -48,7 +47,7 @@ public class CategoryTest {
 		}
 	}
 
-	//@Test
+//	@Test
 	public void testCategoryCsvPage() {
 		try {
 			List<String> lines = Arrays.asList("10,'AccessibleComputing,2,0", 

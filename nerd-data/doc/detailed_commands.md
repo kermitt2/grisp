@@ -106,3 +106,4 @@ To add new languages requires a few changes in the configuration and the code.
    - This classes describe the namespaces used for this language. Information from the siteinfo element are at the beginning of the Wikipedia XML dump files for this language. E.g. https://github.com/kermitt2/entity-fishing/blob/master/src/main/java/com/scienceminer/nerd/utilities/mediaWiki/DefaultConfigEnWp.java#L18
    - Then test the parser with a couple of articles for this language (as done in entity-fishing). 
    - When it works, build entity-fishing and place the jar file under `lib/com/scienceminer/entity-fishing/0.0.6/` in GRISP.
+   - Discussion on this topic [here](https://github.com/kermitt2/grisp/issues/15).

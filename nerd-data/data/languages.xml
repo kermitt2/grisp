@@ -37,7 +37,7 @@
 
 	<Language code="de" name="German" localName="Deutsch">
 		<RootCategory>!Hauptkategorie</RootCategory>
-		<RootCategory>Übersicht</RootCategory>
+<!--		<RootCategory>Übersicht</RootCategory>-->
 		<!--RootCategory>Sachsystematik</RootCategory-->
 
 		<DisambiguationCategory>Begriffsklärung</DisambiguationCategory>

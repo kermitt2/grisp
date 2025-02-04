@@ -15,7 +15,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<avro.version>1.7.5</avro.version>
+		<avro.version>1.11.4</avro.version>
 		<lmdbjni.version>0.4.6</lmdbjni.version>
 
 		<!-- placeholder for exec arguments -->

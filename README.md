@@ -57,7 +57,7 @@ The steps mentioned above are realized successively by the scripts.
 By default, all the languages will be covered, but you can change to a subset of languages by modifying the script at the following line:
 
 ```bash
-declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa" "uk" "sv" "hi" "bn", "nl")
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa" "uk" "sv" "hi" "bn" "nl")
 ```
 
 Note that English `"en"` at least is mandatory to further running [entity-fishing](https://github.com/kermitt2/entity-fishing). 

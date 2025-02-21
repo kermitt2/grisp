@@ -102,4 +102,35 @@ public class DumpPageParserTest {
         }
     }
 
+    @Test
+    public void testPageParserNL() {
+        try {
+            this.setUp("nl");
+
+            String markup = FileUtils.readFileToString(new File("src/test/resources/Artiklar.xml"), "UTF-8");
+            DumpPage page = dumpPageParser.parsePage(markup);
+
+            // should not be null because category page
+            assertNotNull(page);
+
+            String localTitle = page.getTitle();
+            assertNotNull(localTitle);
+            System.out.println("page title: " + localTitle);
+
+            // test capture of links
+            String localMarkup = page.getMarkup();
+
+            System.out.println("page localMarkup: " + localMarkup);
+
+            localMarkup = stripper.toTextWithInternalLinksAndCategoriesOnly(localMarkup, "sv");
+
+            System.out.println("stripped localMarkup: " + localMarkup);
+
+            assertNotNull(localMarkup);
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

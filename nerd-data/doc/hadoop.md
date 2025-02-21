@@ -189,7 +189,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/home/lopez/tools/hadoop/hadoop-3.3.1
 
 ## Preparing the hdfs space:
 
-Note: you will probably encounter some issues for starting Hadoop, see [bellow](hadoop.md#common-issues-with-hadoop) for help.
+Note: you will probably encounter some issues for starting Hadoop, see [below](hadoop.md#common-issues-with-hadoop) for help.
 
 * Prepare the namenode:
 
@@ -299,6 +299,8 @@ To solve this problem, you usually need to indicate in the `etc/hadoop/yarn-site
 </property>
 ```
 
+- **JAR Job file is cached**:
+It is possible that the JAR Job file is cached by hadoop, renaming the file usually should solve the problem.
 
 ## Building the hadoop job jar 
 

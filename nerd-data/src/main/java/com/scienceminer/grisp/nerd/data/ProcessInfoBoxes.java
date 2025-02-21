@@ -1,6 +1,9 @@
 package com.scienceminer.grisp.nerd.data;
 
-import java.util.*;    
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.io.*;    
 import java.math.BigInteger;
 
@@ -227,7 +230,7 @@ public class ProcessInfoBoxes {
 	private void write(String outputPath) {
 		Writer writer =  null;
 		try {
-			writer = new OutputStreamWriter(new FileOutputStream(outputPath), "UTF8");
+			writer = new OutputStreamWriter(Files.newOutputStream(Paths.get(outputPath)), StandardCharsets.UTF_8);
 			// iterate through the DB
 			try (Transaction tx = env.createReadTransaction()) {
 				int nbWritten = 0;

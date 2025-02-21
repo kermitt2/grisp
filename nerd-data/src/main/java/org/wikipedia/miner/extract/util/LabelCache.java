@@ -1,6 +1,7 @@
 package org.wikipedia.miner.extract.util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
@@ -117,7 +118,7 @@ public class LabelCache {
 					bytesRead = bytesRead + line.length() + 1 ;
 					tracker.update(bytesRead) ;
 					try {
-						CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream(line.getBytes("UTF8"))) ;
+						CsvRecordInput cri = new CsvRecordInput(new ByteArrayInputStream(line.getBytes(StandardCharsets.UTF_8))) ;
 						String labelText = cri.readString("labelText");
 						if (labelText.length() < 500) {
 							db.put(txw, bytes(labelText), bytes("1"));

@@ -1,22 +1,14 @@
 package com.scienceminer.grisp.nerd.mapping;
 
-import java.util.*;
-import java.util.zip.GZIPInputStream;
-import java.io.*;    
-import java.math.BigInteger;
-
-import com.scienceminer.nerd.disambiguation.*;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.commons.io.input.BoundedInputStream;
-import org.apache.commons.io.IOUtils;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.node.*;
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Mapping UAT (https://github.com/astrothesaurus/UAT) to Wikidata via (N)ERD

@@ -1,5 +1,7 @@
 package com.scienceminer.grisp.nerd.data;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.io.*;
@@ -47,10 +49,10 @@ public class ProcessWikiData {
 
   	// this is the list of languages we consider for target translations, we will ignore the other
   	// languages
-  	private static List<String> targetLanguages = 
-  		Arrays.asList("en","fr", "de", "es", "it", "ar", "zh", "ja", "ru", "pt", "fa", "bn", "hi", "sv", "uk");
+  	private static final List<String> targetLanguages =
+  		Arrays.asList("en", "fr", "de", "es", "it", "ar", "zh", "ja", "ru", "pt", "fa", "bn", "hi", "sv", "uk", "nl");
 
-  	public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
+	  public ProcessWikiData(String pathWikidataJSONPath, String pathLanguagePropsDir) {
   		try {
   			this.pathWikidataJSONPath = pathWikidataJSONPath;
 
@@ -121,7 +123,7 @@ public class ProcessWikiData {
 		int nbTotalAdded = 0;
 		try {
 			// open file
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pathWikidataJSONPath));
+			BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(Paths.get(pathWikidataJSONPath)));
 			CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
 			reader = new BufferedReader(new InputStreamReader(input));
 

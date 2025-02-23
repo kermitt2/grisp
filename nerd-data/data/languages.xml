@@ -37,6 +37,7 @@
 
 	<Language code="de" name="German" localName="Deutsch">
 		<RootCategory>!Hauptkategorie</RootCategory>
+<!--		<RootCategory>Übersicht</RootCategory>-->
 		<!--RootCategory>Sachsystematik</RootCategory-->
 
 		<DisambiguationCategory>Begriffsklärung</DisambiguationCategory>
@@ -98,6 +99,7 @@
 
 		<DisambiguationCategory>Disambiguazione</DisambiguationCategory>
 		<DisambiguationCategory>Disambigua</DisambiguationCategory>
+		<DisambiguationCategory>Nota disambigua</DisambiguationCategory>
 		<DisambiguationCategory>Pagine_di_disambiguazione</DisambiguationCategory>
 		
 		<DisambiguationTemplate>disambigua</DisambiguationTemplate>
@@ -271,6 +273,23 @@
 
 		<RedirectIdentifier>পুননির্দেশ</RedirectIdentifier>
 		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+	</Language>
+
+	<Language code="nl" name="Dutch" localName="Nederlands">
+		<RootCategory>Alles</RootCategory>
+
+		<DisambiguationCategory>Doorverwijspagina</DisambiguationCategory>
+
+		<DisambiguationTemplate>dp</DisambiguationTemplate>
+		<DisambiguationTemplate>Dp</DisambiguationTemplate>
+		<DisambiguationTemplate>dpintro</DisambiguationTemplate>
+		<DisambiguationTemplate>Dpintro</DisambiguationTemplate>
+
+		<RedirectIdentifier>REDIRECT</RedirectIdentifier>
+		<RedirectIdentifier>Redirect</RedirectIdentifier>
+		<RedirectIdentifier>R</RedirectIdentifier>
+		<RedirectIdentifier>REFERRAL</RedirectIdentifier>
+		<RedirectIdentifier>DOORVERWIJZING</RedirectIdentifier>
 	</Language>
 
 </WikipediaLanguageList>

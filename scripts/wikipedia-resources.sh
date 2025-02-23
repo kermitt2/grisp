@@ -25,7 +25,7 @@ wget -c https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.bz2
 ## Download all the Wikipedia resources by language (a bit less than 50GB, in Feb. 2022 for the 9 indicated languages)
 
 ## declare an array variable
-declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa" "uk" "sv" "hi" "bn")
+declare -a languages=("en" "de" "fr" "it" "es" "ar" "zh" "ja" "ru" "pt" "fa" "uk" "sv" "hi" "bn" "nl")
 
 ## now loop through the language array to download resources
 cd $data_path

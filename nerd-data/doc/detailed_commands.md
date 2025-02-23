@@ -89,12 +89,13 @@ Just modify the language code in the url for other languages. Put all these lang
 
 ### Add new languages
 
-To add new languages requires a few changes in the configuration and the code. 
+To add new languages, GRISP requires a few changes in both the configuration and the code: 
 
 1. Update the file `languages.xml`. The file needs to have the following information:
-   - RootCategory: Open a random category (at the end of a Wikipedia page) and navigate up to the top category 
-   - DisambiguationCategory: take `Wikipedia:Content` from the english wikipedia and check the `translation` in the target language
-   - DisambiguationTemplate, RedirectIdentifier: Usually in the page `Help:Disambiguate` corresponding translation there are information about the templates. Editing a disambiguation page usually contains such information. 
+   - `RootCategory`: Open a random category (at the end of a Wikipedia page) and navigate up to the top category, alternatively take `Wikipedia:Contents` from [the english wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Contents) and check the corresponding translation page in the target language 
+   - `DisambiguationCategory`: Start from the [english disambiguation page](https://en.wikipedia.org/wiki/Wikipedia:Disambiguation), move to the translation of the target language and take the name of the page (e.g. the corresponding page for Ido, is https://io.wikipedia.org/wiki/Wikipedio:Homonimo so the disambiguation category is `Homonimo`)  
+   - `DisambiguationTemplate`: Indicate the template applied to disambiguation pages. Showing the source of a disambiguation page, e.g. [bank](https://en.wikipedia.org/w/index.php?title=Bank_(disambiguation)&action=edit), show the template on the bottom of the sources, however there might be more templates, which should be described in the page `Help:Disambiguate` corresponding translation in the target language.
+   - `RedirectIdentifier`: Identify the redirects. Usually in the [page](https://en.wikipedia.org/wiki/Help:Redirect) `Help:Redirect`'s corresponding translation in the target language provide information about the redirect identifiers. 
 
 2. The new language code needs to be added in the following files/classes:
    - `wikipedia-resources.sh`
